@@ -1,4 +1,7 @@
-module.exports = async function ({ startblock, gymtokenaddress, rewardrate}, { deployments: { deterministic }, ethers: { getNamedSigners } }) {
+module.exports = async function (
+	{ startblock, gymtokenaddress, rewardrate },
+	{ deployments: { deterministic }, ethers: { getNamedSigners } }
+) {
 	const { deployer } = await getNamedSigners();
 
 	const deterministicDeploy = await deterministic("GymVaultsBank", {
@@ -6,8 +9,7 @@ module.exports = async function ({ startblock, gymtokenaddress, rewardrate}, { d
 		contract: "GymVaultsBank",
 		args: [startblock, gymtokenaddress, rewardrate],
 		log: true,
-		deterministicDeployment: true,
+		deterministicDeployment: true
 	});
-console.log("detereterere");
 	await deterministicDeploy.deploy();
 };

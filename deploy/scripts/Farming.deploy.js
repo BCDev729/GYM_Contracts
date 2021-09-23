@@ -1,10 +1,10 @@
 const { getDeploymentArgs } = require("../../utils");
 
-module.exports = async function (hre) {
+module.exports = async function (hre, getChainId) {
 	const chainId = await getChainId();
-    console.log("🚀 ~ file: Farming.deploy.js ~ line 5 ~ chainId", chainId)
+	console.log("🚀 ~ file: Farming.deploy.js ~ line 5 ~ chainId", chainId);
 	const deploymentArgs = await getDeploymentArgs(chainId, "Farming");
-    console.log("🚀 ~ file: Farming.deploy.js ~ line 6 ~ deploymentArgs", deploymentArgs)
+	console.log("🚀 ~ file: Farming.deploy.js ~ line 6 ~ deploymentArgs", deploymentArgs);
 
 	// const options = {
 	// 	contractName: "GymFarming",
@@ -20,7 +20,7 @@ module.exports = async function (hre) {
 		bankAddress: "0x3fa427d76b0d50933eD074b99AfA997C9785Eb33",
 		rewardTokenAddress: "0x3fa427d76b0d50933eD074b99AfA997C9785Eb33",
 		rewardPerBlock: deploymentArgs.rewardPerBlock,
-		startBlock: deploymentArgs.startBlock,
+		startBlock: deploymentArgs.startBlock
 	});
 
 	// try {
