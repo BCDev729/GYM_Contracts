@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.8.0;
+pragma solidity 0.8.7;
 
 interface IPancakeFactory {
     event PairCreated(address indexed token0, address indexed token1, address pair, uint256);
