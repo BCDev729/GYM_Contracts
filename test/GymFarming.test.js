@@ -523,7 +523,6 @@ describe("GymFarming contract: ", function () {
             await expect(() =>
                 hre.run("farming:speedStake", {
                     pid: "0",
-                    tokenAmount: "0",
                     caller: "holder",
                     deadline: `${new Date().getTime() + 20}`,
                     bnbAmount: `${ethers.utils.parseEther("10")}`,
@@ -613,30 +612,41 @@ describe("GymFarming contract: ", function () {
         });
 
         it("Should claimA in pool: ", async () => {
-            let tx = await this.gymFarming
-                .connect(accounts.holder)
-                .speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-                    value: ethers.utils.parseEther("10"),
-                });
+            let tx = await hre.run("farming:speedStake", {
+                pid: "0",
+                caller: "holder",
+                deadline: `${new Date().getTime() + 20}`,
+                bnbAmount: `${ethers.utils.parseEther("10")}`,
+            });
 
             await advanceBlockTo(tx.blockNumber + 200);
             let userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
-            await this.gymFarming.connect(accounts.holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20);
+
+            await hre.run("farming:claimAndDeposit", {
+                pid: "0",
+                caller: "holder",
+                deadline: `${new Date().getTime() + 20}`,
+            });
 
             expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);
         });
 
         it("Should claimA in pool: ", async () => {
-            let tx = await this.gymFarming
-                .connect(accounts.holder)
-                .speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-                    value: ethers.utils.parseEther("10"),
-                });
+            let tx = await hre.run("farming:speedStake", {
+                pid: "0",
+                caller: "holder",
+                deadline: `${new Date().getTime() + 20}`,
+                bnbAmount: `${ethers.utils.parseEther("10")}`,
+            });
 
             await advanceBlockTo(tx.blockNumber + 200);
             let userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
-            await this.gymFarming.connect(accounts.holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20, {
-                value: ethers.utils.parseEther("1"),
+
+            await hre.run("farming:claimAndDeposit", {
+                pid: "0",
+                caller: "holder",
+                deadline: `${new Date().getTime() + 20}`,
+                bnbAmount: `${ethers.utils.parseEther("10")}`,
             });
 
             expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);

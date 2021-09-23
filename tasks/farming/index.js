@@ -20,3 +20,12 @@ task("farming:autoDeposit", "Call autoDeposit function from farming contract", r
 	.addParam("deadline", "deadline", "0")
 	.addParam("caller", "Signer who will call function", "caller")
 	.addParam("bnbAmount", "Amount of bnb for speedStake", "0");
+
+task("farming:claimAndDeposit", "Call claimAndDeposit function from farming contract", require("./claimAndDeposit"))
+	.addParam("pid", "Pool id")
+	.addParam("amountAMin", "amountAMin", "0")
+	.addParam("amountBMin", "amountBMin", "0")
+	.addParam("minAmountOutA", "minAmountOutA", "0")
+	.addParam("deadline", "deadline", "0")
+	.addParam("caller", "Signer who will call function", "caller")
+	.addParam("bnbAmount", "Amount of bnb for speedStake", "0");

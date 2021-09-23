@@ -15,5 +15,9 @@ module.exports = async function (
 
 	const farming = await getContract("GymFarming", signers[caller]);
 
-	await farming.speedStake(pid, tokenAmount, amountAMin, amountBMin, minAmountOutA, deadline, { value: bnbAmount });
+	const tx = await farming.speedStake(pid, tokenAmount, amountAMin, amountBMin, minAmountOutA, deadline, {
+		value: bnbAmount,
+	});
+
+	return tx;
 };

@@ -1,5 +1,5 @@
 module.exports = async function (
-	{ pid, amount, amountTokenMin, amountBNBMin, minAmountOutA, recipient, deadline, caller, bnbAmount },
+	{ pid, amountAMin, amountBMin, minAmountOutA, deadline, caller, bnbAmount },
 	{
 		ethers: {
 			getNamedSigners,
@@ -15,18 +15,9 @@ module.exports = async function (
 
 	const farming = await getContract("GymFarming", signers[caller]);
 
-	const tx = await farming.autoDeposit(
-		pid,
-		amount,
-		amountTokenMin,
-		amountBNBMin,
-		minAmountOutA,
-		signers[recipient].address,
-		deadline,
-		{
-			value: bnbAmount,
-		}
-	);
+	const tx = await farming.claimAndDeposit(pid, amountAMin, amountBMin, minAmountOutA, deadline, {
+		value: bnbAmount,
+	});
 
 	return tx;
 };
