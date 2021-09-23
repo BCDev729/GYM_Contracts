@@ -39,7 +39,47 @@ const eoaAccountsPublicKeys = getEOAAccountsPublicKeys();
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-    solidity: "0.8.7",
+    solidity: {
+        compilers: [
+            {
+                version: "0.8.3",
+                settings: {
+                    optimizer: {
+                        enabled: false,
+                        runs: 200,
+                    },
+                },
+            },
+            {
+                version: "0.8.0",
+                settings: {
+                    optimizer: {
+                        enabled: false,
+                        runs: 200,
+                    },
+                },
+            },
+            {
+                version: "0.6.12",
+                settings: {
+                    optimizer: {
+                        enabled: false,
+                        runs: 200,
+                    },
+                },
+            },
+            {
+                version: "0.4.18",
+                settings: {
+                    optimizer: {
+                        enabled: false,
+                        runs: 200,
+                    },
+                },
+            },
+        ],
+    },
+
     namedAccounts: {
         deployer: getNamedAccountsConfig(0, eoaAccountsPublicKeys[0]),
         owner: getNamedAccountsConfig(1, eoaAccountsPublicKeys[1]),
