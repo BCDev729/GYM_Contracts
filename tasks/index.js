@@ -1,5 +1,6 @@
 require("./utils");
 require("./deploy");
+require("./farming");
 
 const { VARIABLES } = require("../utils");
 
