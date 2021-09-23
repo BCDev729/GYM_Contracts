@@ -1,25 +1,18 @@
 const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function (hre) {
-	const chainId = await hre.ethers.getChainId();
+	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
-	const { deployer } = await hre.ethers.getNamedAccounts();
+	const { deployer } = await getNamedAccounts();
 
 	const options = {
 		contractName: "GymToken",
 		args: [deploymentArgs.holder],
 	};
 
-	const deterministic = await hre.deployments.deterministic("GymToken", {
-		from: deployer,
-		contract: "GymToken",
-		args: [deploymentArgs.holder],
-		log: true,
-		skipIfAlreadyDeployed: false,
-		deterministicDeployment: true,
-	});
-
-	await deterministic.deploy();
+	await hre.run("deploy:gymToken", {
+		holder: deploymentArgs.holder
+	})
 
 	try {
 		await hre.run("verify:verify", {
@@ -29,16 +22,5 @@ module.exports = async function (hre) {
 	} catch (e) {
 		console.log(e.toString());
 	}
-
-	// await contractDeploy(hre, options, async contract => {
-	//   try {
-	//     await hre.run("verify:verify", {
-	//       address: contract.address,
-	//       constructorArguments: options.args
-	//     });
-	//   } catch (e) {
-	//     console.log(e.toString())
-	//   }
-	// })
 };
 module.exports.tags = ["GymToken"];
