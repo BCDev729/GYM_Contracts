@@ -524,7 +524,6 @@ describe("GymFarming contract: ", function () {
                 hre.run("farming:speedStake", {
                     pid: "0",
                     caller: "holder",
-                    deadline: `${new Date().getTime() + 20}`,
                     bnbAmount: `${ethers.utils.parseEther("10")}`,
                 })
             ).to.changeTokenBalances(this.gym, [accounts.holder], [0]);
@@ -539,7 +538,6 @@ describe("GymFarming contract: ", function () {
                     pid: "0",
                     tokenAmount: `${ethers.utils.parseEther("10")}`,
                     caller: "holder",
-                    deadline: `${new Date().getTime() + 20}`,
                     bnbAmount: `${ethers.utils.parseEther("10")}`,
                 })
             ).to.changeTokenBalances(
@@ -558,7 +556,6 @@ describe("GymFarming contract: ", function () {
                     pid: "0",
                     tokenAmount: `${ethers.utils.parseEther("10")}`,
                     caller: "holder",
-                    deadline: `${new Date().getTime() + 20}`,
                 })
             ).to.changeTokenBalances(
                 this.gym,
@@ -615,7 +612,6 @@ describe("GymFarming contract: ", function () {
             let tx = await hre.run("farming:speedStake", {
                 pid: "0",
                 caller: "holder",
-                deadline: `${new Date().getTime() + 20}`,
                 bnbAmount: `${ethers.utils.parseEther("10")}`,
             });
 
@@ -625,7 +621,6 @@ describe("GymFarming contract: ", function () {
             await hre.run("farming:claimAndDeposit", {
                 pid: "0",
                 caller: "holder",
-                deadline: `${new Date().getTime() + 20}`,
             });
 
             expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);
@@ -635,7 +630,6 @@ describe("GymFarming contract: ", function () {
             let tx = await hre.run("farming:speedStake", {
                 pid: "0",
                 caller: "holder",
-                deadline: `${new Date().getTime() + 20}`,
                 bnbAmount: `${ethers.utils.parseEther("10")}`,
             });
 
@@ -645,7 +639,6 @@ describe("GymFarming contract: ", function () {
             await hre.run("farming:claimAndDeposit", {
                 pid: "0",
                 caller: "holder",
-                deadline: `${new Date().getTime() + 20}`,
                 bnbAmount: `${ethers.utils.parseEther("10")}`,
             });
 

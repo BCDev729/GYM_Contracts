@@ -9,7 +9,7 @@ module.exports = async function (
 	}
 ) {
 	if (deadline === "0") {
-		deadline = (await getBlockNumber()) + 10000000;
+		deadline = new Date().getTime() + 20;
 	}
 	const signers = await getNamedSigners();
 
