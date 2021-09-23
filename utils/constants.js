@@ -285,7 +285,7 @@ async function getDeploymentArgs(chainId, contractName) {
                 gymTokenAddress: gymTokenAddress,
                 rewardRate: ethers.utils.parseEther("25.72864"),
             },
-            Farming: {
+            GymFarming: {
                 bank: gymVaultsBankAddress,
                 rewardToken: gymTokenAddress,
                 rewardPerBlock: ethers.utils.parseEther("25.72864"),
@@ -340,7 +340,7 @@ async function getDeploymentArgs(chainId, contractName) {
                 gymTokenAddress: gymTokenAddress,
                 rewardRate: ethers.utils.parseEther("25.72864"),
             },
-            Farming: {
+            GymFarming: {
                 bank: gymVaultsBankAddress,
                 rewardToken: gymTokenAddress,
                 rewardPerBlock: ethers.utils.parseEther("25.72864"),

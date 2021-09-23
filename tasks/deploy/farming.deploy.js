@@ -2,7 +2,7 @@ module.exports = async function ({ bankAddress, rewardTokenAddress, rewardPerBlo
 	const { deployer } = await getNamedSigners();
 
 	const deterministicDeploy = await deterministic("GymFarming", {
-		from: deployer,
+		from: deployer.address,
 		contract: "GymFarming",
 		args: [bankAddress, rewardTokenAddress, rewardPerBlock, startBlock],
 		log: true,
