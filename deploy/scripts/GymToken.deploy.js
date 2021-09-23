@@ -2,7 +2,7 @@ const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function (hre) {
 	let deterministicDeploy;
-	const chainId = await hre.ethers.getChainId();
+	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
 
 	const options = {

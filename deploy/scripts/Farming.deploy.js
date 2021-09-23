@@ -1,38 +1,36 @@
 const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function (hre) {
-	const chainId = await hre.ethers.getChainId();
+	const chainId = await getChainId();
+    console.log("🚀 ~ file: Farming.deploy.js ~ line 5 ~ chainId", chainId)
 	const deploymentArgs = await getDeploymentArgs(chainId, "Farming");
-	const { deployer } = await hre.ethers.getNamedAccounts();
+    console.log("🚀 ~ file: Farming.deploy.js ~ line 6 ~ deploymentArgs", deploymentArgs)
 
-	const options = {
-		contractName: "GymFarming",
-		args: [
-			deploymentArgs.bank,
-			deploymentArgs.rewardToken,
-			deploymentArgs.rewardPerBlock,
-			deploymentArgs.startBlock,
-		],
-	};
+	// const options = {
+	// 	contractName: "GymFarming",
+	// 	args: [
+	// 		deploymentArgs.bank,
+	// 		deploymentArgs.rewardToken,
+	// 		deploymentArgs.rewardPerBlock,
+	// 		deploymentArgs.startBlock,
+	// 	],
+	// };
 
-	const deterministic = await hre.deployments.deterministic("GymFarming", {
-		from: deployer,
-		contract: "GymFarming",
-		args: [...options.args],
-		log: true,
-		deterministicDeployment: true,
+	await hre.run("deploy:farming", {
+		bankAddress: "0x3fa427d76b0d50933eD074b99AfA997C9785Eb33",
+		rewardTokenAddress: "0x3fa427d76b0d50933eD074b99AfA997C9785Eb33",
+		rewardPerBlock: deploymentArgs.rewardPerBlock,
+		startBlock: deploymentArgs.startBlock,
 	});
 
-	await deterministic.deploy();
-
-	try {
-		await hre.run("verify:verify", {
-			address: deterministic.address,
-			constructorArguments: options.args,
-		});
-	} catch (e) {
-		console.log(e.toString());
-	}
+	// try {
+	// 	await hre.run("verify:verify", {
+	// 		address: deterministicDeploy.address,
+	// 		constructorArguments: options.args,
+	// 	});
+	// } catch (e) {
+	// 	console.log(e.toString());
+	// }
 
 	// await contractDeploy(hre, options, async contract => {
 	//   try {
@@ -47,4 +45,4 @@ module.exports = async function (hre) {
 };
 
 module.exports.tags = ["Farming"];
-module.exports.dependencies = ["GymVaultsBank"];
+// module.exports.dependencies = ["GymVaultsBank"];
