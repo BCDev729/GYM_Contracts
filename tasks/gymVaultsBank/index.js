@@ -62,3 +62,11 @@ task(
 )
 	.addParam("pid", "pool id")
 	.addParam("user", "user address");
+
+task(
+	"gymVaultsBank:stakedWantTokens",
+	"Call stakedWantTokens function from GymVaultsBank contract",
+	require("./stakedWantTokens")
+)
+	.addParam("pid", "pool id")
+	.addParam("user", "user address");

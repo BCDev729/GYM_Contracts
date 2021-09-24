@@ -385,9 +385,12 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
-			expect(await this.gymVaultsBank.stakedWantTokens(1, accounts.vzgo.address)).to.equal(
-				(variables.TEST_AMOUNT * variables.gymVaultsBank[1]) / 100
-			);
+			expect(
+				await run("gymVaultsBank:stakedWantTokens", {
+					pid: "1",
+					user: accounts.vzgo.address
+				})
+			).to.equal((variables.TEST_AMOUNT * variables.gymVaultsBank[1]) / 100);
 			expect(
 				BigNumber.from(
 					await run("gymVaultsBank:pendingReward", {
