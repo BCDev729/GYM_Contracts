@@ -279,7 +279,11 @@ describe("GymVaultsBank contract: ", function () {
 			const poolAllocPoint = (await this.gymVaultsBank.poolInfo(poolLength.sub(1))).allocPoint;
 			const newAllocPoint = BigNumber.from(30);
 
-			await this.gymVaultsBank.connect(accounts.deployer).set(poolLength.sub(1), newAllocPoint);
+			await run("gymVaultsBank:set", {
+				pid: `${poolLength.sub(1)}`,
+				allocPoint: `${newAllocPoint}`,
+				caller: "deployer"
+			});
 			expect(await this.gymVaultsBank.totalAllocPoint()).to.equal(
 				totalAllocPoint.sub(poolAllocPoint).add(newAllocPoint)
 			);
@@ -292,7 +296,12 @@ describe("GymVaultsBank contract: ", function () {
 				.connect(accounts.deployer)
 				.add(this.wantToken2.address, allocPoint, false, this.strategy1.address);
 
-			await this.gymVaultsBank.connect(accounts.deployer).resetStrategy(1, this.strategy2.address);
+			// await this.gymVaultsBank.connect(accounts.deployer).resetStrategy(1, this.strategy2.address);
+			await run("gymVaultsBank:resetStrategy", {
+				pid: "1",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			expect((await this.gymVaultsBank.poolInfo(1)).strategy).to.equal(this.strategy2.address);
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
@@ -310,7 +319,11 @@ describe("GymVaultsBank contract: ", function () {
 				caller: "grno"
 			});
 			await expect(
-				this.gymVaultsBank.connect(accounts.deployer).resetStrategy(1, this.strategy3.address)
+				run("gymVaultsBank:resetStrategy", {
+					pid: "1",
+					strategy: this.strategy3.address,
+					caller: "deployer"
+				})
 			).to.be.revertedWith("GymVaultsBank: Strategy not empty");
 		});
 	});
@@ -945,7 +958,11 @@ describe("GymVaultsBank contract: ", function () {
 			const oldStrategyWantLocked = await this.strategy2.wantLockedTotal();
 			const oldStrategySharesTotal = await this.strategy2.sharesTotal();
 
-			await this.gymVaultsBank.connect(accounts.deployer).migrateStrategy(1, this.strategy3.address);
+			await run("gymVaultsBank:migrateStrategy", {
+				pid: "1",
+				newStrategy: this.strategy3.address,
+				caller: "deployer"
+			});
 
 			expect(await this.strategy3.wantLockedTotal()).to.equal(oldStrategyWantLocked);
 			expect(await this.strategy3.sharesTotal()).to.equal(oldStrategySharesTotal);
@@ -977,7 +994,11 @@ describe("GymVaultsBank contract: ", function () {
 				caller: "grno"
 			});
 			await expect(
-				this.gymVaultsBank.connect(accounts.deployer).migrateStrategy(1, this.strategy3.address)
+				run("gymVaultsBank:migrateStrategy", {
+					pid: "1",
+					newStrategy: this.strategy3.address,
+					caller: "deployer"
+				})
 			).to.be.revertedWith("GymVaultsBank: New strategy not empty");
 		});
 	});

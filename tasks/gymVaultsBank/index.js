@@ -25,3 +25,26 @@ task("gymVaultsBank:withdraw", "Call withdraw function from GymVaultsBank contra
 	.addParam("pid", "Pool id")
 	.addParam("wantAmt", "Amount of want token for withdraw")
 	.addParam("caller", "signer that call the function");
+
+task("gymVaultsBank:set", "Call set function from GymVaultsBank contract", require("./set"))
+	.addParam("pid", "Pool id")
+	.addParam("allocPoint", "Pool allocation point")
+	.addParam("caller", "signer that call the function");
+
+task(
+	"gymVaultsBank:resetStrategy",
+	"Call resetStrategy function from GymVaultsBank contract",
+	require("./resetStrategy")
+)
+	.addParam("pid", "Pool id")
+	.addParam("strategy", "Strategy contract address")
+	.addParam("caller", "signer that call the function");
+
+task(
+	"gymVaultsBank:migrateStrategy",
+	"Call migrateStrategy function from GymVaultsBank contract",
+	require("./migrateStrategy")
+)
+	.addParam("pid", "Pool id")
+	.addParam("newStrategy", "Strategy contract address")
+	.addParam("caller", "signer that call the function");
