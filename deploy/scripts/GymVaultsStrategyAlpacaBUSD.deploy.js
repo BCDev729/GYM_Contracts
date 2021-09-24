@@ -1,9 +1,9 @@
 const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function (hre) {
-	const chainId = await hre.ethers.getChainId();
+	let deterministicDeploy;
+	const chainId = await hre.getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsStrategyAlpacaBUSD");
-	const { deployer } = await hre.ethers.getNamedAccounts();
 
 	const options = {
 		contractName: "GymVaultsStrategyAlpacaBUSD",
@@ -15,40 +15,30 @@ module.exports = async function (hre) {
 			deploymentArgs.pid,
 			deploymentArgs.want,
 			deploymentArgs.earn,
-			deploymentArgs.router,
+			deploymentArgs.router
 		],
-		owner: deploymentArgs.bank,
+		owner: deploymentArgs.bank
 	};
 
-	const deterministic = await hre.deployments.deterministic("GymVaultsStrategyAlpacaBUSD", {
-		from: deployer,
-		contract: "GymVaultsStrategyAlpaca",
-		args: options.args,
-		log: true,
-		deterministicDeployment: true,
+	await hre.run("deploy:gymVaultsStrategy", {
+		contractName: "GymVaultsStrategyAlpacaBUSD",
+		bank: deploymentArgs.bank,
+		isAutoComp: deploymentArgs.isAutoComp.toString(),
+		vault: deploymentArgs.vault,
+		fairLaunch: deploymentArgs.fairLaunch,
+		pid: deploymentArgs.pid.toString(),
+		want: deploymentArgs.want,
+		earn: deploymentArgs.earn,
+		router: deploymentArgs.router
 	});
-
-	await deterministic.deploy();
-
 	try {
 		await hre.run("verify:verify", {
-			address: deterministic.address,
-			constructorArguments: options.args,
+			address: deterministicDeploy.address,
+			constructorArguments: options.args
 		});
 	} catch (e) {
 		console.log(e.toString());
 	}
-
-	// await contractDeploy(hre, options, async contract => {
-	//     try {
-	//         await hre.run("verify:verify", {
-	//             address: contract.address,
-	//             constructorArguments: options.args
-	//         });
-	//     } catch (e) {
-	//         console.log(e.toString())
-	//     }
-	// })
 };
 module.exports.tags = ["GymVaultsStrategyAlpacaBUSD"];
 module.exports.dependencies = ["GymVaultsBank"];

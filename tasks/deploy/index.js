@@ -20,3 +20,16 @@ task("deploy:gymVaultsBank", "Deploy GymVaultsBank contract", require("./gymVaul
 	.addParam("startblock", "startBlock")
 	.addParam("gymtokenaddress", "GymTokenAddress address")
 	.addParam("rewardrate", "rewardRate");
+
+task("deploy:gymMLM", "Deploy GymMLM contract", require("./gymMLM.deploy"));
+
+task("deploy:gymVaultsStrategy", "Deploy GymVaultsStrategy contract", require("./gymVaultsStrategy.deploy"))
+	.addParam("contractName", "contractName")
+	.addParam("bank", "GymVaultsBank address")
+	.addParam("isAutoComp", "Boolean")
+	.addParam("vault", "vault address")
+	.addParam("fairLaunch", "fairLaunch address")
+	.addParam("pid", "pool id on fairlunch")
+	.addParam("want", "want token address")
+	.addParam("earn", "earn token address")
+	.addParam("router", "router address");
