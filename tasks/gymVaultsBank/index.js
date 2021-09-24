@@ -21,11 +21,7 @@ task(
 	.addParam("deadline", "deadline", "0")
 	.addParam("caller", "signer that call the function");
 
-task(
-	"gymVaultsBank:withdraw",
-	"Call withdraw function from GymVaultsBank contract",
-	require("./withdraw")
-)
+task("gymVaultsBank:withdraw", "Call withdraw function from GymVaultsBank contract", require("./withdraw"))
 	.addParam("pid", "Pool id")
 	.addParam("wantAmt", "Amount of want token for withdraw")
 	.addParam("caller", "signer that call the function");

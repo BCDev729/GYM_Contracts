@@ -1,12 +1,6 @@
 module.exports = async function (
 	{ pid, wantAmt, referrerId, minBurnAmt, deadline, caller, bnbAmount },
-	{
-		ethers: {
-			getNamedSigners,
-			getContract,
-			provider: { getBlockNumber }
-		}
-	}
+	{ ethers: { getNamedSigners, getContract } }
 ) {
 	if (deadline === "0") {
 		deadline = new Date().getTime() + 20;
