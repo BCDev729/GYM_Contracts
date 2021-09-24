@@ -54,3 +54,11 @@ task(
 	"Call updateRewardPerBlock function from GymVaultsBank contract",
 	require("./updateRewardPerBlock")
 ).addParam("caller", "signer that call the function");
+
+task(
+	"gymVaultsBank:pendingReward",
+	"Call pendingReward function from GymVaultsBank contract",
+	require("./pendingReward")
+)
+	.addParam("pid", "pool id")
+	.addParam("user", "user address");

@@ -361,16 +361,16 @@ describe("GymVaultsBank contract: ", function () {
 		});
 		const allocPoint = 30;
 		it("Should add deposit from vzgo, return correct stakedWantTokens count:", async function () {
-			await advanceBlockTo((await ethers.provider.getBlockNumber()) + this.deploymentArgs.startBlock);
+			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
 			await this.gymVaultsBank
 				.connect(accounts.deployer)
 				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
-			poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
+			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
-			tx = await hre.run("gymVaultsBank:deposit", {
+			await run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
 				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
@@ -383,36 +383,41 @@ describe("GymVaultsBank contract: ", function () {
 			// const depositTime = (await ethers.provider.getBlock(tx.blockNumber)).timestamp;
 			// expect((await this.gymVaultsBank.userInfo(1, accounts.vzgo.address)).shares).to.equal(variables.TEST_AMOUNT * variables.gymVaultsBank[1] / 100)
 
-			await advanceBlockTo((await ethers.provider.getBlockNumber()) + variables.TEST_BLOCK_COUNT);
+			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
 			expect(await this.gymVaultsBank.stakedWantTokens(1, accounts.vzgo.address)).to.equal(
 				(variables.TEST_AMOUNT * variables.gymVaultsBank[1]) / 100
 			);
 			expect(
-				ethers.BigNumber.from(await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address)).add(1)
+				BigNumber.from(
+					await run("gymVaultsBank:pendingReward", {
+						pid: "1",
+						user: accounts.vzgo.address
+					})
+				).add(1)
 			).to.equal(this.rewardPerBlock.mul(variables.TEST_BLOCK_COUNT).mul(poolAllocPoint1).div(totalAllocPoint));
 		});
 
 		it("Should calculate rewards for 2 users in 1 pool:", async function () {
-			await advanceBlockTo((await ethers.provider.getBlockNumber()) + this.deploymentArgs.startBlock);
+			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
 			await this.gymVaultsBank
 				.connect(accounts.deployer)
 				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
-			poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
+			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 			await this.wantToken2.connect(accounts.grno).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 
-			await hre.run("gymVaultsBank:deposit", {
+			await run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
 				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
 				caller: "vzgo"
 			});
 
-			await hre.run("gymVaultsBank:deposit", {
+			await run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
 				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
@@ -426,10 +431,15 @@ describe("GymVaultsBank contract: ", function () {
 				this.grnoWant2Balance - variables.TEST_AMOUNT
 			);
 
-			await advanceBlockTo((await ethers.provider.getBlockNumber()) + variables.TEST_BLOCK_COUNT);
+			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
 			expect(
-				ethers.BigNumber.from(await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address)).add(1)
+				BigNumber.from(
+					await run("gymVaultsBank:pendingReward", {
+						pid: "1",
+						user: accounts.vzgo.address
+					})
+				).add(1)
 			).to.equal(
 				this.rewardPerBlock
 					.mul(variables.TEST_BLOCK_COUNT)
@@ -439,17 +449,22 @@ describe("GymVaultsBank contract: ", function () {
 					.mul(poolAllocPoint1)
 					.div(totalAllocPoint)
 			);
-			expect(await this.gymVaultsBank.pendingReward(1, accounts.grno.address)).to.equal(
+			expect(
+				await run("gymVaultsBank:pendingReward", {
+					pid: "1",
+					user: accounts.grno.address
+				})
+			).to.equal(
 				this.rewardPerBlock.div(2).mul(variables.TEST_BLOCK_COUNT).mul(poolAllocPoint1).div(totalAllocPoint)
 			);
 		});
 
 		it("Should calculate rewards for 2 users in 2 different pools:", async function () {
-			await advanceBlockTo((await ethers.provider.getBlockNumber()) + this.deploymentArgs.startBlock);
+			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
 			await this.gymVaultsBank
 				.connect(accounts.deployer)
 				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
-			poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
+			// const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
 			await this.gymVaultsBank
 				.connect(accounts.deployer)
@@ -461,13 +476,13 @@ describe("GymVaultsBank contract: ", function () {
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 			await this.wantToken1.connect(accounts.grno).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 
-			const vzgoDeposit = await hre.run("gymVaultsBank:deposit", {
+			await run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
 				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
 				caller: "vzgo"
 			});
-			await hre.run("gymVaultsBank:deposit", {
+			await run("gymVaultsBank:deposit", {
 				pid: "2",
 				wantAmt: variables.TEST_AMOUNT.toString(),
 				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
@@ -481,13 +496,18 @@ describe("GymVaultsBank contract: ", function () {
 				this.grnoWant1Balance - variables.TEST_AMOUNT
 			);
 
-			await advanceBlockTo((await ethers.provider.getBlockNumber()) + variables.TEST_BLOCK_COUNT);
-			const currentBlock = await ethers.provider.getBlockNumber();
+			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
+			// const currentBlock = await getBlockNumber();
 			// expect(await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address))
 			//     .to.equal((ethers.BigNumber.from(currentBlock).sub(vzgoDeposit.blockNumber)).mul(this.rewardPerBlock).mul(poolAllocPoint1).div(totalAllocPoint))
-			expect((await this.gymVaultsBank.pendingReward(2, accounts.grno.address)).add(1)).to.equal(
-				this.rewardPerBlock.mul(variables.TEST_BLOCK_COUNT).mul(poolAllocPoint2).div(totalAllocPoint)
-			);
+			expect(
+				(
+					await run("gymVaultsBank:pendingReward", {
+						pid: "2",
+						user: accounts.grno.address
+					})
+				).add(1)
+			).to.equal(this.rewardPerBlock.mul(variables.TEST_BLOCK_COUNT).mul(poolAllocPoint2).div(totalAllocPoint));
 		});
 	});
 
@@ -608,7 +628,10 @@ describe("GymVaultsBank contract: ", function () {
 			});
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
-			const pending = await this.gymVaultsBank.connect(accounts.vzgo).pendingReward(1, accounts.vzgo.address);
+			const pending = await run("gymVaultsBank:pendingReward", {
+				pid: "1",
+				user: accounts.vzgo.address
+			});
 
 			await this.gymVaultsBank.connect(accounts.vzgo).claim(1);
 
@@ -644,8 +667,14 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
-			const pending0 = await this.gymVaultsBank.connect(accounts.vzgo).pendingReward(0, accounts.vzgo.address);
-			const pending1 = await this.gymVaultsBank.connect(accounts.vzgo).pendingReward(1, accounts.vzgo.address);
+			const pending0 = await run("gymVaultsBank:pendingReward", {
+				pid: "0",
+				user: accounts.vzgo.address
+			});
+			const pending1 = await run("gymVaultsBank:pendingReward", {
+				pid: "1",
+				user: accounts.vzgo.address
+			});
 
 			await this.gymVaultsBank.connect(accounts.vzgo).claimAll();
 
@@ -697,7 +726,10 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
-			const pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address);
+			const pendingReward = await run("gymVaultsBank:pendingReward", {
+				pid: "1",
+				user: accounts.vzgo.address
+			});
 
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
@@ -736,7 +768,10 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
-			const pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address);
+			const pendingReward = await run("gymVaultsBank:pendingReward", {
+				pid: "1",
+				user: accounts.vzgo.address
+			});
 
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
@@ -790,7 +825,10 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
-			let pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address);
+			let pendingReward = await run("gymVaultsBank:pendingReward", {
+				pid: "1",
+				user: accounts.vzgo.address
+			});
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
 				wantAmt: `${variables.TEST_AMOUNT}`,
@@ -810,7 +848,10 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
-			pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.grno.address);
+			pendingReward = await run("gymVaultsBank:pendingReward", {
+				pid: "1",
+				user: accounts.grno.address
+			});
 
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
@@ -898,7 +939,10 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
-			const pendingReward = await this.gymVaultsBank.pendingReward(0, accounts.vzgo.address);
+			const pendingReward = await run("gymVaultsBank:pendingReward", {
+				pid: "0",
+				user: accounts.vzgo.address
+			});
 
 			const withdrawTx = await run("gymVaultsBank:withdraw", {
 				pid: "0",
