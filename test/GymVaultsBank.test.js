@@ -535,7 +535,11 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			await advanceBlockTo((await ethers.provider.getBlockNumber()) + 150);
-			await this.gymVaultsBank.connect(accounts.vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
+			// await this.gymVaultsBank.connect(accounts.vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
+			await hre.run("gymVaultsBank:claimAndDeposit", {
+				pid: "1",
+				caller: "vzgo"
+			});
 			expect((await this.farming.userInfo(0, accounts.vzgo.address)).amount).to.equal(
 				variables.ROUTER_MOCK_RETURN_AMOUNT
 			);
@@ -655,7 +659,7 @@ describe("GymVaultsBank contract: ", function () {
 			totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
-            
+
 			await hre.run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
@@ -669,7 +673,11 @@ describe("GymVaultsBank contract: ", function () {
 
 			const pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address);
 
-			await this.gymVaultsBank.connect(accounts.vzgo).withdraw(1, vzgoShares);
+			await hre.run("gymVaultsBank:withdraw", {
+				pid: "1",
+				wantAmt: `${vzgoShares}`,
+				caller: "vzgo"
+			});
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
 					this.vzgoWant2Balance -
@@ -704,7 +712,11 @@ describe("GymVaultsBank contract: ", function () {
 
 			const pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address);
 
-			await this.gymVaultsBank.connect(accounts.vzgo).withdraw(1, vzgoShares - 20);
+			await hre.run("gymVaultsBank:withdraw", {
+				pid: "1",
+				wantAmt: `${vzgoShares - 20}`,
+				caller: "vzgo"
+			});
 
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
@@ -753,7 +765,11 @@ describe("GymVaultsBank contract: ", function () {
 			await advanceBlockTo((await ethers.provider.getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
 			let pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.vzgo.address);
-			await this.gymVaultsBank.connect(accounts.vzgo).withdraw(1, variables.TEST_AMOUNT);
+			await hre.run("gymVaultsBank:withdraw", {
+				pid: "1",
+				wantAmt: `${variables.TEST_AMOUNT}`,
+				caller: "vzgo"
+			});
 
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
@@ -772,7 +788,11 @@ describe("GymVaultsBank contract: ", function () {
 
 			pendingReward = await this.gymVaultsBank.pendingReward(1, accounts.grno.address);
 
-			await this.gymVaultsBank.connect(accounts.grno).withdraw(1, variables.TEST_AMOUNT);
+			await hre.run("gymVaultsBank:withdraw", {
+				pid: "1",
+				wantAmt: `${variables.TEST_AMOUNT}`,
+				caller: "grno"
+			});
 
 			expect((await this.wantToken2.balanceOf(accounts.grno.address)).sub(1)).to.equal(
 				Math.floor(
@@ -809,7 +829,11 @@ describe("GymVaultsBank contract: ", function () {
 				(await ethers.provider.getBlockNumber()) + variables.TEST_BLOCK_COUNT_FOR_SAFETRANSFER
 			);
 
-			await this.gymVaultsBank.connect(accounts.vzgo).withdraw(1, variables.TEST_AMOUNT);
+			await hre.run("gymVaultsBank:withdraw", {
+				pid: "1",
+				wantAmt: `${variables.TEST_AMOUNT}`,
+				caller: "vzgo"
+			});
 
 			expect(await this.wantToken2.balanceOf(accounts.vzgo.address)).to.equal(
 				this.vzgoWant2Balance
@@ -855,9 +879,12 @@ describe("GymVaultsBank contract: ", function () {
 
 			const pendingReward = await this.gymVaultsBank.pendingReward(0, accounts.vzgo.address);
 
-			const withdrawTx = await this.gymVaultsBank
-				.connect(accounts.vzgo)
-				.withdraw(0, ethers.utils.parseEther(variables.TEST_AMOUNT.toString()));
+			const withdrawTx = 
+			await hre.run("gymVaultsBank:withdraw", {
+				pid: "0",
+				wantAmt: `${ethers.utils.parseEther(variables.TEST_AMOUNT.toString())}`,
+				caller: "vzgo"
+			});
 
 			const fee =
 				(await depositTx.wait()).gasUsed * depositTx.gasPrice +
@@ -903,14 +930,14 @@ describe("GymVaultsBank contract: ", function () {
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 			await this.wantToken2.connect(accounts.grno).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
-			
+
 			await hre.run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
 				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
 				caller: "vzgo"
 			});
-			
+
 			await hre.run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),
@@ -939,7 +966,7 @@ describe("GymVaultsBank contract: ", function () {
 				.add(this.wantToken2.address, 40, false, this.strategy3.address);
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 			await this.wantToken2.connect(accounts.grno).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
-		
+
 			await hre.run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: variables.TEST_AMOUNT.toString(),

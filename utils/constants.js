@@ -68,7 +68,7 @@ const VARIABLES = {
 
 			"0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", // BUSD
 			"0x53dbb71303ad0F9AFa184B8f7147F9f12Bb5Dc01", // Alpaca Vault Config address
-			"0xAd3E631c01798f9aAE4692dabF791a62c226C5D4", // RelationShip
+			"0x68B1D87F95878fE05B998F19b66F4baba5De1aed", // RelationShip
 			"0x0Ac85d55ebFc7f7b0cF4c13bb3BD6Eaf3909d62d", // buyBack
 			"0x2B1C93fFfF55E2620D6fb5DaD7D69A6a468C9731" // LiquidityProvider
 		],
