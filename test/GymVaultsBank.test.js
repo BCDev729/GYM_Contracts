@@ -193,7 +193,9 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 20);
 
-			await this.gymVaultsBank.connect(accounts.deployer).updateRewardPerBlock();
+			await run("gymVaultsBank:updateRewardPerBlock", {
+				caller: "deployer"
+			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
 				Math.floor((rewardPerBlock * variables.gymVaultsBank[7]) / 1e12)
@@ -201,7 +203,9 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 41);
 
-			await this.gymVaultsBank.connect(accounts.deployer).updateRewardPerBlock();
+			await run("gymVaultsBank:updateRewardPerBlock", {
+				caller: "deployer"
+			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
 				Math.floor((rewardPerBlock * variables.gymVaultsBank[7] ** 2) / 1e12 ** 2)
@@ -209,7 +213,9 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 62);
 
-			await this.gymVaultsBank.connect(accounts.deployer).updateRewardPerBlock();
+			await run("gymVaultsBank:updateRewardPerBlock", {
+				caller: "deployer"
+			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
 				Math.floor((rewardPerBlock * variables.gymVaultsBank[7] ** 3) / 1e12 ** 3)
@@ -217,7 +223,9 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 90);
 
-			await this.gymVaultsBank.connect(accounts.deployer).updateRewardPerBlock();
+			await run("gymVaultsBank:updateRewardPerBlock", {
+				caller: "deployer"
+			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
 				Math.floor((rewardPerBlock * variables.gymVaultsBank[7] ** 3) / 1e12 ** 3)
@@ -225,9 +233,11 @@ describe("GymVaultsBank contract: ", function () {
 		});
 
 		it("Should revert with message: Ownable: caller is not the owner", async function () {
-			await expect(this.gymVaultsBank.connect(accounts.caller).updateRewardPerBlock()).to.be.revertedWith(
-				"Ownable: caller is not the owner"
-			);
+			await expect(
+				run("gymVaultsBank:updateRewardPerBlock", {
+					caller: "caller"
+				})
+			).to.be.revertedWith("Ownable: caller is not the owner");
 		});
 	});
 

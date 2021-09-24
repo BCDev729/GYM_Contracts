@@ -48,3 +48,9 @@ task(
 	.addParam("pid", "Pool id")
 	.addParam("newStrategy", "Strategy contract address")
 	.addParam("caller", "signer that call the function");
+
+task(
+	"gymVaultsBank:updateRewardPerBlock",
+	"Call updateRewardPerBlock function from GymVaultsBank contract",
+	require("./updateRewardPerBlock")
+).addParam("caller", "signer that call the function");
