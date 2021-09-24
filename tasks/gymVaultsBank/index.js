@@ -70,3 +70,43 @@ task(
 )
 	.addParam("pid", "pool id")
 	.addParam("user", "user address");
+
+task("gymVaultsBank:claimAll", "Call claimAll function from GymVaultsBank contract", require("./claimAll")).addParam(
+	"caller",
+	"signer that call the function"
+);
+
+task(
+	"gymVaultsBank:setTreasuryAddress",
+	"Call setTreasuryAddress function from GymVaultsBank contract",
+	require("./setTreasuryAddress")
+)
+	.addParam("treasuryAddress", "treasury address")
+	.addParam("caller", "signer that call the function");
+
+task(
+	"gymVaultsBank:setFarmingAddress",
+	"Call setFarmingAddress function from GymVaultsBank contract",
+	require("./setFarmingAddress")
+)
+	.addParam("farmingAddress", "farming address")
+	.addParam("caller", "signer that call the function");
+
+task(
+	"gymVaultsBank:setWithdrawFee",
+	"Call setWithdrawFee function from GymVaultsBank contract",
+	require("./setWithdrawFee")
+)
+	.addParam("withdrawFee", "withdrawFee")
+	.addParam("caller", "signer that call the function");
+
+task("gymVaultsBank:claim", "Call claim function from GymVaultsBank contract", require("./claim"))
+	.addParam("pid", "pool id")
+	.addParam("caller", "signer that call the function");
+
+task("gymVaultsBank:add", "Call add function from GymVaultsBank contract", require("./add"))
+	.addParam("want", "want token contract address")
+	.addParam("allocPoint", "pool allocation point")
+	.addParam("withUpdate", "boolean")
+	.addParam("strategy", "strategy contract address")
+	.addParam("caller", "signer that call the function");

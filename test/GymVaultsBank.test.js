@@ -85,9 +85,19 @@ describe("GymVaultsBank contract: ", function () {
 		this.strategy = await getContract("StrategyMock", accounts.caller);
 		this.routerMock = await getContract("RouterMock", accounts.caller);
 
-		await this.gymVaultsBank.connect(accounts.deployer).setFarmingAddress(this.farming.address);
-		await this.gymVaultsBank.connect(accounts.deployer).setTreasuryAddress(accounts.owner.address);
+		await run("gymVaultsBank:setFarmingAddress", {
+			farmingAddress: this.farming.address,
+			caller: "deployer"
+		});
+		await run("gymVaultsBank:setTreasuryAddress", {
+			treasuryAddress: accounts.owner.address,
+			caller: "deployer"
+		});
 		await this.gymVaultsBank.connect(accounts.deployer).setWithdrawFee(1000);
+		await run("gymVaultsBank:setWithdrawFee", {
+			withdrawFee: "1000",
+			caller: "deployer"
+		});
 		await this.WBNB.connect(accounts.deployer).deposit({
 			value: parseEther("10")
 		});
@@ -99,7 +109,13 @@ describe("GymVaultsBank contract: ", function () {
 			to: this.routerMock.address
 		});
 		await this.gymToken.connect(accounts.holder).approve(this.routerMock.address, parseEther("1000"));
-		await this.gymVaultsBank.connect(accounts.deployer).add(this.WBNB.address, 30, false, this.strategy.address);
+		await run("gymVaultsBank:add", {
+			want: this.WBNB.address,
+			allocPoint: "30",
+			withUpdate: "false",
+			strategy: this.strategy.address,
+			caller: "deployer"
+		});
 
 		this.strategy3 = await getContract("StrategyMock3", accounts.deployer);
 
@@ -263,9 +279,13 @@ describe("GymVaultsBank contract: ", function () {
 			poolLength = await this.gymVaultsBank.poolLength();
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
-			const tx = await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy1.address);
+			const tx = await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy1.address,
+				caller: "deployer"
+			});
 			poolLength = poolLength.add(1);
 
 			expect(await this.gymVaultsBank.poolLength()).to.equal(poolLength);
@@ -282,9 +302,13 @@ describe("GymVaultsBank contract: ", function () {
 		it("Should set new allocation point:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy1.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy1.address,
+				caller: "deployer"
+			});
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 			const poolAllocPoint = (await this.gymVaultsBank.poolInfo(poolLength.sub(1))).allocPoint;
 			const newAllocPoint = BigNumber.from(30);
@@ -302,11 +326,15 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should: Reset Strategy", async function () {
 			await advanceBlockTo((await getBlockNumber()) + 150);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy1.address);
 
-			// await this.gymVaultsBank.connect(accounts.deployer).resetStrategy(1, this.strategy2.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy1.address,
+				caller: "deployer"
+			});
+
 			await run("gymVaultsBank:resetStrategy", {
 				pid: "1",
 				strategy: this.strategy2.address,
@@ -362,9 +390,14 @@ describe("GymVaultsBank contract: ", function () {
 		const allocPoint = 30;
 		it("Should add deposit from vzgo, return correct stakedWantTokens count:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
+
 			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
@@ -403,9 +436,13 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should calculate rewards for 2 users in 1 pool:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
@@ -469,9 +506,13 @@ describe("GymVaultsBank contract: ", function () {
 				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
 			// const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken1.address, 40, false, this.strategy1.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken1.address,
+				allocPoint: "40",
+				withUpdate: "false",
+				strategy: this.strategy1.address,
+				caller: "deployer"
+			});
 
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 			const poolAllocPoint2 = (await this.gymVaultsBank.poolInfo(2)).allocPoint;
@@ -532,9 +573,14 @@ describe("GymVaultsBank contract: ", function () {
 			const vzgoBalance = await accounts.vzgo.getBalance();
 			const allocPoint = 30;
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 
 			const tx = await run("gymVaultsBank:deposit", {
 				pid: "0",
@@ -574,9 +620,14 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should deposit in gymVaultsbank, claim rewards and deposit in Farming", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, 30, false, this.strategy2.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: "30",
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 
 			await run("gymVaultsBank:deposit", {
@@ -616,9 +667,14 @@ describe("GymVaultsBank contract: ", function () {
 		it("Should claim rewards", async function () {
 			const rewardPerBlock = (await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock;
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, 30, false, this.strategy2.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: "30",
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
@@ -636,7 +692,10 @@ describe("GymVaultsBank contract: ", function () {
 				user: accounts.vzgo.address
 			});
 
-			await this.gymVaultsBank.connect(accounts.vzgo).claim(1);
+			await run("gymVaultsBank:claim", {
+				pid: "1",
+				caller: "vzgo"
+			});
 
 			expect(await this.gymToken.balanceOf(accounts.vzgo.address)).to.equal(
 				pending.add(rewardPerBlock.mul(poolAllocPoint1).div(totalAllocPoint))
@@ -647,9 +706,14 @@ describe("GymVaultsBank contract: ", function () {
 			const rewardPerBlock = (await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock;
 
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, 30, false, this.strategy2.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: "30",
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 
@@ -679,7 +743,9 @@ describe("GymVaultsBank contract: ", function () {
 				user: accounts.vzgo.address
 			});
 
-			await this.gymVaultsBank.connect(accounts.vzgo).claimAll();
+			await run("gymVaultsBank:claimAll", {
+				caller: "vzgo"
+			});
 
 			expect(Math.floor(await this.gymToken.balanceOf(accounts.vzgo.address))).to.equal(
 				Math.floor(pending0.add(pending1).add(rewardPerBlock))
@@ -710,9 +776,14 @@ describe("GymVaultsBank contract: ", function () {
 		const allocPoint = 30;
 		it("Should transfer all assets to Vzgo(single user):", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 
@@ -752,9 +823,13 @@ describe("GymVaultsBank contract: ", function () {
 		});
 		it("Should transfer part of  assets to Vzgo(single user):", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 
@@ -796,14 +871,23 @@ describe("GymVaultsBank contract: ", function () {
 		});
 		it("Should withdraw all assets (2 users in 1 pool):", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 			const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
 
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken1.address, 40, false, this.strategy1.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken1.address,
+				allocPoint: "40",
+				withUpdate: "false",
+				strategy: this.strategy1.address,
+				caller: "deployer"
+			});
 			const totalAllocPoint = await this.gymVaultsBank.totalAllocPoint();
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
@@ -875,9 +959,13 @@ describe("GymVaultsBank contract: ", function () {
 		});
 		it("Should transfer all assets(more than balance) safeTransfer check:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 
 			const bankGymBalance = await this.gymToken.balanceOf(this.gymVaultsBank.address);
 
@@ -991,9 +1079,13 @@ describe("GymVaultsBank contract: ", function () {
 		const allocPoint = 30;
 		it("Should migrate strategy:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 			await this.wantToken2.connect(accounts.grno).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
@@ -1029,12 +1121,22 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should revert with message: GymVaultsBank: New strategy not empty", async function () {
 			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, 40, false, this.strategy3.address);
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: "40",
+				withUpdate: "false",
+				strategy: this.strategy3.address,
+				caller: "deployer"
+			});
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 			await this.wantToken2.connect(accounts.grno).approve(this.gymVaultsBank.address, variables.TEST_AMOUNT);
 
