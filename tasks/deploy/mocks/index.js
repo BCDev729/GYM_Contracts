@@ -27,4 +27,6 @@ task("deploy:vaultMock", "VaultMock deploy", require("./vaultMock.deploy")).addP
 
 task("deploy:bankMock", "bankMock deploy", require("./bankMock.deploy"));
 
+task("deploy:wbnb", "wbnb deploy", require("./wbnb.deploy"));
+
 task("deploy:fairLaunchMock", "fairLaunchMock deploy", require("./fairLaunchMock.deploy"));
