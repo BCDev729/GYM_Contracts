@@ -77,7 +77,7 @@ describe("GymVaultsBank contract: ", function () {
 		this.strategy2 = await getContract("StrategyMock2", accounts.deployer);
 		this.strategy = await getContract("StrategyMock", accounts.caller);
 		this.routerMock = await getContract("RouterMock", accounts.caller);
-		// await this.relationship.connect(accounts.deployer).setBankAddress(this.gymVaultsBank.address);
+		
 		await run("gymMLM:setBankAddress", {
 			bankAddress: this.gymVaultsBank.address,
 			caller: "deployer"
