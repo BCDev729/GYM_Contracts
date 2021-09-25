@@ -3,20 +3,24 @@ function printDeployInfo(contractName, contractAddress, chainId, owner) {
 	console.log(`${contractName}'s owner: ${owner}`);
 }
 
-async function contractDeploy({ ethers, upgrades, deployments, getNamedAccounts, ethernal, getChainId }, options,  callback = () => { }) {
+async function contractDeploy(
+	{ ethers, upgrades, deployments, getNamedAccounts, ethernal, getChainId },
+	options,
+	callback = () => {}
+) {
 	const { deploy } = deployments;
 	const chainId = await getChainId();
 	const { deployer } = await getNamedAccounts();
 
-	if (typeof (options) === "string") {
+	if (typeof options === "string") {
 		options = {
 			contractName: options,
 			contractFactory: options,
 			isUpgrade: false,
-			args: [],
+			args: []
 		};
 	}
-    
+
 	options = {
 		contractName: options.contractName,
 		contractFactory: options.contractFactory,
@@ -55,7 +59,6 @@ async function contractDeploy({ ethers, upgrades, deployments, getNamedAccounts,
 		printDeployInfo(options.contractName, contract.address, chainId, deployer);
 		return;
 	}
-
 	await deploy(options.contractName, {
 		from: deployer,
 		contract: options.contractFactory,
@@ -63,10 +66,10 @@ async function contractDeploy({ ethers, upgrades, deployments, getNamedAccounts,
 		log: true,
 		deterministicDeployment: false
 	});
-
+console.log("----------");
 	contract = await ethers.getContract(options.contractName, deployer);
 
-	if ((typeof contract.transferOwnership === "function") && (await contract.owner() !== options.owner)) {
+	if (typeof contract.transferOwnership === "function" && (await contract.owner()) !== options.owner) {
 		// Transfer ownership of contract to owner
 		await contract.transferOwnership(options.owner);
 	}

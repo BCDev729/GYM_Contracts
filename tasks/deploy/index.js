@@ -1,4 +1,5 @@
 const { task } = require("hardhat/config");
+require("./mocks");
 
 task("deploy:greeter", "Deploy Greeter contract", require("./greeter.deploy")).addParam(
 	"msg",
