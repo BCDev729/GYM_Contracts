@@ -1,8 +1,8 @@
 const { getDeploymentArgs } = require("../../utils");
 
-module.exports = async function (hre) {
+module.exports = async function ({ run, getChainId }) {
 	let deterministicDeploy;
-	const chainId = await hre.getChainId();
+	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsStrategyAlpaca");
 
 	const options = {
@@ -20,7 +20,7 @@ module.exports = async function (hre) {
 		owner: deploymentArgs.bank
 	};
 
-	await hre.run("deploy:gymVaultsStrategy", {
+	await run("deploy:gymVaultsStrategy", {
 		contractName: "GymVaultsStrategyAlpaca",
 		bank: deploymentArgs.bank,
 		isAutoComp: deploymentArgs.isAutoComp.toString(),
@@ -32,7 +32,7 @@ module.exports = async function (hre) {
 		router: deploymentArgs.router
 	});
 	try {
-		await hre.run("verify:verify", {
+		await run("verify:verify", {
 			address: deterministicDeploy.address,
 			constructorArguments: options.args
 		});

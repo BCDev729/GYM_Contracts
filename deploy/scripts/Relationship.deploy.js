@@ -1,10 +1,10 @@
-module.exports = async function (hre) {
+module.exports = async function ({ run }) {
 	let deterministicDeploy;
-	await hre.run("deploy:gymMLM");
+	await run("deploy:gymMLM");
 
 	try {
-		await hre.run("verify:verify", {
-			address: deterministicDeploy.address,
+		await run("verify:verify", {
+			address: deterministicDeploy.address
 		});
 	} catch (e) {
 		console.log(e.toString());

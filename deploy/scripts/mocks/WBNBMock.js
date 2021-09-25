@@ -1,6 +1,6 @@
 const { VARIABLES } = require("../../../utils/constants");
 
-module.exports = async function ({ethers: {getContract}, getChainId}) {
+module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
 	const chainId = await getChainId();
 
 	if (chainId === "31337") {

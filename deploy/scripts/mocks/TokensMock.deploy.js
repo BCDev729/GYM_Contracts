@@ -21,11 +21,6 @@ module.exports = async function ({ getChainId, run, ethers }) {
 			supply: `${VARIABLES.hardhat.TEST_TOKENS_MINT_AMOUNT}`
 		});
 
-		// const options4 = {
-		// 	contractName: "TokenA",
-		// 	contractFactory: "ERC20Mock",
-		// 	args: ["TokenA", "TA", VARIABLES.hardhat.TEST_TOKENS_MINT_AMOUNT]
-		// };
 		await run("deploy:tokensMock", {
 			contractName: "TokenA",
 			symbol: "TA",

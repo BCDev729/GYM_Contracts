@@ -1,9 +1,8 @@
 const { getDeploymentArgs } = require("../../utils");
 
-module.exports = async function (hre) {
-	// console.log( ethers);
+module.exports = async function ({ run, getChainId }) {
 	let deterministicDeploy;
-	const chainId = await hre.getChainId();
+	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
 
 	const options = {
@@ -11,12 +10,12 @@ module.exports = async function (hre) {
 		args: [deploymentArgs.holder]
 	};
 
-	await hre.run("deploy:gymToken", {
+	await run("deploy:gymToken", {
 		holder: deploymentArgs.holder
 	});
 
 	try {
-		await hre.run("verify:verify", {
+		await run("verify:verify", {
 			address: deterministicDeploy.address,
 			constructorArguments: options.args
 		});

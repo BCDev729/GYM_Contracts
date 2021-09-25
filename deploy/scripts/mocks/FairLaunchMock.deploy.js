@@ -1,4 +1,4 @@
-module.exports = async function ({getChainId}) {
+module.exports = async function ({ getChainId, run }) {
 	const chainId = await getChainId();
 
 	if (chainId === "31337") {

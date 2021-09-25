@@ -1,8 +1,8 @@
 const { getDeploymentArgs } = require("../../utils");
 
-module.exports = async function (hre) {
+module.exports = async function ({ run, getChainId }) {
 	let deterministicDeploy;
-	const chainId = await hre.getChainId();
+	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymFarming");
 
 	const options = {
@@ -11,11 +11,11 @@ module.exports = async function (hre) {
 			deploymentArgs.bank,
 			deploymentArgs.rewardToken,
 			deploymentArgs.rewardPerBlock,
-			deploymentArgs.startBlock,
-		],
+			deploymentArgs.startBlock
+		]
 	};
 
-	await hre.run("deploy:farming", {
+	await run("deploy:farming", {
 		bankAddress: deploymentArgs.bank,
 		rewardTokenAddress: deploymentArgs.rewardToken,
 		rewardPerBlock: deploymentArgs.rewardPerBlock.toString(),
@@ -23,9 +23,9 @@ module.exports = async function (hre) {
 	});
 
 	try {
-		await hre.run("verify:verify", {
+		await run("verify:verify", {
 			address: deterministicDeploy.address,
-			constructorArguments: options.args,
+			constructorArguments: options.args
 		});
 	} catch (e) {
 		console.log(e.toString());
