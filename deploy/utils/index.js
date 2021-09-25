@@ -66,7 +66,6 @@ async function contractDeploy(
 		log: true,
 		deterministicDeployment: false
 	});
-console.log("----------");
 	contract = await ethers.getContract(options.contractName, deployer);
 
 	if (typeof contract.transferOwnership === "function" && (await contract.owner()) !== options.owner) {
