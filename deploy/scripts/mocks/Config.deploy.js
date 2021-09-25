@@ -1,16 +1,11 @@
-const { contractDeploy } = require("../../utils");
-
-module.exports = async function (hre) {
-    const chainId = await getChainId();
-    if (chainId === "31337") {
-        const WBNB = await ethers.getContract("WBNBMock");
-        let options = {
-            contractName: "Config",
-            args: [WBNB.address],
-        };
-
-        await contractDeploy(hre, options);
-    }
+module.exports = async function ({ getChainId, ethers: { getContract }, run }) {
+	const chainId = await getChainId();
+	if (chainId === "31337") {
+		const WBNB = await getContract("WBNBMock");
+		await run("deploy:config", {
+			wbnbAddress: WBNB.address
+		});
+	}
 };
 
 module.exports.tags = ["Config"];
