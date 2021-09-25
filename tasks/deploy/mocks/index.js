@@ -20,6 +20,11 @@ task("deploy:routerMock", "RouterMock deploy", require("./routerMock.deploy")).a
 	"want token address"
 );
 
+task("deploy:vaultMock", "VaultMock deploy", require("./vaultMock.deploy")).addParam(
+	"wantAddress",
+	"want token address"
+);
+
 task("deploy:bankMock", "bankMock deploy", require("./bankMock.deploy"));
 
 task("deploy:fairLaunchMock", "fairLaunchMock deploy", require("./fairLaunchMock.deploy"));
