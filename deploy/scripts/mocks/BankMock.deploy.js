@@ -1,10 +1,8 @@
-const { contractDeploy } = require("../../utils");
-
-module.exports = async function (hre) {
-    const chainId = await hre.getChainId();
-    if (chainId === "31337") {
-        await contractDeploy(hre, "BankMock");
-    }
+module.exports = async function ({ getChainId, run }) {
+	const chainId = await getChainId();
+	if (chainId === "31337") {
+		await run("deploy:bankMock");
+	}
 };
 
 module.exports.tags = ["BankMock"];

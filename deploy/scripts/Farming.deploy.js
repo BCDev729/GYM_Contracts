@@ -1,9 +1,9 @@
 const { getDeploymentArgs } = require("../../utils");
 
-module.exports = async function (hre) {
-	const chainId = await hre.ethers.getChainId();
-	const deploymentArgs = await getDeploymentArgs(chainId, "Farming");
-	const { deployer } = await hre.ethers.getNamedAccounts();
+module.exports = async function ({ run, getChainId }) {
+	let deterministicDeploy;
+	const chainId = await getChainId();
+	const deploymentArgs = await getDeploymentArgs(chainId, "GymFarming");
 
 	const options = {
 		contractName: "GymFarming",
@@ -11,39 +11,25 @@ module.exports = async function (hre) {
 			deploymentArgs.bank,
 			deploymentArgs.rewardToken,
 			deploymentArgs.rewardPerBlock,
-			deploymentArgs.startBlock,
-		],
+			deploymentArgs.startBlock
+		]
 	};
 
-	const deterministic = await hre.deployments.deterministic("GymFarming", {
-		from: deployer,
-		contract: "GymFarming",
-		args: [...options.args],
-		log: true,
-		deterministicDeployment: true,
+	await run("deploy:farming", {
+		bankAddress: deploymentArgs.bank,
+		rewardTokenAddress: deploymentArgs.rewardToken,
+		rewardPerBlock: deploymentArgs.rewardPerBlock.toString(),
+		startBlock: deploymentArgs.startBlock.toString()
 	});
 
-	await deterministic.deploy();
-
 	try {
-		await hre.run("verify:verify", {
-			address: deterministic.address,
-			constructorArguments: options.args,
+		await run("verify:verify", {
+			address: deterministicDeploy.address,
+			constructorArguments: options.args
 		});
 	} catch (e) {
 		console.log(e.toString());
 	}
-
-	// await contractDeploy(hre, options, async contract => {
-	//   try {
-	//     await hre.run("verify:verify", {
-	//       address: contract.address,
-	//       constructorArguments: options.args
-	//     });
-	//   } catch (e) {
-	//     console.log(e.toString())
-	//   }
-	// })
 };
 
 module.exports.tags = ["Farming"];

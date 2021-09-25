@@ -1,16 +1,13 @@
-const { contractDeploy } = require("../../utils");
+module.exports = async function ({ getChainId, ethers: { getContract }, run }) {
+	const chainId = await getChainId();
 
-module.exports = async function (hre) {
-    const chainId = await getChainId();
+	if (chainId === "31337") {
+		const want = await getContract("WantToken1");
 
-    if (chainId === "31337") {
-        const want = await ethers.getContract("WantToken1");
-        let options = {
-            contractName: "RouterMock",
-            args: [want.address],
-        };
-        await contractDeploy(hre, options);
-    }
+		await run("deploy:routerMock", {
+			wantAddress: want.address
+		});
+	}
 };
 
 module.exports.tags = ["RouterMock"];

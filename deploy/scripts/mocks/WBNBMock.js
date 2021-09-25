@@ -1,16 +1,15 @@
-const { VARIABLES } = require("../../../utils");
-const { contractDeploy } = require("../../utils");
+const { VARIABLES } = require("../../../utils/constants");
 
-module.exports = async function (hre) {
-    const chainId = await getChainId();
+module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
+	const chainId = await getChainId();
 
-    if (chainId === "31337") {
-        await contractDeploy(hre, "WBNBMock");
+	if (chainId === "31337") {
+		await run("deploy:wbnb");
 
-        const wbnb = await ethers.getContract("WBNBMock");
+		const wbnb = await getContract("WBNBMock");
 
-        VARIABLES.hardhat.GYM_VAULTS_BANK_CORE_POOL_WANT_ADDRESS = wbnb.address;
-    }
+		VARIABLES.hardhat.GYM_VAULTS_BANK_CORE_POOL_WANT_ADDRESS = wbnb.address;
+	}
 };
 
 module.exports.tags = ["WBNBMock"];

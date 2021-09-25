@@ -1,46 +1,34 @@
 const { VARIABLES } = require("../../../utils");
 
-const { contractDeploy } = require("../../utils");
+module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
+	const chainId = await getChainId();
 
-module.exports = async function (hre) {
-    accounts = await ethers.getNamedSigners();
-    const chainId = await getChainId();
+	if (chainId === "31337") {
+		const WBNB = await getContract("WBNBMock");
+		const wantToken1 = await getContract("WantToken1");
+		const wantToken2 = await getContract("WantToken2");
 
-    if (chainId === "31337") {
-        const WBNB = await ethers.getContract("WBNBMock");
-        const wantToken1 = await ethers.getContract("WantToken1");
-        const wantToken2 = await ethers.getContract("WantToken2");
+		await run("deploy:strategyMock", {
+			contractName: "StrategyMock1",
+			wantAddress: wantToken1.address
+		});
 
-        let options1 = {
-            contractName: "StrategyMock1",
-            contractFactory: "StrategyMock",
-            args: [wantToken1.address],
-        };
+		await run("deploy:strategyMock", {
+			contractName: "StrategyMock2",
+			wantAddress: wantToken2.address
+		});
 
-        let options2 = {
-            contractName: "StrategyMock2",
-            contractFactory: "StrategyMock",
-            args: [wantToken2.address],
-        };
+		await run("deploy:strategyMock", {
+			contractName: "StrategyMock3",
+			wantAddress: wantToken2.address
+		});
 
-        let options3 = {
-            contractName: "StrategyMock3",
-            contractFactory: "StrategyMock",
-            args: [wantToken2.address],
-        };
-
-        let options = {
-            contractName: "StrategyMock",
-            args: [WBNB.address],
-        };
-
-        await contractDeploy(hre, options1);
-        await contractDeploy(hre, options2);
-        await contractDeploy(hre, options3);
-        await contractDeploy(hre, options, async (contract) => {
-            VARIABLES.hardhat.GYM_VAULTS_BANK_CORE_POOL_STRATEGY_ADDRESS = contract.address;
-        });
-    }
+		const strategy = await run("deploy:strategyMock", {
+			contractName: "StrategyMock",
+			wantAddress: WBNB.address
+		});
+		VARIABLES.hardhat.GYM_VAULTS_BANK_CORE_POOL_STRATEGY_ADDRESS = strategy;
+	}
 };
 
 module.exports.tags = ["Strategies"];
