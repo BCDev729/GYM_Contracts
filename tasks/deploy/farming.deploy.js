@@ -10,4 +10,5 @@ module.exports = async function ({ bankAddress, rewardTokenAddress, rewardPerBlo
 	});
 
 	await deterministicDeploy.deploy();
+	return deterministicDeploy;
 };

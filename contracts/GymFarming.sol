@@ -11,7 +11,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract GymFarming is Ownable, ReentrancyGuard {
+contract GymFarming is Ownable, ReentrancyGuard { 
     using SafeERC20 for IERC20;
     /**
      * @notice Info of each user

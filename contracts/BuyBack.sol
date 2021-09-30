@@ -22,7 +22,7 @@ contract BuyBack {
      * @param _wantAmt: Amount of want token for swap
      * @param _rewardToken: Address of reward token
      */
-    function buyAndBurnToken(
+    function buyAndBurnToken( 
         address _wantAdd,
         uint256 _wantAmt,
         address _rewardToken,

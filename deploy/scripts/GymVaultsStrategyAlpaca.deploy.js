@@ -1,14 +1,13 @@
 const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function ({ run, getChainId }) {
-	let deterministicDeploy;
-	const chainId = await getChainId();
+	const chainId = 97;
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsStrategyAlpaca");
 
 	const options = {
 		contractName: "GymVaultsStrategyAlpaca",
 		args: [
-			deploymentArgs.bank,
+			"0xFaBF92Ebd2528aC7C2E9663887b63c01aC7cD884",
 			deploymentArgs.isAutoComp,
 			deploymentArgs.vault,
 			deploymentArgs.fairLaunch,
@@ -17,12 +16,12 @@ module.exports = async function ({ run, getChainId }) {
 			deploymentArgs.earn,
 			deploymentArgs.router
 		],
-		owner: deploymentArgs.bank
+		owner: "0xFaBF92Ebd2528aC7C2E9663887b63c01aC7cD884"
 	};
 
-	await run("deploy:gymVaultsStrategy", {
+	const deterministicDeploy = await run("deploy:gymVaultsStrategy", {
 		contractName: "GymVaultsStrategyAlpaca",
-		bank: deploymentArgs.bank,
+		bank: "0xFaBF92Ebd2528aC7C2E9663887b63c01aC7cD884",
 		isAutoComp: deploymentArgs.isAutoComp.toString(),
 		vault: deploymentArgs.vault,
 		fairLaunch: deploymentArgs.fairLaunch,
@@ -41,4 +40,4 @@ module.exports = async function ({ run, getChainId }) {
 	}
 };
 module.exports.tags = ["GymVaultsStrategyAlpaca"];
-module.exports.dependencies = ["GymVaultsBank"];
+// module.exports.dependencies = ["GymVaultsBank"];

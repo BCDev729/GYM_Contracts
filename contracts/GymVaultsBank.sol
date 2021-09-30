@@ -13,8 +13,8 @@ import "./interfaces/IFarming.sol";
 import "./interfaces/IGymMLM.sol";
 import "hardhat/console.sol";
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @notice GymVaultsBank contract:
@@ -24,7 +24,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  *   # Withdraw assets
  */
 
-contract GymVaultsBank is ReentrancyGuard, Ownable {
+contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
 
     /**
@@ -56,7 +56,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         IERC20 want;
         uint256 allocPoint;
         uint256 lastRewardBlock;
-        uint256 accRewardPerShare;
+        uint256 accRewardPerShare; 
         address strategy;
     }
 
@@ -109,12 +109,14 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
     event RewardPaid(address indexed token, address indexed user, uint256 amount);
 
-    constructor(
+    function initialize(
         uint256 _startBlock,
         address _gym,
         uint256 _gymRewardRate
-    ) {
+    ) public initializer {
+        __Ownable_init();
         require(block.number < _startBlock, "GymVaultsBank: Start block must have a bigger value");
+
         startBlock = _startBlock;
         rewardPoolInfo = RewardPoolInfo({rewardToken: _gym, rewardPerBlock: _gymRewardRate});
         alpacaToWBNB = [$$(contracts[1]), $$(contracts[2])];
@@ -535,12 +537,12 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         address _receiver,
         uint256 _amount
     ) private {
-        if (_token == $$(contracts[2])) {
-            // If _token is WBNB
-            IWETH(_token).withdraw(_amount);
-            payable(_receiver).transfer(_amount);
-        } else {
+        // if (_token == $$(contracts[2])) {
+        //     // If _token is WBNB
+        //     IWETH(_token).withdraw(_amount);
+        //     // payable(_receiver).transfer(_amount);
+        // } else {
             IERC20(_token).safeTransfer(_receiver, _amount);
-        }
+        // }
     }
 }

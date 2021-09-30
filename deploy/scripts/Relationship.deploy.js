@@ -1,6 +1,5 @@
 module.exports = async function ({ run }) {
-	let deterministicDeploy;
-	await run("deploy:gymMLM");
+	const deterministicDeploy = await run("deploy:gymMLM");
 
 	try {
 		await run("verify:verify", {
@@ -11,4 +10,4 @@ module.exports = async function ({ run }) {
 	}
 };
 module.exports.tags = ["GymMLM"];
-module.exports.dependencies = ["GymVaultsBank"];
+module.exports.dependencies = [];

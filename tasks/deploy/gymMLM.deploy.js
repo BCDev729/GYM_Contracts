@@ -10,4 +10,5 @@ module.exports = async function ({ msg }, { deployments: { deterministic }, ethe
 	});
 
 	await deterministicDeploy.deploy();
+	return deterministicDeploy;
 };

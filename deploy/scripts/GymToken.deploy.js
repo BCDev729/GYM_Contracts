@@ -1,7 +1,6 @@
 const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function ({ run, getChainId }) {
-	let deterministicDeploy;
 	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
 
@@ -10,7 +9,7 @@ module.exports = async function ({ run, getChainId }) {
 		args: [deploymentArgs.holder]
 	};
 
-	await run("deploy:gymToken", {
+	const deterministicDeploy = await run("deploy:gymToken", {
 		holder: deploymentArgs.holder
 	});
 

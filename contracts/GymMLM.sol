@@ -35,7 +35,7 @@ contract GymMLM is Ownable {
         _;
     }
 
-    receive() external payable {}
+    receive() external payable {} 
 
     fallback() external payable {}
 

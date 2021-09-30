@@ -296,7 +296,7 @@ contract GymToken {
         _moveDelegates(delegates[src], delegates[dst], amount);
     }
 
-    function _moveDelegates(
+    function _moveDelegates( 
         address srcRep,
         address dstRep,
         uint96 amount

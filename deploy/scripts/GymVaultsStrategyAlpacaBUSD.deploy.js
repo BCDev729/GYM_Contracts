@@ -1,7 +1,6 @@
 const { getDeploymentArgs } = require("../../utils");
 
 module.exports = async function ({ run, getChainId }) {
-	let deterministicDeploy;
 	const chainId = await getChainId();
 	const deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsStrategyAlpacaBUSD");
 
@@ -20,7 +19,7 @@ module.exports = async function ({ run, getChainId }) {
 		owner: deploymentArgs.bank
 	};
 
-	await run("deploy:gymVaultsStrategy", {
+	const deterministicDeploy = await run("deploy:gymVaultsStrategy", {
 		contractName: "GymVaultsStrategyAlpacaBUSD",
 		bank: deploymentArgs.bank,
 		isAutoComp: deploymentArgs.isAutoComp.toString(),
