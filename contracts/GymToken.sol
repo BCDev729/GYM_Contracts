@@ -6,16 +6,16 @@ import "hardhat/console.sol";
 
 contract GymToken {
     /// @notice EIP-20 token name for this token
-    string public constant name = $$(gymToken[0]);
+    string public constant name = $(GymToken_NAME);
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = $$(gymToken[1]);
+    string public constant symbol = $(GymToken_SYMBOL);
 
     /// @notice EIP-20 token decimals for this token
-    uint8 public constant decimals = $$(gymToken[2]);
+    uint8 public constant decimals = $(GymToken_DECIMALS);
 
     /// @notice Total number of tokens in circulation
-    uint256 public totalSupply = $$(gymToken[3]); // 80 million Gym
+    uint256 public totalSupply = $(GymToken_TOTAL_SUPPLY); // 80 million Gym
 
     /// @dev Allowance amounts on behalf of others
     mapping(address => mapping(address => uint96)) internal allowances;

@@ -2,6 +2,6 @@
     "GymFarming_COEFFICIENT": 972222222200,
     "GymFarming_REWARD_CHANGE_COUNT": 3,
     "GymFarming_REWARD_CHANGE_BLOCKS": 20,
-    "GymFarming_LIQUIDITY_PROVIDER_API_ID": 2,
-    "GymFarming_OWNER": "0x5f2cFa351B7d4b973d341fdB2cB154794c0a899c"
+    "GymFarming_OWNER": "0x5f2cFa351B7d4b973d341fdB2cB154794c0a899c",
+    "GymFarming_LIQUIDITY_PROVIDER_API_ID": 2
 }

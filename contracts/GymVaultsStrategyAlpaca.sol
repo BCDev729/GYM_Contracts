@@ -73,11 +73,11 @@ contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
     /// address of earn token contract
     address public earnedAddress;
     /// PancakeSwap: Router address
-    address public uniRouterAddress = address($$(contracts[0]));
+    address public uniRouterAddress = address($(ROUTER));
     /// WBNB address
-    address public constant wbnbAddress = address($$(contracts[2]));
+    address public constant wbnbAddress = address($(WBNB_TOKEN));
     /// BUSD address
-    address public constant busdAddress = address($$(contracts[5]));
+    address public constant busdAddress = address($(BUSD));
 
     address public operator;
     address public strategist;
@@ -88,16 +88,16 @@ contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
     uint256 public wantLockedTotal;
     uint256 public sharesTotal;
 
-    uint256 public controllerFee = $$(gymVaultsStrategyAlpaca[0]);
+    uint256 public controllerFee = $(GymVaultsStrategyAlpaca_CONTROLLER_FEE);
     /// 100 = 1%
-    uint256 public constant controllerFeeMax = $$(gymVaultsStrategyAlpaca[1]);
-    uint256 public constant controllerFeeUL = $$(gymVaultsStrategyAlpaca[2]);
+    uint256 public constant controllerFeeMax = $(GymVaultsStrategyAlpaca_CONTROLLER_FEE_MAX);
+    uint256 public constant controllerFeeUL = $(GymVaultsStrategyAlpaca_CONTROLLER_FEE_UL);
     /// 0% entrance fee (goes to pool + prevents front-running)
-    uint256 public entranceFeeFactor = $$(gymVaultsStrategyAlpaca[3]);
+    uint256 public entranceFeeFactor = $(GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR);
     /// 100 = 1%
-    uint256 public constant entranceFeeFactorMax = $$(gymVaultsStrategyAlpaca[4]);
+    uint256 public constant entranceFeeFactorMax = $(GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR_MAX);
     /// 0.5% is the max entrance fee settable. LL = lowerlimit
-    uint256 public constant entranceFeeFactorLL = $$(gymVaultsStrategyAlpaca[5]);
+    uint256 public constant entranceFeeFactorLL = $(GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR_LL);
 
     address[] public earnedToWantPath;
     address[] public earnedToBusdPath;
@@ -288,10 +288,10 @@ contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
             IFairLaunch(farmContractAddress).withdraw(address(this), pid, ibAmount);
             vault.withdraw(ibAmount);
             if (
-                vault.token() == IVaultConfig($$(contracts[6])).getWrappedNativeAddr()
+                vault.token() == IVaultConfig($(ALPACA_VAULT_CONFIG)).getWrappedNativeAddr()
                 // address(this).balance > 0
             ) {
-                IWETH($$(contracts[2])).deposit{value: _wantAmt}();
+                IWETH($(WBNB_TOKEN)).deposit{value: _wantAmt}();
             }
         }
 

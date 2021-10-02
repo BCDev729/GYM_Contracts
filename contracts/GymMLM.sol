@@ -10,7 +10,7 @@ import "hardhat/console.sol";
 contract GymMLM is Ownable {
     uint256 public currentId;
     address public bankAddress;
-    uint8[$$(gymMLM[1])] public directReferralBonuses;
+    uint8[$(GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH)] public directReferralBonuses;
 
     mapping(address => uint256) public addressToId;
     mapping(uint256 => address) public idToAddress;
@@ -22,12 +22,12 @@ contract GymMLM is Ownable {
     event ReferralRewardReceved(address indexed user, address indexed referral, uint256 amount);
 
     constructor() {
-        directReferralBonuses = $$(gymMLM[0]);
-        addressToId[$$(gymMLM[2])] = 1;
-        idToAddress[1] = $$(gymMLM[2]);
-        userToReferrer[$$(gymMLM[2])] = $$(gymMLM[2]);
+        directReferralBonuses = $(GymMLM_DIRECT_REFERRAL_BONUSES);
+        addressToId[$(GymMLM_OWNER)] = 1;
+        idToAddress[1] = $(GymMLM_OWNER);
+        userToReferrer[$(GymMLM_OWNER)] = $(GymMLM_OWNER);
         currentId = 2;
-        transferOwnership($$(gymMLM[2])); // deployer address
+        transferOwnership($(GymMLM_OWNER)); // deployer address
     }
 
     modifier onlyBank() {
@@ -89,7 +89,7 @@ contract GymMLM is Ownable {
         uint256 length = directReferralBonuses.length;
 
         IERC20 token = IERC20(_wantAddr);
-        if (_wantAddr != $$(contracts[2])) {
+        if (_wantAddr != $(WBNB_TOKEN)) {
             while (index < length && addressToId[userToReferrer[_user]] != 1) {
                 address referrer = userToReferrer[_user];
                 uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
@@ -109,7 +109,7 @@ contract GymMLM is Ownable {
         while (index < length && addressToId[userToReferrer[_user]] != 1) {
             address referrer = userToReferrer[_user];
             uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
-            IWETH($$(contracts[2])).withdraw(reward);
+            IWETH($(WBNB_TOKEN)).withdraw(reward);
             payable(referrer).transfer(reward);
             emit ReferralRewardReceved(referrer, _user, reward);
             _user = userToReferrer[_user];

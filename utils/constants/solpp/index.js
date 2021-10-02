@@ -5,7 +5,7 @@ module.exports = (network) => {
 		...require(`./${network}/gymMLM.json`),
 		...require(`./${network}/gymToken.json`),
 		...require(`./${network}/gymVaultsBank.json`),
-		...require(`./${network}/gymVaultsStratergyAlpaca.json`),
+		...require(`./${network}/gymVaultsStrategyAlpaca.json`),
 		...require(`./${network}/mocks.json`)
 	};
 };
