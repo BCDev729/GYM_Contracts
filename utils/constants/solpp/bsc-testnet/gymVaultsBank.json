@@ -1,0 +1,11 @@
+{
+    "GymVaultsBank_RELATIONSHIP_REWARD": 45,
+    "GymVaultsBank_VAULTS_SAVING": 45,
+    "GymVaultsBank_BUY_AND_BURN": 10,
+    "GymVaultsBank_WITHDRAW_FEE_FACTOR_MAX": 10000,
+    "GymVaultsBank_CORE_POOL_ID": 0,
+    "GymVaultsBank_REWARD_CHANGE_BLOCKS": 20,
+    "GymVaultsBank_REWARD_CHANGE_COUNT": 3,
+    "GymVaultsBank_COEFFICIENT": 972222222200,
+    "GymVaultsBank_OWNER": "0x5f2cFa351B7d4b973d341fdB2cB154794c0a899c"
+}

@@ -1,4 +1,4 @@
-const { VARIABLES } = require("../../../utils");
+const { VARIABLES } = require("../../../utils/constants");
 
 module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
 	const chainId = await getChainId();

@@ -75,9 +75,9 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
     /// PancakeSwap: Router address
     address public uniRouterAddress;
     /// WBNB address
-    address public constant wbnbAddress = address($$(contracts[2]));
+    address public constant wbnbAddress = address($(WBNB_TOKEN));
     /// BUSD address
-    address public constant busdAddress = address($$(contracts[5]));
+    address public constant busdAddress = address($(BUSD));
 
     address public operator;
     address public strategist;
@@ -90,14 +90,14 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
 
     uint256 public controllerFee;
     /// 100 = 1%
-    uint256 public constant controllerFeeMax = $$(gymVaultsStrategyAlpaca[1]);
-    uint256 public constant controllerFeeUL = $$(gymVaultsStrategyAlpaca[2]);
+    uint256 public constant controllerFeeMax = $(GymVaultsStrategyAlpaca_CONTROLLER_FEE_MAX);
+    uint256 public constant controllerFeeUL = $(GymVaultsStrategyAlpaca_CONTROLLER_FEE_UL);
     /// 0% entrance fee (goes to pool + prevents front-running)
     uint256 public entranceFeeFactor;
     /// 100 = 1%
-    uint256 public constant entranceFeeFactorMax = $$(gymVaultsStrategyAlpaca[4]);
+    uint256 public constant entranceFeeFactorMax = $(GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR_MAX);
     /// 0.5% is the max entrance fee settable. LL = lowerlimit
-    uint256 public constant entranceFeeFactorLL = $$(gymVaultsStrategyAlpaca[5]);
+    uint256 public constant entranceFeeFactorLL = $(GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR_LL);
 
     address[] public earnedToWantPath;
     address[] public earnedToBusdPath;
@@ -133,12 +133,12 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
         operator = msg.sender;
         strategist = msg.sender;
         // to call earn if public not allowed
-        uniRouterAddress = address($$(contracts[0]));
+        uniRouterAddress = address($(ROUTER));
         notPublic = false;
-        controllerFee = $$(gymVaultsStrategyAlpaca[0]);
+        controllerFee = $(GymVaultsStrategyAlpaca_CONTROLLER_FEE);
         isAutoComp = _isAutoComp;
         wantAddress = _wantAddress;
-        entranceFeeFactor = $$(gymVaultsStrategyAlpaca[3]);
+        entranceFeeFactor = $(GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR);
 
         if (_uniRouterAddress != address(0)) uniRouterAddress = _uniRouterAddress;
 
@@ -292,10 +292,10 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
             IFairLaunch(farmContractAddress).withdraw(address(this), pid, ibAmount);
             vault.withdraw(ibAmount);
             if (
-                vault.token() == IVaultConfig($$(contracts[6])).getWrappedNativeAddr()
+                vault.token() == IVaultConfig($(ALPACA_VAULT_CONFIG)).getWrappedNativeAddr()
                 // address(this).balance > 0
             ) {
-                IWETH($$(contracts[2])).deposit{value: _wantAmt}();
+                IWETH($(WBNB_TOKEN)).deposit{value: _wantAmt}();
             }
         }
 

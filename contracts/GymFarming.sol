@@ -48,11 +48,11 @@ contract GymFarming is Ownable, ReentrancyGuard {
     /// The block number when reward mining starts.
     uint256 public startBlock;
     /// The Liquidity Provider
-    ILiquidityProvider public liquidityProvider = ILiquidityProvider($$(contracts[9]));
-    uint256 public liquidityProviderApiId = $$(gymFarming[4]);
+    ILiquidityProvider public liquidityProvider = ILiquidityProvider($(LIQUIDITY_PROVIDER));
+    uint256 public liquidityProviderApiId = $(GymFarming_LIQUIDITY_PROVIDER_API_ID);
     address public bankAddress;
-    address public constant ROUTER_ADDRESS = $$(contracts[0]);
-    address public constant wbnbAddress = address($$(contracts[2]));
+    address public constant ROUTER_ADDRESS = $(ROUTER);
+    address public constant wbnbAddress = address($(WBNB_TOKEN));
     address[] public rewardTokenToWBNB;
     uint256 private rewardPerBlockChangesCount;
     uint256 private lastChangeBlock;
@@ -76,11 +76,11 @@ contract GymFarming is Ownable, ReentrancyGuard {
         rewardToken = IERC20(_rewardToken);
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
-        rewardPerBlockChangesCount = $$(gymFarming[1]);
+        rewardPerBlockChangesCount = $(GymFarming_REWARD_CHANGE_COUNT);
         lastChangeBlock = _startBlock;
 
         rewardTokenToWBNB = [_rewardToken, wbnbAddress];
-        transferOwnership($$(gymFarming[3]));
+        transferOwnership($(GymFarming_OWNER));
     }
 
     // #else
@@ -95,11 +95,11 @@ contract GymFarming is Ownable, ReentrancyGuard {
         rewardToken = IERC20(_rewardToken);
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
-        rewardPerBlockChangesCount = $$(gymFarming[1]);
+        rewardPerBlockChangesCount = $(GymFarming_REWARD_CHANGE_COUNT);
         lastChangeBlock = _startBlock;
         rewardTokenToWBNB = [_rewardToken, wbnbAddress];
 
-        transferOwnership($$(gymFarming[3]));
+        transferOwnership($(GymFarming_OWNER));
     }
 
     // #endif
@@ -148,8 +148,8 @@ contract GymFarming is Ownable, ReentrancyGuard {
      */
     function setRewardPerBlock() external onlyOwner {
         massUpdatePools();
-        if (block.number - lastChangeBlock > $$(gymFarming[2]) && rewardPerBlockChangesCount > 0) {
-            rewardPerBlock = (rewardPerBlock * $$(gymFarming[0])) / 1e12;
+        if (block.number - lastChangeBlock > $(GymFarming_REWARD_CHANGE_BLOCKS) && rewardPerBlockChangesCount > 0) {
+            rewardPerBlock = (rewardPerBlock * $(GymFarming_COEFFICIENT)) / 1e12;
             rewardPerBlockChangesCount -= 1;
             lastChangeBlock = block.number;
         }

@@ -1,0 +1,8 @@
+{
+    "GymVaultsStrategyAlpaca_CONTROLLER_FEE": 0, 
+    "GymVaultsStrategyAlpaca_CONTROLLER_FEE_MAX": 10000, 
+    "GymVaultsStrategyAlpaca_CONTROLLER_FEE_UL": 300, 
+    "GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR": 10000, 
+    "GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR_MAX": 10000, 
+    "GymVaultsStrategyAlpaca_ENTRANCE_FEE_FACTOR_LL": 9950 
+}

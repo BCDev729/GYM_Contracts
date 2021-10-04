@@ -24,6 +24,18 @@ require("@nomiclabs/hardhat-solhint");
 
 require("./tasks");
 
+const getNetwork = function () {
+	const args = process.argv.slice(2);
+	const networkIndex = args.findIndex((el, i, arr) => {
+		return arr[i - 1] === "--network";
+	});
+	return networkIndex === -1 ? "hardhat" : args[networkIndex];
+};
+
+const getSolppDefs = function () {
+	return require("./utils/constants/solpp")(getNetwork());
+};
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -82,25 +94,10 @@ module.exports = {
 		babken: getNamedAccountsConfig(17)
 	},
 	networks: {
-		hardhat: {},
-		bsc: {
-			gasMultiplier: 2,
-			accounts: ["0x43e2458f1c385b0a7c1186c0693a16c63ea148bd8b97982373cd5138fa605a73"],
-			url: "https://bsc-dataseed.binance.org"
-		},
-		"bsc-testnet": {
-			gasMultiplier: 2,
-			accounts: [
-				"0x43e2458f1c385b0a7c1186c0693a16c63ea148bd8b97982373cd5138fa605a73",
-				"0x5937868f836027519da388a4517a2fa8eb169bb845287ee3b02f82cf49891641",
-				"0x9401c0a96ba99f771d6441c28aab2327cf1d3430c23b7cbf3a961ab26b577518",
-				"0xad9a34a575972bcb6161f0d99953bd60fbc93c3fcb13a88e361333d8daee9eec"
-			],
-			url: "https://data-seed-prebsc-1-s1.binance.org:8545"
-		}
+		hardhat: {}
 	},
 	solpp: {
-		defs: VARIABLES[`${process.env.NETWORK}`]
+		defs: getSolppDefs()
 	},
 	spdxLicenseIdentifier: {
 		overwrite: false,

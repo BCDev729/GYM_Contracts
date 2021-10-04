@@ -31,10 +31,10 @@ contract BuyBack {
     ) public returns (uint256) {
         if (_wantAdd != _rewardToken) {
             uint256 burnAmt = IERC20(_rewardToken).balanceOf(address(this));
-            IERC20(_wantAdd).safeIncreaseAllowance($$(contracts[0]), _wantAmt);
+            IERC20(_wantAdd).safeIncreaseAllowance($(ROUTER), _wantAmt);
             _path = [_wantAdd, _rewardToken];
 
-            IPancakeRouter02($$(contracts[0])).swapExactTokensForTokensSupportingFeeOnTransferTokens(
+            IPancakeRouter02($(ROUTER)).swapExactTokensForTokensSupportingFeeOnTransferTokens(
                 _wantAmt,
                 _minBurnAmt,
                 _path,

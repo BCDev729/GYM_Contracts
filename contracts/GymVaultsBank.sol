@@ -73,11 +73,11 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     /// Percent of amount that will be sent to relationship contract
-    uint256 public constant RELATIONSHIP_REWARD = $$(gymVaultsBank[0]);
+    uint256 public constant RELATIONSHIP_REWARD = $(GymVaultsBank_RELATIONSHIP_REWARD);
     /// Percent of amount that will be sent to vault contract
-    uint256 public constant VAULTS_SAVING = $$(gymVaultsBank[1]);
+    uint256 public constant VAULTS_SAVING = $(GymVaultsBank_VAULTS_SAVING);
     /// Percent of amount that will be sent to buyBack contract
-    uint256 public constant BUY_AND_BURN_GYM = $$(gymVaultsBank[2]);
+    uint256 public constant BUY_AND_BURN_GYM = $(GymVaultsBank_BUY_AND_BURN);
 
     /// Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint;
@@ -85,10 +85,10 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 public startBlock;
     uint256 public withdrawFee;
     // contracts[8] - Buyback address
-    address public constant buyBack = $$(contracts[8]);
+    address public constant buyBack = $(BUYBACK);
     address public farming;
     // contracts[7] - RelationShip address
-    address public constant relationship = $$(contracts[7]);
+    address public constant relationship = $(RELATIONSHIP);
     /// Treasury address where will be sent all unused assets
     address public treasuryAddress;
     /// Info of each pool.
@@ -119,10 +119,10 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
         startBlock = _startBlock;
         rewardPoolInfo = RewardPoolInfo({rewardToken: _gym, rewardPerBlock: _gymRewardRate});
-        alpacaToWBNB = [$$(contracts[1]), $$(contracts[2])];
+        alpacaToWBNB = [$(ALPACA_TOKEN), $(WBNB_TOKEN)];
         lastChangeBlock = _startBlock;
-        rewardPerBlockChangesCount = $$(gymVaultsBank[6]);
-        transferOwnership($$(gymVaultsBank[8]));
+        rewardPerBlockChangesCount = $(GymVaultsBank_REWARD_CHANGE_COUNT);
+        transferOwnership($(GymVaultsBank_OWNER));
         emit Initialized(msg.sender, block.number);
     }
 
@@ -185,8 +185,8 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
      */
     function updateRewardPerBlock() external nonReentrant onlyOwner {
         massUpdatePools();
-        if (block.number - lastChangeBlock > $$(gymVaultsBank[5]) && rewardPerBlockChangesCount > 0) {
-            rewardPoolInfo.rewardPerBlock = (rewardPoolInfo.rewardPerBlock * $$(gymVaultsBank[7])) / 1e12;
+        if (block.number - lastChangeBlock > $(GymVaultsBank_REWARD_CHANGE_BLOCKS) && rewardPerBlockChangesCount > 0) {
+            rewardPoolInfo.rewardPerBlock = (rewardPoolInfo.rewardPerBlock * $(GymVaultsBank_COEFFICIENT)) / 1e12;
             rewardPerBlockChangesCount -= 1;
             lastChangeBlock = block.number;
         }
@@ -242,9 +242,9 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     ) external payable {
         IGymMLM(relationship).addGymMLM(msg.sender, _referrerId);
         PoolInfo storage pool = poolInfo[_pid];
-        if (address(pool.want) == $$(contracts[2])) {
+        if (address(pool.want) == $(WBNB_TOKEN)) {
             // If `want` is WBNB
-            IWETH($$(contracts[2])).deposit{value: msg.value}();
+            IWETH($(WBNB_TOKEN)).deposit{value: msg.value}();
             _wantAmt = msg.value;
         }
         _deposit(_pid, _wantAmt, _minBurnAmt, _deadline);
@@ -455,7 +455,7 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         }
 
         if (_wantAmt > 0) {
-            if (address(pool.want) != $$(contracts[2])) {
+            if (address(pool.want) != $(WBNB_TOKEN)) {
                 // If `want` not WBNB
                 pool.want.safeTransferFrom(address(msg.sender), address(this), _wantAmt);
             }
@@ -523,7 +523,7 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
             }
 
             if (_wantAmt > 0) {
-                _transfer(address(pool.want), treasuryAddress, (_wantAmt * withdrawFee) / $$(gymVaultsBank[3]));
+                _transfer(address(pool.want), treasuryAddress, (_wantAmt * withdrawFee) / $(GymVaultsBank_WITHDRAW_FEE_FACTOR_MAX));
                 _transfer(address(pool.want), msg.sender, pool.want.balanceOf(address(this)));
             }
         }
@@ -537,12 +537,12 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         address _receiver,
         uint256 _amount
     ) private {
-        // if (_token == $$(contracts[2])) {
-        //     // If _token is WBNB
-        //     IWETH(_token).withdraw(_amount);
-        //     // payable(_receiver).transfer(_amount);
-        // } else {
+        if (_token == $(WBNB_TOKEN)) {
+            // If _token is WBNB
+            IWETH(_token).withdraw(_amount);
+            payable(_receiver).transfer(_amount);
+        } else {
             IERC20(_token).safeTransfer(_receiver, _amount);
-        // }
+        }
     }
 }
