@@ -1,15 +1,19 @@
 const { expect } = require("chai");
-const { deployments, network, ethers } = require("hardhat");
+const {
+	deployments,
+	network,
+	getChainId,
+	ethers: { getContract, getContractAt, getNamedSigners }
+} = require("hardhat");
 const { advanceBlockTo } = require("./utilities");
-const { getContract, getContractAt, getNamedSigners } = ethers;
-const { VARIABLES, getDeploymentArgs } = require("../helpers/data/constants");
+
+const { getDeploymentArgs } = require("../utils");
 
 let accounts, rewardPerBlock;
-const variables = VARIABLES.hardhat;
 
 describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 	// only working when forked
-	before("Before All: ", async function() {
+	before("Before All: ", async function () {
 		const chainId = await getChainId();
 		accounts = await getNamedSigners();
 
@@ -165,22 +169,22 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			);
 	});
 
-	describe("Deposit function: ", function() {
-		before("Before: ", async function() {
+	describe("Deposit function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function() {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should accept deposit from user: ", async function() {
+		it("Should accept deposit from user: ", async function () {
 			await this.busd.connect(accounts.holder).approve(this.bank.address, ethers.utils.parseEther("100"));
 
 			await this.bank
@@ -191,22 +195,22 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		});
 	});
 
-	describe("Claim function: ", function() {
-		before("Before: ", async function() {
+	describe("Claim function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function() {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should accept claim from user: ", async function() {
+		it("Should accept claim from user: ", async function () {
 			await this.busd.connect(accounts.holder).approve(this.bank.address, ethers.utils.parseEther("0.1"));
 
 			const tx = await this.bank
@@ -228,22 +232,22 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		});
 	});
 
-	describe("Withdraw function: ", function() {
-		before("Before: ", async function() {
+	describe("Withdraw function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function() {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should accept withdraw from user: ", async function() {
+		it("Should accept withdraw from user: ", async function () {
 			await this.busd.connect(accounts.holder).approve(this.bank.address, ethers.utils.parseEther("0.1"));
 
 			const tx = await this.bank
@@ -258,22 +262,22 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		});
 	});
 
-	describe("ClaimAndDeposit function: ", function() {
-		before("Before: ", async function() {
+	describe("ClaimAndDeposit function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function() {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should accept claimAndDeposit from user: ", async function() {
+		it("Should accept claimAndDeposit from user: ", async function () {
 			await this.busd.connect(accounts.holder).approve(this.bank.address, ethers.utils.parseEther("0.1"));
 
 			const tx = await this.bank

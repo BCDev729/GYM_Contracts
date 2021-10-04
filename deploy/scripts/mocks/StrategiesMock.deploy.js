@@ -1,5 +1,3 @@
-const { VARIABLES } = require("../../../utils/constants");
-
 module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
 	const chainId = await getChainId();
 
@@ -23,11 +21,10 @@ module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
 			wantAddress: wantToken2.address
 		});
 
-		const strategy = await run("deploy:strategyMock", {
+		await run("deploy:strategyMock", {
 			contractName: "StrategyMock",
 			wantAddress: WBNB.address
 		});
-		VARIABLES.hardhat.GYM_VAULTS_BANK_CORE_POOL_STRATEGY_ADDRESS = strategy;
 	}
 };
 

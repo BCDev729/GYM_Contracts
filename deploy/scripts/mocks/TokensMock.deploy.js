@@ -1,4 +1,4 @@
-const { VARIABLES } = require("../../../utils/constants");
+const testVars = require("../../../test/utilities/testVariables.json");
 
 module.exports = async function ({ getChainId, run, ethers }) {
 	const chainId = await getChainId();
@@ -12,31 +12,31 @@ module.exports = async function ({ getChainId, run, ethers }) {
 		await run("deploy:tokensMock", {
 			contractName: "WantToken2",
 			symbol: "WT2",
-			supply: `${VARIABLES.hardhat.TEST_WANTTOKEN2_AMOUNT}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 
 		await run("deploy:tokensMock", {
 			contractName: "EarnToken",
 			symbol: "ET",
-			supply: `${VARIABLES.hardhat.TEST_TOKENS_MINT_AMOUNT}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 
 		await run("deploy:tokensMock", {
 			contractName: "TokenA",
 			symbol: "TA",
-			supply: `${VARIABLES.hardhat.TEST_TOKENS_MINT_AMOUNT}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 
 		await run("deploy:tokensMock", {
 			contractName: "TokenB",
 			symbol: "TB",
-			supply: `${VARIABLES.hardhat.TEST_TOKENS_MINT_AMOUNT}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 
 		await run("deploy:tokensMock", {
 			contractName: "ibToken",
 			symbol: "IT",
-			supply: `${VARIABLES.hardhat.TEST_TOKENS_MINT_AMOUNT}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 	}
 };

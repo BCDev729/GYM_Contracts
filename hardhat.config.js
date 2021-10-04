@@ -43,7 +43,7 @@ const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 const TENDERLY_PROJECT = process.env.TENDERLY_PROJECT || "";
 const TENDERLY_USERNAME = process.env.TENDERLY_USERNAME || "";
 
-const { getEOAAccountsPublicKeys, getNamedAccountsConfig, VARIABLES } = require("./utils");
+const { getEOAAccountsPublicKeys, getNamedAccountsConfig } = require("./utils");
 
 const eoaAccountsPublicKeys = getEOAAccountsPublicKeys();
 
