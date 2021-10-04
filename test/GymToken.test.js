@@ -56,10 +56,10 @@ describe("GymToken contract: ", function () {
         })
 
         it("Should initialize with correct values: ", async () => {
-            expect("\"" + (await this.gymToken.name()) + "\"").to.equal(variables.gymToken[0]);
-            expect("\"" + (await this.gymToken.symbol()) + "\"").to.equal(variables.gymToken[1]);
-            expect(await this.gymToken.decimals()).to.equal(variables.gymToken[2]);
-            expect(await this.gymToken.totalSupply()).to.equal(variables.gymToken[3]);
+            expect("\"" + (await this.gymToken.name()) + "\"").to.equal(variables["GymToken_NAME"]);
+            expect("\"" + (await this.gymToken.symbol()) + "\"").to.equal(variables["GymToken_SYMBOL"]);
+            expect(await this.gymToken.decimals()).to.equal(variables["GymToken_DECIMALS"]);
+            expect(await this.gymToken.totalSupply()).to.equal(variables["GymToken_TOTAL_SUPPLY"]);
         })
     })
 

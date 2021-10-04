@@ -13,8 +13,8 @@ import "./interfaces/IFarming.sol";
 import "./interfaces/IGymMLM.sol";
 import "hardhat/console.sol";
 
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @notice GymVaultsBank contract:
@@ -24,7 +24,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
  *   # Withdraw assets
  */
 
-contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
+contract GymVaultsBank is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
     /**
@@ -109,12 +109,11 @@ contract GymVaultsBank is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
     event RewardPaid(address indexed token, address indexed user, uint256 amount);
 
-    function initialize(
+    constructor(
         uint256 _startBlock,
         address _gym,
         uint256 _gymRewardRate
-    ) public initializer {
-        __Ownable_init();
+    ){
         require(block.number < _startBlock, "GymVaultsBank: Start block must have a bigger value");
 
         startBlock = _startBlock;

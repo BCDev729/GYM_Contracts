@@ -30,6 +30,13 @@ describe("GymVaultsBank contract: ", function () {
 		await run("deploy:gymToken", {
 			holder: deploymentArgs.holder
 		});
+		
+		await deployments.deploy("BuyBack", {
+			from: accounts.deployer.address,
+			args: [],
+			log: true,
+			deterministicDeployment: false
+		});
 
 		await deployments.deploy("GymMLM", {
 			from: accounts.deployer.address,
@@ -39,12 +46,6 @@ describe("GymVaultsBank contract: ", function () {
 		});
 
 		// await run("deploy:gymMLM");
-		await deployments.deploy("BuyBack", {
-			from: accounts.deployer.address,
-			args: [],
-			log: true,
-			deterministicDeployment: false
-		});
 
 		this.deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsBank");
 
@@ -159,9 +160,9 @@ describe("GymVaultsBank contract: ", function () {
 		});
 
 		it("Should initialize with correct parameters:", async function () {
-			expect(await this.gymVaultsBank.RELATIONSHIP_REWARD()).to.equal(variables.gymVaultsBank[0]);
-			expect(await this.gymVaultsBank.VAULTS_SAVING()).to.equal(variables.gymVaultsBank[1]);
-			expect(await this.gymVaultsBank.BUY_AND_BURN_GYM()).to.equal(variables.gymVaultsBank[2]);
+			expect(await this.gymVaultsBank.RELATIONSHIP_REWARD()).to.equal(variables.GymVaultsBank_RELATIONSHIP_REWARD);
+			expect(await this.gymVaultsBank.VAULTS_SAVING()).to.equal(variables.GymVaultsBank_VAULTS_SAVING);
+			expect(await this.gymVaultsBank.BUY_AND_BURN_GYM()).to.equal(variables.GymVaultsBank_BUY_AND_BURN);
 			expect(await this.gymVaultsBank.startBlock()).to.equal(this.deploymentArgs.startBlock);
 			expect(await this.gymVaultsBank.rewardPoolInfo()).to.deep.equal([
 				this.deploymentArgs.gymTokenAddress,
@@ -212,7 +213,7 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
-				Math.floor((rewardPerBlock * variables.gymVaultsBank[7]) / 1e12)
+				Math.floor((rewardPerBlock * variables.GymVaultsBank_COEFFICIENT) / 1e12)
 			);
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 41);
@@ -222,7 +223,7 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
-				Math.floor((rewardPerBlock * variables.gymVaultsBank[7] ** 2) / 1e12 ** 2)
+				Math.floor((rewardPerBlock * variables.GymVaultsBank_COEFFICIENT ** 2) / 1e12 ** 2)
 			);
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 62);
@@ -232,7 +233,7 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
-				Math.floor((rewardPerBlock * variables.gymVaultsBank[7] ** 3) / 1e12 ** 3)
+				Math.floor((rewardPerBlock * variables.GymVaultsBank_COEFFICIENT ** 3) / 1e12 ** 3)
 			);
 
 			await advanceBlockTo((await this.gymVaultsBank.startBlock()) + 90);
@@ -242,7 +243,7 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			expect(Math.floor(BigNumber.from((await this.gymVaultsBank.rewardPoolInfo()).rewardPerBlock))).to.equal(
-				Math.floor((rewardPerBlock * variables.gymVaultsBank[7] ** 3) / 1e12 ** 3)
+				Math.floor((rewardPerBlock * variables.GymVaultsBank_COEFFICIENT ** 3) / 1e12 ** 3)
 			);
 		});
 
@@ -412,7 +413,7 @@ describe("GymVaultsBank contract: ", function () {
 				this.vzgoWant2Balance.sub(variables.TEST_AMOUNT)
 			);
 			// const depositTime = (await ethers.provider.getBlock(tx.blockNumber)).timestamp;
-			// expect((await this.gymVaultsBank.userInfo(1, accounts.vzgo.address)).shares).to.equal(variables.TEST_AMOUNT * variables.gymVaultsBank[1] / 100)
+			// expect((await this.gymVaultsBank.userInfo(1, accounts.vzgo.address)).shares).to.equal(variables.TEST_AMOUNT * variables["GymVaultsBank_VAULTS_SAVING"] / 100)
 
 			await advanceBlockTo((await getBlockNumber()) + variables.TEST_BLOCK_COUNT);
 
@@ -421,7 +422,7 @@ describe("GymVaultsBank contract: ", function () {
 					pid: "1",
 					user: accounts.vzgo.address
 				})
-			).to.equal((variables.TEST_AMOUNT * variables.gymVaultsBank[1]) / 100);
+			).to.equal((variables.TEST_AMOUNT * variables.GymVaultsBank_VAULTS_SAVING) / 100);
 			expect(
 				BigNumber.from(
 					await run("gymVaultsBank:pendingReward", {
@@ -595,7 +596,7 @@ describe("GymVaultsBank contract: ", function () {
 				Number(parseEther("0.00000005"))
 			);
 			expect(Number((await this.gymVaultsBank.userInfo(0, accounts.vzgo.address)).shares)).to.equal(
-				(variables.gymVaultsBank[1] / 100) * Number(parseEther(variables.TEST_AMOUNT.toString()))
+				(variables.GymVaultsBank_VAULTS_SAVING / 100) * Number(parseEther(variables.TEST_AMOUNT.toString()))
 			);
 		});
 	});
@@ -811,7 +812,7 @@ describe("GymVaultsBank contract: ", function () {
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
 					this.vzgoWant2Balance -
-						(variables.TEST_AMOUNT * (variables.gymVaultsBank[2] + variables.gymVaultsBank[0])) / 100 -
+						(variables.TEST_AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
 						vzgoShares / 10
 				)
 			);
@@ -859,7 +860,7 @@ describe("GymVaultsBank contract: ", function () {
 				Math.floor(
 					this.vzgoWant2Balance -
 						20 -
-						(variables.TEST_AMOUNT * (variables.gymVaultsBank[2] + variables.gymVaultsBank[0])) / 100 -
+						(variables.TEST_AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
 						(vzgoShares - 20) / 10
 				)
 			);
@@ -923,7 +924,7 @@ describe("GymVaultsBank contract: ", function () {
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
 					this.vzgoWant2Balance -
-						(variables.TEST_AMOUNT * (variables.gymVaultsBank[2] + variables.gymVaultsBank[0])) / 100 -
+						(variables.TEST_AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
 						vzgoShares / 10
 				)
 			);
@@ -947,7 +948,7 @@ describe("GymVaultsBank contract: ", function () {
 			expect((await this.wantToken2.balanceOf(accounts.grno.address)).sub(1)).to.equal(
 				Math.floor(
 					this.grnoWant2Balance -
-						(variables.TEST_AMOUNT * (variables.gymVaultsBank[2] + variables.gymVaultsBank[0])) / 100 -
+						(variables.TEST_AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
 						grnoShares / 10
 				)
 			);
@@ -988,7 +989,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			expect(await this.wantToken2.balanceOf(accounts.vzgo.address)).to.equal(
 				this.vzgoWant2Balance
-					.sub((variables.TEST_AMOUNT * (variables.gymVaultsBank[2] + variables.gymVaultsBank[0])) / 100)
+					.sub((variables.TEST_AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100)
 					.sub(vzgoShares.div(10))
 			);
 			expect(await this.gymToken.balanceOf(accounts.vzgo.address)).to.equal(bankGymBalance);
@@ -1047,7 +1048,7 @@ describe("GymVaultsBank contract: ", function () {
 				BigNumber.from(vzgoBalance)
 					.sub(
 						BigNumber.from(parseEther(variables.TEST_AMOUNT.toString()))
-							.mul(BigNumber.from(variables.gymVaultsBank[2]).add(variables.gymVaultsBank[0]))
+							.mul(BigNumber.from(variables.GymVaultsBank_BUY_AND_BURN).add(variables.GymVaultsBank_RELATIONSHIP_REWARD))
 							.div(100)
 					)
 					.sub(vzgoShares.div(10)),

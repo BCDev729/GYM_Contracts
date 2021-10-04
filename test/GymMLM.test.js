@@ -1,20 +1,21 @@
 const { expect } = require("chai");
-const { deployments, network, ethers } = require("hardhat");
+const { deployments, network, ethers, getChainId, run } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
-const { VARIABLES, getDeploymentArgs } = require("../helpers/data/constants");
+const variables = require("../utils/constants/solpp")("hardhat");
+const { getDeploymentArgs } = require("../utils/constants");
+
+let accounts, deploymentArgs, snapshotId;
+const depositAmount = 500;
+const transferAmount = 5000;
+const gymMLMReward = variables.GymVaultsBank_RELATIONSHIP_REWARD;
+const gymMLMBonuses = variables.GymMLM_DIRECT_REFERRAL_BONUSES;
+const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 
 describe("GymMLM contract: ", function () {
-	let accounts, deploymentArgs;
-	const variables = VARIABLES.hardhat;
-	const depositAmount = 500;
-	const transferAmount = 5000;
-	const gymMLMReward = variables.gymVaultsBank[0];
-	const gymMLMBonuses = variables.gymMLM[0];
-	const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 
-	before("Before All: ", async function() {
+	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		await hre.run("deployMocks");
+		await run("deployMocks");
 
 		const chainId = await getChainId();
 
@@ -66,7 +67,7 @@ describe("GymMLM contract: ", function () {
 		await this.gymVaultsBank.connect(accounts.deployer).setTreasuryAddress(accounts.deployer.address);
 
 		for (const signer in accounts) {
-			if (signer == "deployer") {
+			if (signer === "deployer") {
 				continue;
 			}
 
@@ -87,8 +88,8 @@ describe("GymMLM contract: ", function () {
 			.add(this.wantToken.address, 20, true, this.strategy.address);
 	});
 
-	describe("Initialization: ", function() {
-		it("Should initialize with correct values: ", async function() {
+	describe("Initialization: ", function () {
+		it("Should initialize with correct values: ", async function () {
 			expect(await this.gymMLM.bankAddress()).to.equal(this.gymVaultsBank.address);
 			expect(await this.gymMLM.addressToId(accounts.deployer.address)).to.equal(1);
 			expect(await this.gymMLM.idToAddress(1)).to.equal(accounts.deployer.address);
@@ -96,28 +97,30 @@ describe("GymMLM contract: ", function () {
 				accounts.deployer.address
 			);
 			expect(await this.gymMLM.currentId()).to.equal(2);
-			for (let i = 0; i < variables.gymMLM[1]; i++) {
-				expect(await this.gymMLM.directReferralBonuses(i)).to.equal(variables.gymMLM[0][i]);
+			for (let i = 0; i < variables.GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH; i++) {
+				expect(await this.gymMLM.directReferralBonuses(i)).to.equal(
+					variables.GymMLM_DIRECT_REFERRAL_BONUSES[i]
+				);
 			}
 		});
 	});
 
-	describe("AddGymMLM function: ", function() {
-		beforeEach("Before: ", async function() {
+	describe("AddGymMLM function: ", function () {
+		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		afterEach("After tests: ", async function() {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshotId]
 			});
 		});
 
-		it("Should add new gymMLM: ", async function() {
+		it("Should add new gymMLM: ", async function () {
 			const currentId = await this.gymMLM.currentId();
 			const referrerId = await this.gymMLM.addressToId(accounts.deployer.address);
 
@@ -135,7 +138,7 @@ describe("GymMLM contract: ", function () {
 			);
 		});
 
-		it("Should revert with 'GymMLM::referrer is zero address': ", async function() {
+		it("Should revert with 'GymMLM::referrer is zero address': ", async function () {
 			await this.wantToken.connect(accounts.vzgo).approve(this.gymVaultsBank.address, depositAmount);
 			await expect(
 				this.gymVaultsBank.connect(accounts.vzgo).deposit(1, depositAmount, 4, 0, new Date().getTime() + 20)
@@ -143,29 +146,29 @@ describe("GymMLM contract: ", function () {
 		});
 	});
 
-	describe("DistributeRewards function for tokens: ", function() {
-		beforeEach("Before: ", async function() {
+	describe("DistributeRewards function for tokens: ", function () {
+		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		afterEach("After tests: ", async function() {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshotId]
 			});
 		});
 
-		it("Should distribute rewards for referrers: ", async function() {
+		it("Should distribute rewards for referrers: ", async function () {
 			let prevSigner = "deployer";
 			let index = 0;
 			let prevSignerBal;
 			let ownerBal = (await this.wantToken.balanceOf(accounts.owner.address)).sub(depositAmount);
 
 			for (const signer in accounts) {
-				if (signer == "deployer") {
+				if (signer === "deployer") {
 					continue;
 				}
 
@@ -180,14 +183,14 @@ describe("GymMLM contract: ", function () {
 						new Date().getTime() + 20
 					);
 
-				if (index == 0) {
+				if (index === 0) {
 					prevSigner = signer;
 					prevSignerBal = await this.wantToken.balanceOf(accounts[signer].address);
 					index++;
 					continue;
 				}
 
-				if (index == 16) {
+				if (index === 16) {
 					expect((await this.wantToken.balanceOf(accounts.owner.address)).sub(ownerBal)).to.equal(0);
 				} else {
 					expect((await this.wantToken.balanceOf(accounts.owner.address)).sub(ownerBal)).to.equal(
@@ -205,7 +208,7 @@ describe("GymMLM contract: ", function () {
 			}
 		});
 
-		it("Should transfer unmute tokens to treasure address: ", async function() {
+		it("Should transfer unmute tokens to treasure address: ", async function () {
 			let deployerAmtBefore = await this.wantToken.balanceOf(accounts.deployer.address);
 			await this.wantToken.connect(accounts.vzgo).approve(this.gymVaultsBank.address, depositAmount);
 			await this.gymVaultsBank
@@ -240,31 +243,30 @@ describe("GymMLM contract: ", function () {
 		});
 	});
 
-	describe("DistributeRewards function for BNB: ", function() {
-		beforeEach("Before: ", async function() {
+	describe("DistributeRewards function for BNB: ", function () {
+		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		afterEach("After tests: ", async function() {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshotId]
 			});
 		});
 
-		it("Should distribute rewards for referrers: ", async function() {
+		it("Should distribute rewards for referrers: ", async function () {
 			let prevSigner = "deployer";
 			let index = 0;
 			let prevSignerBal;
 			let ownerBal = (await accounts.owner.getBalance()).sub(depositAmount);
-			const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 			let tx;
 
 			for (const signer in accounts) {
-				if (signer == "deployer") {
+				if (signer === "deployer") {
 					continue;
 				}
 
@@ -281,7 +283,7 @@ describe("GymMLM contract: ", function () {
 						}
 					);
 
-				if (index == 0) {
+				if (index === 0) {
 					prevSigner = signer;
 					prevSignerBal = await accounts[signer].getBalance();
 					ownerBal = ownerBal.sub((await tx.wait()).gasUsed * tx.gasPrice);
@@ -289,7 +291,7 @@ describe("GymMLM contract: ", function () {
 					continue;
 				}
 
-				if (index == 16) {
+				if (index === 16) {
 					expect((await accounts.owner.getBalance()).sub(ownerBal)).to.equal(0);
 				} else {
 					expect((await accounts.owner.getBalance()).sub(ownerBal)).to.equal(
@@ -307,7 +309,7 @@ describe("GymMLM contract: ", function () {
 			}
 		});
 
-		it("Should transfer unmute BNB to treasure address: ", async function() {
+		it("Should transfer unmute BNB to treasure address: ", async function () {
 			let deployerAmtBefore = await accounts.deployer.getBalance();
 			await this.gymVaultsBank
 				.connect(accounts.vzgo)

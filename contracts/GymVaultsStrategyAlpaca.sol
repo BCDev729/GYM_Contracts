@@ -1,13 +1,13 @@
 pragma solidity 0.8.7;
 
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./interfaces/IPancakeRouter01.sol";
 import "./interfaces/IPancakeRouter02.sol";
 import "./interfaces/IAlpacaToken.sol";
@@ -53,7 +53,7 @@ interface IFairLaunch {
 }
 
 // SPDX-License-Identifier: MIT
-contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -119,7 +119,7 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
     // _buyBackToken2Info[]: buyBackToken2, buyBackAddress2, buyBackToken2MidRouteAddress
     // _token0Info[]: token0Address, token0MidRouteAddress
     // _token1Info[]: token1Address, token1MidRouteAddress
-    function initialize(
+    constructor(
         address _controller,
         bool _isAutoComp,
         address _vaultContractAddress,
@@ -128,8 +128,7 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
         address _wantAddress,
         address _earnedAddress,
         address _uniRouterAddress // address[] memory _token0Info, // address[] memory _token1Info
-    ) public initializer {
-        __Ownable_init();
+    ){
         operator = msg.sender;
         strategist = msg.sender;
         // to call earn if public not allowed
@@ -287,8 +286,8 @@ contract GymVaultsStrategyAlpaca is OwnableUpgradeable, ReentrancyGuardUpgradeab
     function withdraw(address, uint256 _wantAmt) public onlyOwner nonReentrant returns (uint256) {
         require(_wantAmt > 0, "GymVaultsStrategyAlpaca: !_wantAmt");
         IVault vault = IVault(vaultContractAddress);
-        uint256 ibAmount = (_wantAmt * vault.totalSupply()) / vault.totalToken();
         if (isAutoComp && !strategyStopped) {
+            uint256 ibAmount = (_wantAmt * vault.totalSupply()) / vault.totalToken();
             IFairLaunch(farmContractAddress).withdraw(address(this), pid, ibAmount);
             vault.withdraw(ibAmount);
             if (

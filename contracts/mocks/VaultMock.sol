@@ -37,4 +37,8 @@ contract VaultMock is ERC20("ibToken", "IT") {
     function token() external pure returns (address) {
         return address(0);
     }
+
+    function totalToken() external pure returns (uint256) {
+        return 10000;
+    }
 }
