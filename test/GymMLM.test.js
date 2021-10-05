@@ -1,10 +1,10 @@
 const { expect } = require("chai");
-const { deployments, network, ethers, getChainId, run } = require("hardhat");
+const { deployments, network, ethers } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
 const variables = require("../utils/constants/solpp")("hardhat");
-const { getDeploymentArgs } = require("../utils/constants");
+// const { getDeploymentArgs } = require("../utils/constants");
 
-let accounts, deploymentArgs, snapshotId;
+let accounts, snapshotId; // deploymentArgs
 const depositAmount = 500;
 const transferAmount = 5000;
 const gymMLMReward = variables.GymVaultsBank_RELATIONSHIP_REWARD;
@@ -12,51 +12,20 @@ const gymMLMBonuses = variables.GymMLM_DIRECT_REFERRAL_BONUSES;
 const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 
 describe("GymMLM contract: ", function () {
-
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		await run("deployMocks");
 
-		const chainId = await getChainId();
+		await deployments.fixture();
 
-		deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
-
-		await deployments.deploy("GymToken", {
-			from: accounts.deployer.address,
-			args: [deploymentArgs.holder],
-			log: true,
-			deterministicDeployment: false
-		});
 		this.gymToken = await getContract("GymToken", accounts.caller);
 
-		deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsBank");
-		await deployments.deploy("GymVaultsBank", {
-			from: accounts.deployer.address,
-			contract: "GymVaultsBank",
-			args: [deploymentArgs.startBlock, deploymentArgs.gymTokenAddress, deploymentArgs.rewardRate],
-			log: true,
-			deterministicDeployment: false
-		});
 		this.gymVaultsBank = await getContract("GymVaultsBank", accounts.caller);
 
-		await deployments.deploy("BuyBack", {
-			from: accounts.deployer.address,
-			contract: "BuyBack",
-			args: [],
-			log: true,
-			deterministicDeployment: false
-		});
 		this.buyBack = await getContract("BuyBack", accounts.caller);
 
-		await deployments.deploy("GymMLM", {
-			from: accounts.deployer.address,
-			contract: "GymMLM",
-			args: [],
-			log: true,
-			deterministicDeployment: false
-		});
 		this.gymMLM = await getContract("GymMLM", accounts.deployer);
 		await this.gymMLM.setBankAddress(this.gymVaultsBank.address);
+
 		this.wantToken = await getContract("WantToken2", accounts.caller);
 		this.WBNBMock = await getContract("WBNBMock", accounts.caller);
 		this.strategy = await getContract("StrategyMock2", accounts.caller);
