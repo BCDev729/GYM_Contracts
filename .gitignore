@@ -1,10 +1,13 @@
 node_modules
 .env
+package-lock.json
 
 #Hardhat files
+deployments
+docgen
+coverage
 cache
 artifacts
 typechain
 networks.json
 abi
-package-lock.json

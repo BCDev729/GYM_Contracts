@@ -1,8 +1,9 @@
 const { expect } = require("chai");
 const {
-	deployments,
+	deployments: { fixture, deploy },
 	network,
 	ethers: {
+		getContractFactory,
 		getNamedSigners,
 		getContract,
 		utils: { parseEther },
@@ -14,63 +15,64 @@ const {
 } = require("hardhat");
 
 const { advanceBlockTo } = require("./utilities/time");
-const { getDeploymentArgs } = require("../utils");
+// const { getDeploymentArgs } = require("../utils");
 const testVars = require("./utilities/testVariables.json");
 const variables = require("../utils/constants/solpp")("hardhat");
 
 let accounts;
+const rewardRate = parseEther("25.72864");
 
 describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
-		// await deployments.fixture()
-		const chainId = await getChainId();
+		await fixture();
+		// const chainId = await getChainId();
 		accounts = await getNamedSigners();
-		await run("deployMocks");
-		const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
+		// await run("deployMocks");
+		// const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
 
-		await run("deploy:gymToken", {
-			holder: deploymentArgs.holder
-		});
-		
-		await deployments.deploy("BuyBack", {
-			from: accounts.deployer.address,
-			args: [],
-			log: true,
-			deterministicDeployment: false
-		});
+		// await run("deploy:gymToken", {
+		// 	holder: deploymentArgs.holder
+		// });
 
-		await deployments.deploy("GymMLM", {
-			from: accounts.deployer.address,
-			args: [],
-			log: true,
-			deterministicDeployment: false
-		});
+		// await deployments.deploy("BuyBack", {
+		// 	from: accounts.deployer.address,
+		// 	args: [],
+		// 	log: true,
+		// 	deterministicDeployment: false
+		// });
+
+		// await deployments.deploy("GymMLM", {
+		// 	from: accounts.deployer.address,
+		// 	args: [],
+		// 	log: true,
+		// 	deterministicDeployment: false
+		// });
 
 		// await run("deploy:gymMLM");
 
-		this.deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsBank");
+		// this.deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsBank");
 
-		await run("deploy:gymVaultsBank", {
-			startblock: this.deploymentArgs.startBlock.toString(),
-			gymtokenaddress: this.deploymentArgs.gymTokenAddress,
-			rewardrate: this.deploymentArgs.rewardRate.toString()
-		});
+		// await run("deploy:gymVaultsBank", {
+		// 	startblock: this.deploymentArgs.startBlock.toString(),
+		// 	gymtokenaddress: this.deploymentArgs.gymTokenAddress,
+		// 	rewardrate: this.deploymentArgs.rewardRate.toString()
+		// });
 
-		const farmingDeploymentArgs = await getDeploymentArgs(chainId, "GymFarming");
+		// const farmingDeploymentArgs = await getDeploymentArgs(chainId, "GymFarming");
 
-		await run("deploy:farming", {
-			bankAddress: farmingDeploymentArgs.bank,
-			rewardTokenAddress: farmingDeploymentArgs.rewardToken,
-			rewardPerBlock: farmingDeploymentArgs.rewardPerBlock.toString(),
-			startBlock: farmingDeploymentArgs.startBlock.toString()
-		});
+		// await run("deploy:farming", {
+		// 	bankAddress: farmingDeploymentArgs.bank,
+		// 	rewardTokenAddress: farmingDeploymentArgs.rewardToken,
+		// 	rewardPerBlock: farmingDeploymentArgs.rewardPerBlock.toString(),
+		// 	startBlock: farmingDeploymentArgs.startBlock.toString()
+		// });
 
 		this.wantToken1 = await getContract("WantToken1", accounts.caller);
 		this.wantToken2 = await getContract("WantToken2", accounts.caller);
 		this.gymToken = await getContract("GymToken", accounts.caller);
 		this.relationship = await getContract("GymMLM", accounts.caller);
 		this.farming = await getContract("GymFarming", accounts.deployer);
-		await this.farming.connect(accounts.deployer).add(30, farmingDeploymentArgs.rewardToken, false);
+		await this.farming.connect(accounts.deployer).add(30, this.gymToken.address, false);
 		this.buyBack = await getContract("BuyBack", accounts.caller);
 		this.gymVaultsBank = await getContract("GymVaultsBank", accounts.deployer);
 		this.WBNB = await getContract("WBNBMock", accounts.caller);
@@ -80,6 +82,11 @@ describe("GymVaultsBank contract: ", function () {
 		this.strategy = await getContract("StrategyMock", accounts.caller);
 		this.routerMock = await getContract("RouterMock", accounts.caller);
 		
+		// console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 85 ~ this.gymVaultsBank", this.gymVaultsBank.interface.fragments);
+		// console.log(
+		// 	"🚀 ~ file: GymVaultsBank.test.js ~ line 85 ~ await this.gymVaultsBank.deployTransaction()",
+		// 	await this.gymVaultsBank.deployTransaction()
+		// );
 		await run("gymMLM:setBankAddress", {
 			bankAddress: this.gymVaultsBank.address,
 			caller: "deployer"
@@ -119,31 +126,19 @@ describe("GymVaultsBank contract: ", function () {
 
 		this.strategy3 = await getContract("StrategyMock3", accounts.deployer);
 
-		await this.wantToken2
-			.connect(accounts.deployer)
-			.transfer(accounts.vzgo.address, testVars.WANTTOKEN_AMOUNT / 4);
-		await this.wantToken2
-			.connect(accounts.deployer)
-			.transfer(accounts.grno.address, testVars.WANTTOKEN_AMOUNT / 4);
+		await this.wantToken2.connect(accounts.deployer).transfer(accounts.vzgo.address, testVars.WANTTOKEN_AMOUNT / 4);
+		await this.wantToken2.connect(accounts.deployer).transfer(accounts.grno.address, testVars.WANTTOKEN_AMOUNT / 4);
 		await this.wantToken2
 			.connect(accounts.deployer)
 			.transfer(this.routerMock.address, testVars.WANTTOKEN_AMOUNT / 4);
 
-		await this.wantToken1
-			.connect(accounts.deployer)
-			.transfer(accounts.grno.address, testVars.WANTTOKEN_AMOUNT / 2);
-		await this.wantToken1
-			.connect(accounts.deployer)
-			.transfer(accounts.vzgo.address, testVars.WANTTOKEN_AMOUNT / 2);
-		await this.gymToken
-			.connect(accounts.holder)
-			.transfer(this.gymVaultsBank.address, 2000);
+		await this.wantToken1.connect(accounts.deployer).transfer(accounts.grno.address, testVars.WANTTOKEN_AMOUNT / 2);
+		await this.wantToken1.connect(accounts.deployer).transfer(accounts.vzgo.address, testVars.WANTTOKEN_AMOUNT / 2);
+		await this.gymToken.connect(accounts.holder).transfer(this.gymVaultsBank.address, 2000);
 		await this.gymToken
 			.connect(accounts.holder)
 			.transfer(this.routerMock.address, parseEther(testVars.AMOUNT.toString()));
-		await this.earnToken
-			.connect(accounts.deployer)
-			.transfer(this.gymVaultsBank.address, 5000);
+		await this.earnToken.connect(accounts.deployer).transfer(this.gymVaultsBank.address, 5000);
 	});
 	describe("Initialization: ", function () {
 		beforeEach("Before: ", async function () {
@@ -161,13 +156,15 @@ describe("GymVaultsBank contract: ", function () {
 		});
 
 		it("Should initialize with correct parameters:", async function () {
-			expect(await this.gymVaultsBank.RELATIONSHIP_REWARD()).to.equal(variables.GymVaultsBank_RELATIONSHIP_REWARD);
+			expect(await this.gymVaultsBank.RELATIONSHIP_REWARD()).to.equal(
+				variables.GymVaultsBank_RELATIONSHIP_REWARD
+			);
 			expect(await this.gymVaultsBank.VAULTS_SAVING()).to.equal(variables.GymVaultsBank_VAULTS_SAVING);
 			expect(await this.gymVaultsBank.BUY_AND_BURN_GYM()).to.equal(variables.GymVaultsBank_BUY_AND_BURN);
-			expect(await this.gymVaultsBank.startBlock()).to.equal(this.deploymentArgs.startBlock);
+			// expect(await this.gymVaultsBank.startBlock()).to.equal(this.deploymentArgs.startBlock);
 			expect(await this.gymVaultsBank.rewardPoolInfo()).to.deep.equal([
-				this.deploymentArgs.gymTokenAddress,
-				BigNumber.from(this.deploymentArgs.rewardRate)
+				this.gymToken.address,
+				BigNumber.from(rewardRate)
 			]);
 		});
 
@@ -176,9 +173,9 @@ describe("GymVaultsBank contract: ", function () {
 			await advanceBlockTo(startBlock + 10);
 
 			await expect(
-				deployments.deploy("GymVaultsBank", {
+				deploy("GymVaultsBank", {
 					from: accounts.deployer.address,
-					args: [startBlock, this.deploymentArgs.gymTokenAddress, this.deploymentArgs.rewardRate],
+					args: [startBlock, this.gymToken.address, rewardRate],
 					log: true,
 					deterministicDeployment: false
 				})
@@ -277,7 +274,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 		it("Should add Pool:", async function () {
 			poolLength = await this.gymVaultsBank.poolLength();
-			await advanceBlockTo((await getBlockNumber()) + 150);
+			await advanceBlockTo((await getBlockNumber()) + 200);
 
 			const tx = await run("gymVaultsBank:add", {
 				want: this.wantToken2.address,
@@ -340,6 +337,7 @@ describe("GymVaultsBank contract: ", function () {
 				strategy: this.strategy2.address,
 				caller: "deployer"
 			});
+			console.log(await this.gymVaultsBank.poolInfo);
 			expect((await this.gymVaultsBank.poolInfo(1)).strategy).to.equal(this.strategy2.address);
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, testVars.AMOUNT);
@@ -494,9 +492,7 @@ describe("GymVaultsBank contract: ", function () {
 					pid: "1",
 					user: accounts.grno.address
 				})
-			).to.equal(
-				this.rewardPerBlock.div(2).mul(testVars.BLOCK_COUNT).mul(poolAllocPoint1).div(totalAllocPoint)
-			);
+			).to.equal(this.rewardPerBlock.div(2).mul(testVars.BLOCK_COUNT).mul(poolAllocPoint1).div(totalAllocPoint));
 		});
 
 		it("Should calculate rewards for 2 users in 2 different pools:", async function () {
@@ -813,7 +809,9 @@ describe("GymVaultsBank contract: ", function () {
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
 					this.vzgoWant2Balance -
-						(testVars.AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
+						(testVars.AMOUNT *
+							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+							100 -
 						vzgoShares / 10
 				)
 			);
@@ -861,7 +859,9 @@ describe("GymVaultsBank contract: ", function () {
 				Math.floor(
 					this.vzgoWant2Balance -
 						20 -
-						(testVars.AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
+						(testVars.AMOUNT *
+							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+							100 -
 						(vzgoShares - 20) / 10
 				)
 			);
@@ -925,7 +925,9 @@ describe("GymVaultsBank contract: ", function () {
 			expect((await this.wantToken2.balanceOf(accounts.vzgo.address)).sub(1)).to.equal(
 				Math.floor(
 					this.vzgoWant2Balance -
-						(testVars.AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
+						(testVars.AMOUNT *
+							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+							100 -
 						vzgoShares / 10
 				)
 			);
@@ -949,7 +951,9 @@ describe("GymVaultsBank contract: ", function () {
 			expect((await this.wantToken2.balanceOf(accounts.grno.address)).sub(1)).to.equal(
 				Math.floor(
 					this.grnoWant2Balance -
-						(testVars.AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100 -
+						(testVars.AMOUNT *
+							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+							100 -
 						grnoShares / 10
 				)
 			);
@@ -990,7 +994,11 @@ describe("GymVaultsBank contract: ", function () {
 
 			expect(await this.wantToken2.balanceOf(accounts.vzgo.address)).to.equal(
 				this.vzgoWant2Balance
-					.sub((testVars.AMOUNT * (variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) / 100)
+					.sub(
+						(testVars.AMOUNT *
+							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+							100
+					)
 					.sub(vzgoShares.div(10))
 			);
 			expect(await this.gymToken.balanceOf(accounts.vzgo.address)).to.equal(bankGymBalance);
@@ -1049,7 +1057,11 @@ describe("GymVaultsBank contract: ", function () {
 				BigNumber.from(vzgoBalance)
 					.sub(
 						BigNumber.from(parseEther(testVars.AMOUNT.toString()))
-							.mul(BigNumber.from(variables.GymVaultsBank_BUY_AND_BURN).add(variables.GymVaultsBank_RELATIONSHIP_REWARD))
+							.mul(
+								BigNumber.from(variables.GymVaultsBank_BUY_AND_BURN).add(
+									variables.GymVaultsBank_RELATIONSHIP_REWARD
+								)
+							)
 							.div(100)
 					)
 					.sub(vzgoShares.div(10)),
