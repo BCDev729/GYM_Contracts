@@ -192,10 +192,6 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			await this.bank.deposit(this.strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
 
 			const fairLaunchBefore = await this.vault.balanceOf(this.fairLaunch.address);
-			console.log(
-				"🚀 ~ file: GymVaultsStrategyAlpaca.test.js ~ line 196 ~ fairLaunchBefore",
-				fairLaunchBefore.toString()
-			);
 			const wantBalBefore = await this.want.balanceOf(this.vault.address);
 			const bankBalBefore = await this.want.balanceOf(this.bank.address);
 			const wantLockedTotalBefore = await this.strategyAlpacaAutoComp.wantLockedTotal();

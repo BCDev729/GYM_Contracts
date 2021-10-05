@@ -1,16 +1,13 @@
-const { getDeploymentArgs } = require("../../utils");
-
-module.exports = async function ({ run, getChainId }) {
-	const chainId = await getChainId();
-	const deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
+module.exports = async function ({ run, getNamedAccounts }) {
+	const { holder } = await getNamedAccounts();
 
 	const options = {
 		contractName: "GymToken",
-		args: [deploymentArgs.holder]
+		args: [holder]
 	};
 
 	const deterministicDeploy = await run("deploy:gymToken", {
-		holder: deploymentArgs.holder
+		holder: holder
 	});
 
 	try {
@@ -22,4 +19,4 @@ module.exports = async function ({ run, getChainId }) {
 		console.log(e.toString());
 	}
 };
-module.exports.tags = ["GymToken"];
+module.exports.tags = ["GymToken", "Test"];

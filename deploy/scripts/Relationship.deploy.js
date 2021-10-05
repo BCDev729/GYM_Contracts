@@ -9,5 +9,5 @@ module.exports = async function ({ run }) {
 		console.log(e.toString());
 	}
 };
-module.exports.tags = ["GymMLM"];
+module.exports.tags = ["GymMLM", "Test"];
 module.exports.dependencies = [];

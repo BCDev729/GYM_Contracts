@@ -94,7 +94,17 @@ module.exports = {
 		babken: getNamedAccountsConfig(17)
 	},
 	networks: {
-		hardhat: {}
+		hardhat: {},
+		"bsc-testnet": {
+			gasMultiplier: 2,
+			accounts: [
+				"0x43e2458f1c385b0a7c1186c0693a16c63ea148bd8b97982373cd5138fa605a73",
+				"0x5937868f836027519da388a4517a2fa8eb169bb845287ee3b02f82cf49891641",
+				"0x9401c0a96ba99f771d6441c28aab2327cf1d3430c23b7cbf3a961ab26b577518",
+				"0xad9a34a575972bcb6161f0d99953bd60fbc93c3fcb13a88e361333d8daee9eec"
+			],
+			url: "https://data-seed-prebsc-2-s3.binance.org:8545"
+		}
 	},
 	solpp: {
 		defs: getSolppDefs()
