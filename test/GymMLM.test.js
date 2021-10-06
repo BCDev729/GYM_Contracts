@@ -1,8 +1,11 @@
 const { expect } = require("chai");
-const { deployments, network, ethers } = require("hardhat");
+const {
+	deployments: { fixture },
+	network,
+	ethers
+} = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
 const variables = require("../utils/constants/solpp")("hardhat");
-// const { getDeploymentArgs } = require("../utils/constants");
 
 let accounts, snapshotId; // deploymentArgs
 const depositAmount = 500;
@@ -15,7 +18,7 @@ describe("GymMLM contract: ", function () {
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 
-		await deployments.fixture();
+		await fixture();
 
 		this.gymToken = await getContract("GymToken", accounts.caller);
 
@@ -25,7 +28,6 @@ describe("GymMLM contract: ", function () {
 
 		this.gymMLM = await getContract("GymMLM", accounts.deployer);
 		await this.gymMLM.setBankAddress(this.gymVaultsBank.address);
-		console.log(this.gymMLM.address);
 		this.wantToken = await getContract("WantToken2", accounts.caller);
 		this.WBNBMock = await getContract("WBNBMock", accounts.caller);
 		this.strategy = await getContract("StrategyMock2", accounts.caller);
