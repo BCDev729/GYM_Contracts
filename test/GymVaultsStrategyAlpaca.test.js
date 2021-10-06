@@ -1,5 +1,9 @@
 const { expect } = require("chai");
-const { deployments, network, ethers, run } = require("hardhat");
+const {
+	deployments: { fixture, deploy },
+	network,
+	ethers
+} = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
 const testVars = require("./utilities/testVariables.json");
 
@@ -8,13 +12,7 @@ let accounts;
 describe("GymVaultsStrategyAlpaca contract: ", function () {
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		await run("deployMocks");
-
-		await deployments.deploy("GymToken", {
-			from: accounts.deployer.address,
-			args: [accounts.holder.address],
-			deterministicDeployment: true
-		});
+		await fixture();
 
 		this.router = await getContract("RouterMock");
 		this.farm = await getContract("FarmMock");
@@ -26,26 +24,10 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		this.earn = await getContract("EarnToken", accounts.caller);
 		this.tokenA = await getContract("TokenA", accounts.caller);
 		this.ibToken = await getContract("ibToken", accounts.caller);
-		// this.tokenB = await getContract("TokenB", accounts.caller);
-		await deployments.deploy("GymVaultsStrategyAlpaca", {
-			from: accounts.deployer.address,
-			args: [
-				this.bank.address,
-				false,
-				this.vault.address,
-				this.fairLaunch.address,
-				0, // pid
-				this.want.address,
-				this.earn.address,
-				this.router.address
-			],
-			log: true,
-			deterministicDeployment: false
-		});
 
 		this.strategyAlpaca = await getContract("GymVaultsStrategyAlpaca", accounts.caller);
 
-		await deployments.deploy("GymVaultsStrategyAlpaca", {
+		await deploy("GymVaultsStrategyAlpaca", {
 			from: accounts.deployer.address,
 			args: [
 				this.bank.address,
@@ -66,20 +48,13 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		await this.want.connect(accounts.deployer).transfer(this.bank.address, testVars.TOKENS_MINT_AMOUNT / 4);
 		await this.want.connect(accounts.deployer).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT / 4);
 		await this.want.connect(accounts.deployer).transfer(this.farm.address, testVars.TOKENS_MINT_AMOUNT / 4);
-		await this.want
-			.connect(accounts.deployer)
-			.transfer(accounts.vzgo.address, testVars.TOKENS_MINT_AMOUNT / 8);
+		await this.want.connect(accounts.deployer).transfer(accounts.vzgo.address, testVars.TOKENS_MINT_AMOUNT / 8);
 		await this.earn.connect(accounts.deployer).transfer(this.farm.address, testVars.TOKENS_MINT_AMOUNT / 2);
-		await this.earn
-			.connect(accounts.deployer)
-			.transfer(this.fairLaunch.address, testVars.TOKENS_MINT_AMOUNT / 4);
-		await this.ibToken
-			.connect(accounts.deployer)
-			.transfer(this.vault.address, testVars.TOKENS_MINT_AMOUNT / 2);
+		await this.earn.connect(accounts.deployer).transfer(this.fairLaunch.address, testVars.TOKENS_MINT_AMOUNT / 4);
+		await this.ibToken.connect(accounts.deployer).transfer(this.vault.address, testVars.TOKENS_MINT_AMOUNT / 2);
 		await this.gymToken.connect(accounts.holder).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT);
 		// await this.tokenA.connect(accounts.deployer).transfer(accounts.vzgo.address, variables.TOKENS_MINT_AMOUNT / 2)
 		// await this.tokenB.connect(accounts.deployer).transfer(this.router.address, variables.TOKENS_MINT_AMOUNT / 2)
-		console.log("balance", await this.want.balanceOf(this.bank.address));
 	});
 
 	describe("Constructor: ", function () {
@@ -156,9 +131,7 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 
 			await this.bank.deposit(this.strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
 
-			expect(await this.want.balanceOf(this.vault.address)).to.equal(
-				Number(farmBalBefore) + testVars.TX_AMOUNT
-			);
+			expect(await this.want.balanceOf(this.vault.address)).to.equal(Number(farmBalBefore) + testVars.TX_AMOUNT);
 			expect(await this.strategyAlpacaAutoComp.wantLockedTotal()).to.equal(testVars.TX_AMOUNT);
 		});
 	});

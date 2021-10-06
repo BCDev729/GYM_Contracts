@@ -1,23 +1,18 @@
 module.exports = async function (
 	{ contractName, bank, isAutoComp, vault, fairLaunch, pid, want, earn, router },
-	{
-		ethers: {
-			getNamedSigners,
-		},
-		deployments: { deterministic },
-		upgrades: { deployProxy }
-	}
+	{ ethers: { getNamedSigners }, deployments: { deploy }, upgrades: { deployProxy } }
 ) {
 	const { deployer } = await getNamedSigners();
+	isAutoComp = isAutoComp === "true";
 
-	const deterministicDeploy = await deterministic(contractName, {
+	const deterministicDeploy = await deploy(contractName, {
 		from: deployer.address,
 		contract: "GymVaultsStrategyAlpaca",
 		args: [bank, isAutoComp, vault, fairLaunch, pid, want, earn, router],
 		log: true,
-		deterministicDeployment: true
+		deterministicDeployment: false
 	});
-	await deterministicDeploy.deploy();
+	// await deterministicDeploy.deploy();
 	return deterministicDeploy;
 
 	// const GymVaultsStrategy = await getContractFactory(contractName);
