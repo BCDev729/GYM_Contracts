@@ -1,7 +1,7 @@
-module.exports = async function ({ getChainId, ethers: { getContract }, run }) {
+module.exports = async function ({ getChainId, ethers: { getContract }, run, config }) {
 	const chainId = await getChainId();
 
-	if (chainId === "31337") {
+	if (chainId === "31337" && !config.networks.hardhat.forking.enabled) {
 		const want = await getContract("WantToken1");
 
 		await run("deploy:routerMock", {

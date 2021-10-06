@@ -1,7 +1,7 @@
-module.exports = async function ({ getChainId, run }) {
+module.exports = async function ({ getChainId, run, config }) {
 	const chainId = await getChainId();
 
-	if (chainId === "31337") {
+	if (chainId === "31337" && !config.networks.hardhat.forking.enabled) {
 		await run("deploy:fairLaunchMock");
 	}
 };

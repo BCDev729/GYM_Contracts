@@ -1,7 +1,7 @@
-module.exports = async function ({ ethers: { getContract }, getChainId, run }) {
+module.exports = async function ({ ethers: { getContract }, getChainId, run, config }) {
 	const chainId = await getChainId();
 
-	if (chainId === "31337") {
+	if (chainId === "31337" && !config.networks.hardhat.forking.enabled) {
 		const want = await getContract("WantToken1");
 		await run("deploy:vaultMock", {
 			wantAddress: want.address
