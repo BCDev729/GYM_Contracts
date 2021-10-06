@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { advanceBlockTo, prepare, deploy, getBigNumber } = require("../utilities");
+const { advanceBlockTo } = require("../utilities");
 const {
 	deployments: { fixture },
 	network,
@@ -11,11 +11,11 @@ const {
 		constants
 	}
 } = require("hardhat");
-const variables = require("../../utils/constants/solpp")("fork");
-const data = require("../../utils/constants/data/hardhat/GymFarming.json");
+// const variables = require("../../utils/constants/solpp")("fork");
+// const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
 let accounts;
-const amount = getBigNumber(4);
+// const amount = getBigNumber(4);
 const poolAllocPoint2 = 50;
 
 describe("GymFarming contract: ", function () {

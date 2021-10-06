@@ -1,12 +1,11 @@
 const { expect } = require("chai");
 const {
-	deployments: { fixture, deploy },
+	deployments: { fixture },
 	network,
 	ethers: {
 		getNamedSigners,
 		getContract,
 		utils: { parseEther },
-		BigNumber,
 		provider: { getBlockNumber }
 	},
 	run,
@@ -17,8 +16,6 @@ const testVars = require("../utilities/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 
 let accounts;
-const rewardRate = parseEther("25.72864");
-const startBlock = 200;
 
 describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {

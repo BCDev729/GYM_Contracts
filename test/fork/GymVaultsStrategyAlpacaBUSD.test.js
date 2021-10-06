@@ -10,6 +10,7 @@ const {
 		getSigner,
 		utils: { parseEther },
 	},
+	ethers
 } = require("hardhat");
 
 const { advanceBlockTo } = require("../utilities/time");
@@ -52,7 +53,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		await this.gymVaultsBank.connect(accounts.deployer).setFarmingAddress(this.farming.address);
 		await this.gymVaultsBank.connect(accounts.deployer).setWithdrawFee(1000);
 		await this.gymToken.connect(accounts.holder).delegate(this.buyBack.address);
-		await hre.network.provider.request({
+		await network.provider.request({
 			method: "hardhat_impersonateAccount",
 			params: ["0xf9211FfBD6f741771393205c1c3F6D7d28B90F03"]
 		});
