@@ -1,4 +1,4 @@
-const args = require("../../utils/constants/data/hardhat/GymVaultsBank.json");
+const args = require("../../utils/constants/data/fork/GymVaultsBank.json");
 module.exports = async function ({
 	run,
 	config: { networks: { hardhat: {forking} }},
@@ -37,5 +37,5 @@ module.exports = async function ({
 		console.log(e.toString());
 	}
 };
-module.exports.tags = ["GymVaultsBank", "Test"];
+module.exports.tags = ["GymVaultsBank"];
 module.exports.dependencies = ["GymToken", "BuyBack", "GymMLM"];

@@ -4,8 +4,8 @@ const {
 	network,
 	ethers: { getContract, getNamedSigners, BigNumber }
 } = require("hardhat");
-const testVars = require("./utilities/testVariables.json");
-const variables = require("../utils/constants/solpp")("hardhat");
+const testVars = require("./../utilities/testVariables.json");
+const variables = require("../../utils/constants/solpp")("hardhat");
 
 let accounts, snapshotId;
 

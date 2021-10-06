@@ -3,7 +3,7 @@ const {
 	deployments: { fixture },
 	ethers: { getContract, getNamedSigners }
 } = require("hardhat");
-const variables = require("../utils/constants/solpp")("hardhat");
+const variables = require("../../utils/constants/solpp")("hardhat");
 
 let accounts;
 

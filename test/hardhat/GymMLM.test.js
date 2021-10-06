@@ -5,7 +5,7 @@ const {
 	ethers
 } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
-const variables = require("../utils/constants/solpp")("hardhat");
+const variables = require("../../utils/constants/solpp")("hardhat");
 
 let accounts, snapshotId;
 const depositAmount = 500;
@@ -100,10 +100,10 @@ describe("GymMLM contract: ", function () {
 			);
 
 			await this.wantToken.connect(accounts.vzgo).approve(this.gymVaultsBank.address, depositAmount);
-
 			await this.gymVaultsBank
 				.connect(accounts.vzgo)
 				.deposit(1, depositAmount, referrerId, 0, new Date().getTime() + 20);
+
 			expect(await this.gymMLM.userToReferrer(await this.gymMLM.idToAddress(currentId))).to.equal(
 				await this.gymMLM.idToAddress(referrerId)
 			);

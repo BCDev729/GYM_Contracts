@@ -1,6 +1,10 @@
 const args = require("../../utils/constants/data/hardhat/GymVaultsBank.json");
 module.exports = async function ({
-	config,
+	config: {
+		networks: {
+			hardhat: { forking }
+		}
+	},
 	run,
 	getChainId,
 	ethers: {
@@ -10,7 +14,7 @@ module.exports = async function ({
 	}
 }) {
 	const chainId = await getChainId();
-	if (chainId !== "31337" || config.networks.hardhat.forking.enabled) {
+	if (chainId !== "31337" || forking.enabled) {
 		return;
 	}
 	const startBlock = args.startBlock;
@@ -26,7 +30,7 @@ module.exports = async function ({
 		gymtokenaddress: gymToken.address,
 		rewardrate: rewardRate.toString()
 	});
-	
+
 	try {
 		await run("verify:verify", {
 			address: deterministicDeploy.address,
@@ -36,5 +40,5 @@ module.exports = async function ({
 		console.log(e.toString());
 	}
 };
-module.exports.tags = ["GymVaultsBank", "Test"];
+module.exports.tags = ["GymVaultsBank"];
 module.exports.dependencies = ["GymToken", "BuyBack", "GymMLM"];

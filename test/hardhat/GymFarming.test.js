@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { advanceBlock, advanceBlockTo, prepare, deploy, getBigNumber } = require("./utilities");
+const { advanceBlock, advanceBlockTo, prepare, deploy, getBigNumber } = require("../utilities");
 const {
 	deployments: { fixture },
 	network,
@@ -13,8 +13,8 @@ const {
 		constants
 	}
 } = require("hardhat");
-const variables = require("../utils/constants/solpp")("hardhat");
-const data = require("../utils/constants/data/hardhat/GymFarming.json");
+const variables = require("../../utils/constants/solpp")("hardhat");
+const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
 let accounts;
 const amount = getBigNumber(4);
@@ -447,154 +447,6 @@ describe("GymFarming contract: ", function () {
 
 			expect((await this.gymFarming.userInfo(0, accounts.vzgo.address)).rewardDebt).to.not.equal(constants.Zero);
 			expect((await this.gymFarming.userInfo(1, accounts.vzgo.address)).rewardDebt).to.not.equal(constants.Zero);
-		});
-	});
-
-	xdescribe("SpeedStake function: ", function () {
-		// only work when forked
-		let router, factory, lpToken;
-		before("Before: ", async function () {
-			router = await getContractAt("IPancakeRouter02", "0x10ED43C718714eb63d5aA57B78B54704E256024E");
-			factory = await getContractAt("IPancakeFactory", await router.factory());
-
-			await this.gym.connect(accounts.holder).approve(router.address, parseEther("10"));
-
-			await router
-				.connect(accounts.holder)
-				.addLiquidityETH(
-					this.gym.address,
-					parseEther("10"),
-					0,
-					0,
-					accounts.holder.address,
-					new Date().getTime() + 20,
-					{
-						value: parseEther("10")
-					}
-				);
-
-			lpToken = await factory.getPair(this.gym.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
-		});
-		beforeEach("BeforeEach: ", async function () {
-			this.snapshotStart = await network.provider.request({
-				method: "evm_snapshot",
-				params: []
-			});
-
-			await this.gymFarming.add(poolAllocPoint2, lpToken, true);
-		});
-
-		afterEach("AfterEach: ", async function () {
-			await network.provider.request({
-				method: "evm_revert",
-				params: [this.snapshotStart]
-			});
-		});
-
-		it("Should deposit in pool with BNB: ", async function () {
-			await expect(() =>
-				this.gymFarming.connect(accounts.holder).speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-					value: parseEther("10")
-				})
-			).to.changeTokenBalances(this.gym, [accounts.holder], [0]);
-
-			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount).to.not.equal(0);
-		});
-
-		it("Should deposit in pool: ", async function () {
-			await this.gym.connect(accounts.holder).approve(this.gymFarming.address, parseEther("10"));
-			await expect(() =>
-				this.gymFarming
-					.connect(accounts.holder)
-					.speedStake(0, parseEther("10"), 0, 0, 0, new Date().getTime() + 20, {
-						value: parseEther("10")
-					})
-			).to.changeTokenBalances(this.gym, [accounts.holder], [parseEther("10").mul(constants.NegativeOne)]);
-
-			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount).to.not.equal(0);
-		});
-
-		it("Should deposit in pool with token: ", async function () {
-			await this.gym.connect(accounts.holder).approve(this.gymFarming.address, parseEther("10"));
-			await expect(() =>
-				this.gymFarming
-					.connect(accounts.holder)
-					.speedStake(0, parseEther("10"), 0, 0, 0, new Date().getTime() + 20)
-			).to.changeTokenBalances(this.gym, [accounts.holder], [parseEther("10").mul(constants.NegativeOne)]);
-
-			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount).to.not.equal(0);
-		});
-	});
-
-	xdescribe("ClaimAndDeposit function: ", function () {
-		// only work when forked
-		let router, factory, lpToken;
-		before("Before: ", async function () {
-			router = await getContractAt("IPancakeRouter02", "0x10ED43C718714eb63d5aA57B78B54704E256024E");
-			factory = await getContractAt("IPancakeFactory", await router.factory());
-
-			await this.gym.connect(accounts.holder).approve(router.address, parseEther("10"));
-
-			await router
-				.connect(accounts.holder)
-				.addLiquidityETH(
-					this.gym.address,
-					parseEther("10"),
-					0,
-					0,
-					accounts.holder.address,
-					new Date().getTime() + 20,
-					{
-						value: parseEther("10")
-					}
-				);
-
-			lpToken = await factory.getPair(this.gym.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
-		});
-		beforeEach("BeforeEach: ", async function () {
-			this.snapshotStart = await network.provider.request({
-				method: "evm_snapshot",
-				params: []
-			});
-
-			await this.gymFarming.add(poolAllocPoint2, lpToken, true);
-		});
-
-		afterEach("AfterEach: ", async function () {
-			await network.provider.request({
-				method: "evm_revert",
-				params: [this.snapshotStart]
-			});
-		});
-
-		it("Should claimA in pool: ", async function () {
-			const tx = await this.gymFarming
-				.connect(accounts.holder)
-				.speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-					value: parseEther("10")
-				});
-
-			await advanceBlockTo(tx.blockNumber + 200);
-			const userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
-			await this.gymFarming.connect(accounts.holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20);
-
-			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);
-		});
-
-		it("Should claimA in pool with additional BNB: ", async function () {
-			const tx = await this.gymFarming
-				.connect(accounts.holder)
-				.speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-					value: parseEther("10")
-				});
-
-			await advanceBlockTo(tx.blockNumber + 200);
-			const userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
-			await this.gymFarming.connect(accounts.holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20, {
-				value: parseEther("1")
-			});
-
-			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);
 		});
 	});
 });

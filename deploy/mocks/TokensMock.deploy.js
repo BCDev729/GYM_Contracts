@@ -1,8 +1,17 @@
 const testVars = require("../../test/utilities/testVariables.json");
 
-module.exports = async function ({ getChainId, run, ethers }) {
+module.exports = async function ({
+	getChainId,
+	run,
+	ethers,
+	config: {
+		networks: {
+			hardhat: { forking }
+		}
+	}
+}) {
 	const chainId = await getChainId();
-	if (chainId === "31337") {
+	if (chainId === "31337" && !forking.enabled) {
 		await run("deploy:tokensMock", {
 			contractName: "WantToken1",
 			symbol: "WT1",

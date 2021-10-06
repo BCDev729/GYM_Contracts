@@ -12,9 +12,9 @@ const {
 	run,
 } = require("hardhat");
 
-const { advanceBlockTo } = require("./utilities/time");
-const testVars = require("./utilities/testVariables.json");
-const variables = require("../utils/constants/solpp")("hardhat");
+const { advanceBlockTo } = require("./../utilities/time");
+const testVars = require("./../utilities/testVariables.json");
+const variables = require("../../utils/constants/solpp")("hardhat");
 
 let accounts;
 const rewardRate = parseEther("25.72864");
@@ -545,53 +545,6 @@ describe("GymVaultsBank contract: ", function () {
 			);
 			expect(Number((await this.gymVaultsBank.userInfo(0, accounts.vzgo.address)).shares)).to.equal(
 				(variables.GymVaultsBank_VAULTS_SAVING / 100) * Number(parseEther(testVars.AMOUNT.toString()))
-			);
-		});
-	});
-
-	xdescribe("Claim and deposit in farming:", function () {
-		// fork
-		before("Before: ", async function () {
-			this.snapshotId = await network.provider.request({
-				method: "evm_snapshot",
-				params: []
-			});
-		});
-
-		after("After tests: ", async function () {
-			await network.provider.request({
-				method: "evm_revert",
-				params: [this.snapshotId]
-			});
-		});
-
-		it("Should deposit in gymVaultsbank, claim rewards and deposit in Farming", async function () {
-			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
-
-			await run("gymVaultsBank:add", {
-				want: this.wantToken2.address,
-				allocPoint: "30",
-				withUpdate: "false",
-				strategy: this.strategy2.address,
-				caller: "deployer"
-			});
-			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, testVars.AMOUNT);
-
-			await run("gymVaultsBank:deposit", {
-				pid: "1",
-				wantAmt: testVars.AMOUNT.toString(),
-				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
-				caller: "vzgo"
-			});
-
-			await advanceBlockTo((await getBlockNumber()) + 150);
-			// await this.gymVaultsBank.connect(accounts.vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
-			await run("gymVaultsBank:claimAndDeposit", {
-				pid: "1",
-				caller: "vzgo"
-			});
-			expect((await this.farming.userInfo(0, accounts.vzgo.address)).amount).to.equal(
-				variables.ROUTER_MOCK_RETURN_AMOUNT
 			);
 		});
 	});

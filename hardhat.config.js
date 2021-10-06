@@ -25,7 +25,6 @@ require("@nomiclabs/hardhat-solhint");
 require("./tasks");
 
 const network = require("./network.json");
-
 const getNetwork = function () {
 	const args = process.argv.slice(2);
 	const networkIndex = args.findIndex((el, i, arr) => {
@@ -44,6 +43,7 @@ const getSolppDefs = function () {
 	}
 	return require("./utils/constants/solpp")(getNetwork());
 };
+
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -161,7 +161,7 @@ module.exports = {
 		showTimeSpent: true
 	},
 	etherscan: {
-		apiKey: process.env.ETHERSCAN_API_KEY
+		apiKey: "6ce6d20a-db6a-46e5-8fa5-9c4b16ec7549"
 	},
 	typechain: {
 		outDir: "typechain",
@@ -175,5 +175,8 @@ module.exports = {
 	tenderly: {
 		project: TENDERLY_PROJECT,
 		username: TENDERLY_USERNAME
+	},
+	mocha: {
+		timeout: 100000
 	}
 };

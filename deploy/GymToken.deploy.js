@@ -19,4 +19,4 @@ module.exports = async function ({ run, getNamedAccounts }) {
 		console.log(e.toString());
 	}
 };
-module.exports.tags = ["GymToken", "Test"];
+module.exports.tags = ["GymToken"];

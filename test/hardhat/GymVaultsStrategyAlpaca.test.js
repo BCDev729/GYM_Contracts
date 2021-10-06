@@ -5,7 +5,7 @@ const {
 	ethers
 } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
-const testVars = require("./utilities/testVariables.json");
+const testVars = require("./../utilities/testVariables.json");
 
 let accounts;
 

@@ -3,8 +3,8 @@
 		"hardhat": {
 			"forking": {
 				"enabled": false,
-				"url": "https://eth-mainnet.alchemyapi.io/v2/<key>",
-				"blockNumber": 13230730
+				"url": "https://bsc.getblock.io/mainnet/?api_key=6ce6d20a-db6a-46e5-8fa5-9c4b16ec7549",
+				"blockNumber": 11534744
 			},
 			"allowUnlimitedContractSize": true,
 			"initialBaseFeePerGas": 0

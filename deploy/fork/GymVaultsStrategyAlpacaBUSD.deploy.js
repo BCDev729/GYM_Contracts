@@ -1,8 +1,16 @@
 const args = require("../../utils/constants/data/fork/GymVaultsStrategyAlpacaBUSD.json");
-module.exports = async function ({ run, config, getChainId, ethers: {getContract} }) {
-
+module.exports = async function ({
+	run,
+	config: {
+		networks: {
+			hardhat: { forking }
+		}
+	},
+	getChainId,
+	ethers: { getContract }
+}) {
 	const chainId = await getChainId();
-	if (chainId !== "31337" || !config.networks.hardhat.forking.enabled) {
+	if (chainId !== "31337" || !forking.enabled) {
 		return;
 	}
 
@@ -17,16 +25,7 @@ module.exports = async function ({ run, config, getChainId, ethers: {getContract
 	const owner = bank.address;
 	const options = {
 		contractName: "GymVaultsStrategyAlpaca",
-		args: [
-			bank.address,
-			isAutoComp,
-			vault,
-			fairLaunch,
-			pid,
-			want,
-			earn,
-			router
-		],
+		args: [bank.address, isAutoComp, vault, fairLaunch, pid, want, earn, router],
 		owner: owner
 	};
 
@@ -50,5 +49,5 @@ module.exports = async function ({ run, config, getChainId, ethers: {getContract
 		console.log(e.toString());
 	}
 };
-module.exports.tags = ["GymVaultsStrategyAlpacaBUSD", "Test"];
+module.exports.tags = ["GymVaultsStrategyAlpacaBUSD"];
 module.exports.dependencies = ["GymVaultsBank"];

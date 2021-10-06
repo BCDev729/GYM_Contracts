@@ -9,5 +9,5 @@ coverage
 cache
 artifacts
 typechain
-networks.json
+network.json
 abi
