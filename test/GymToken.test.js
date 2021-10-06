@@ -1,11 +1,10 @@
 const { expect } = require("chai");
 const {
-	deployments,
+	deployments: { fixture },
 	network,
 	getChainId,
 	ethers: { getContract, getNamedSigners, BigNumber }
 } = require("hardhat");
-const { getDeploymentArgs } = require("../utils");
 const testVars = require("./utilities/testVariables.json");
 const variables = require("../utils/constants/solpp")("hardhat");
 
@@ -13,19 +12,9 @@ let accounts, deploymentArgs, snapshotId;
 
 describe("GymToken contract: ", function () {
 	before("Before All: ", async function () {
-		// await deployments.fixture()
+		await fixture();
 
 		accounts = await getNamedSigners();
-		const chainId = await getChainId();
-
-		deploymentArgs = await getDeploymentArgs(chainId, "GymToken");
-
-		await deployments.deploy("GymToken", {
-			from: accounts.deployer.address,
-			args: [deploymentArgs.holder],
-			log: true,
-			deterministicDeployment: false
-		});
 		this.gymToken = await getContract("GymToken", accounts.caller);
 		await this.gymToken.connect(accounts.caller).delegate(accounts.caller.address);
 		await this.gymToken.connect(accounts.holder).delegate(accounts.holder.address);
