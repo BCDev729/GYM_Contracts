@@ -1,9 +1,8 @@
 const { expect } = require("chai");
 const {
-	deployments: { fixture },
+	deployments: { fixture, deploy },
 	network,
-	ethers,
-	run
+	ethers
 } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
 const testVars = require("./utilities/testVariables.json");
@@ -15,14 +14,6 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		accounts = await getNamedSigners();
 		await fixture();
 
-		// await run("deployMocks");
-
-		// await deployments.deploy("GymToken", {
-		// 	from: accounts.deployer.address,
-		// 	args: [accounts.holder.address],
-		// 	deterministicDeployment: true
-		// });
-
 		this.router = await getContract("RouterMock");
 		this.farm = await getContract("FarmMock");
 		this.vault = await getContract("VaultMock");
@@ -33,41 +24,24 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		this.earn = await getContract("EarnToken", accounts.caller);
 		this.tokenA = await getContract("TokenA", accounts.caller);
 		this.ibToken = await getContract("ibToken", accounts.caller);
-		// this.tokenB = await getContract("TokenB", accounts.caller);
-		// await deployments.deploy("GymVaultsStrategyAlpaca", {
-		// 	from: accounts.deployer.address,
-		// 	args: [
-		// 		this.bank.address,
-		// 		false,
-		// 		this.vault.address,
-		// 		this.fairLaunch.address,
-		// 		0, // pid
-		// 		this.want.address,
-		// 		this.earn.address,
-		// 		this.router.address
-		// 	],
-		// 	log: true,
-		// 	deterministicDeployment: false
-		// });
 
 		this.strategyAlpaca = await getContract("GymVaultsStrategyAlpaca", accounts.caller);
-		console.log("🚀 ~ file: GymVaultsStrategyAlpaca.test.js ~ line 54 ~ this.strategyAlpaca", this.strategyAlpaca);
 
-		// await deployments.deploy("GymVaultsStrategyAlpaca", {
-		// 	from: accounts.deployer.address,
-		// 	args: [
-		// 		this.bank.address,
-		// 		true,
-		// 		this.vault.address,
-		// 		this.fairLaunch.address,
-		// 		0, // pid
-		// 		this.want.address,
-		// 		this.earn.address,
-		// 		this.router.address
-		// 	],
-		// 	log: true,
-		// 	deterministicDeployment: false
-		// });
+		await deploy("GymVaultsStrategyAlpaca", {
+			from: accounts.deployer.address,
+			args: [
+				this.bank.address,
+				true,
+				this.vault.address,
+				this.fairLaunch.address,
+				0, // pid
+				this.want.address,
+				this.earn.address,
+				this.router.address
+			],
+			log: true,
+			deterministicDeployment: false
+		});
 
 		this.strategyAlpacaAutoComp = await getContract("GymVaultsStrategyAlpaca", accounts.caller);
 
@@ -81,7 +55,6 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		await this.gymToken.connect(accounts.holder).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT);
 		// await this.tokenA.connect(accounts.deployer).transfer(accounts.vzgo.address, variables.TOKENS_MINT_AMOUNT / 2)
 		// await this.tokenB.connect(accounts.deployer).transfer(this.router.address, variables.TOKENS_MINT_AMOUNT / 2)
-		console.log("balance", await this.want.balanceOf(this.bank.address));
 	});
 
 	describe("Constructor: ", function () {
