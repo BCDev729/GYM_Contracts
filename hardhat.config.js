@@ -24,6 +24,8 @@ require("@nomiclabs/hardhat-solhint");
 
 require("./tasks");
 
+const network = require("./network.json");
+
 const getNetwork = function () {
 	const args = process.argv.slice(2);
 	const networkIndex = args.findIndex((el, i, arr) => {
@@ -33,6 +35,13 @@ const getNetwork = function () {
 };
 
 const getSolppDefs = function () {
+	if (getNetwork() === "hardhat"){
+		if(!network.networks.hardhat.forking.enabled){
+			return require("./utils/constants/solpp")(getNetwork());
+		}else{
+			return require("./utils/constants/solpp")("fork");
+		}
+	}
 	return require("./utils/constants/solpp")(getNetwork());
 };
 
@@ -123,11 +132,10 @@ module.exports = {
 		},
 		babken: {
 			default: 17
-		},
+		}
 	},
 	networks: {
-		hardhat: {
-		}
+		hardhat: {}
 	},
 	solpp: {
 		defs: getSolppDefs()
