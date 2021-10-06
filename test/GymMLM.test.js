@@ -7,7 +7,7 @@ const {
 const { getContract, getNamedSigners } = ethers;
 const variables = require("../utils/constants/solpp")("hardhat");
 
-let accounts, snapshotId; // deploymentArgs
+let accounts, snapshotId;
 const depositAmount = 500;
 const transferAmount = 5000;
 const gymMLMReward = variables.GymVaultsBank_RELATIONSHIP_REWARD;
