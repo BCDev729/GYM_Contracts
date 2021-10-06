@@ -113,7 +113,7 @@ describe("GymVaultsBank contract: ", function () {
 			);
 			expect(await this.gymVaultsBank.VAULTS_SAVING()).to.equal(variables.GymVaultsBank_VAULTS_SAVING);
 			expect(await this.gymVaultsBank.BUY_AND_BURN_GYM()).to.equal(variables.GymVaultsBank_BUY_AND_BURN);
-			// expect(await this.gymVaultsBank.startBlock()).to.equal(this.deploymentArgs.startBlock);
+			expect(await this.gymVaultsBank.startBlock()).to.equal(startBlock);
 			expect(await this.gymVaultsBank.rewardPoolInfo()).to.deep.equal([
 				this.gymToken.address,
 				BigNumber.from(rewardRate)
@@ -289,7 +289,6 @@ describe("GymVaultsBank contract: ", function () {
 				strategy: this.strategy2.address,
 				caller: "deployer"
 			});
-			console.log(await this.gymVaultsBank.poolInfo);
 			expect((await this.gymVaultsBank.poolInfo(1)).strategy).to.equal(this.strategy2.address);
 
 			await this.wantToken2.connect(accounts.vzgo).approve(this.gymVaultsBank.address, testVars.AMOUNT);
