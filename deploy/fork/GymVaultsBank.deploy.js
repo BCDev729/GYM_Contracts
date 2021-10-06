@@ -1,7 +1,7 @@
 const args = require("../../utils/constants/data/hardhat/GymVaultsBank.json");
 module.exports = async function ({
 	run,
-	config,
+	config: { networks: { hardhat: {forking} }},
 	getChainId,
 	ethers: {
 		getContract,
@@ -10,7 +10,7 @@ module.exports = async function ({
 	}
 }) {
 	const chainId = await getChainId();
-	if (chainId !== "31337" || !config.networks.hardhat.forking.enabled) {
+	if (chainId !== "31337" || !forking.enabled) {
 		return;
 	}
 	const blockNumber = await getBlockNumber();

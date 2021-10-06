@@ -144,7 +144,7 @@ module.exports = {
 		clear: true,
 		runOnCompile: true
 	},
-	localNetworksConfig: `${process.cwd()}/networks.json`,
+	localNetworksConfig: `${process.cwd()}/network.json`,
 	gasReporter: {
 		coinmarketcap: COINMARKETCAP_API_KEY,
 		enabled: process.env.REPORT_GAS !== undefined,
