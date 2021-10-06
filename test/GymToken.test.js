@@ -2,13 +2,12 @@ const { expect } = require("chai");
 const {
 	deployments: { fixture },
 	network,
-	getChainId,
 	ethers: { getContract, getNamedSigners, BigNumber }
 } = require("hardhat");
 const testVars = require("./utilities/testVariables.json");
 const variables = require("../utils/constants/solpp")("hardhat");
 
-let accounts, deploymentArgs, snapshotId;
+let accounts, snapshotId;
 
 describe("GymToken contract: ", function () {
 	before("Before All: ", async function () {
