@@ -37,5 +37,5 @@ module.exports = async function ({
 	});
 
 };
-module.exports.tags = ["GymVaultsStrategyAlpacaBUSD"];
+module.exports.tags = ["GymVaultsStrategyAlpacaBUSD", "Fork"];
 module.exports.dependencies = ["GymVaultsBank"];

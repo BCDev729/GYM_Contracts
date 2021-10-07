@@ -12,5 +12,5 @@ module.exports = async function ({ run, getChainId }) {
 		}
 	}
 };
-module.exports.tags = ["BuyBack", "Hardhat"];
+module.exports.tags = ["BuyBack", "Hardhat", "Fork"];
 module.exports.dependencies = [];

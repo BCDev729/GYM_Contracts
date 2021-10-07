@@ -22,7 +22,7 @@ describe("GymVaultsBank contract: ", function () {
 	let strategy, strategy1, strategy2, strategy3, routerMock, snapshotId;
 	const startBlock = 200;
 	before("Before All: ", async function () {
-		await fixture();
+		await fixture("Fork");
 		accounts = await getNamedSigners();
 		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
 		wantToken1 = await getContract("WantToken1", caller);

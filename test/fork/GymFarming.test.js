@@ -19,7 +19,7 @@ describe("GymFarming contract: ", function () {
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 		({ deployer, caller, holder } = accounts);
-		await fixture();
+		await fixture("Fork");
 
 		this.gymFarming = await getContract("GymFarming", deployer);
 		this.gym = await getContract("GymToken", caller);

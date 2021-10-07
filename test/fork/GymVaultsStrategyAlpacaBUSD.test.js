@@ -26,7 +26,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 		({ deployer, owner, caller, holder } = accounts);
-		await fixture();
+		await fixture("Fork");
 
 		gymToken = await getContract("GymToken", caller);
 		relationship = await getContract("GymMLM", deployer);

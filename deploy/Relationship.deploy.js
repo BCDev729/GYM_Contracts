@@ -11,4 +11,4 @@ module.exports = async function ({ run, getChainId }) {
 		}
 	}
 };
-module.exports.tags = ["GymMLM", "Hardhat"];
+module.exports.tags = ["GymMLM", "Hardhat", "Fork"];

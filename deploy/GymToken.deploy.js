@@ -21,4 +21,4 @@ module.exports = async function ({ run, getNamedAccounts, getChainId }) {
 		}
 	}
 };
-module.exports.tags = ["GymToken", "Hardhat"];
+module.exports.tags = ["GymToken", "Hardhat", "Fork"];

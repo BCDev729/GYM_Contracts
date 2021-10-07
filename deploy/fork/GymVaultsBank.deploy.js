@@ -24,5 +24,5 @@ module.exports = async function ({
 		rewardrate: rewardRate.toString()
 	});
 };
-module.exports.tags = ["GymVaultsBank"];
+module.exports.tags = ["GymVaultsBank", "Fork"];
 module.exports.dependencies = ["GymToken", "BuyBack", "GymMLM"];
