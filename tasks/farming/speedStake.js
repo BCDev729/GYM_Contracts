@@ -3,8 +3,7 @@ module.exports = async function (
 	{
 		ethers: {
 			getNamedSigners,
-			getContract,
-			provider: { getBlockNumber },
+			getContract
 		},
 	}
 ) {

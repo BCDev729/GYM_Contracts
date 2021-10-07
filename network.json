@@ -1,0 +1,30 @@
+{
+	"networks": {
+		"hardhat": {
+			"forking": {
+				"enabled": true,
+				"url": "https://bsc.getblock.io/mainnet/?api_key=6ce6d20a-db6a-46e5-8fa5-9c4b16ec7549",
+				"blockNumber": 11534744
+			},
+			"allowUnlimitedContractSize": true,
+			"initialBaseFeePerGas": 0
+		},
+		"bsc": {
+			"gasMultiplier": 2,
+			"accounts": [
+				"0x43e2458f1c385b0a7c1186c0693a16c63ea148bd8b97982373cd5138fa605a73"
+			],
+			"url": "https://bsc-dataseed.binance.org"
+		},
+		"bsc-testnet": {
+			"gasMultiplier": 2,
+			"accounts": [
+				"0x43e2458f1c385b0a7c1186c0693a16c63ea148bd8b97982373cd5138fa605a73"
+			],
+			"url": "https://data-seed-prebsc-2-s3.binance.org:8545"
+		}
+	},
+	"defaultConfig": {
+		"gasPrice": "auto"
+	}
+}

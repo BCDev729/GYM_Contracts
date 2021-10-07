@@ -1,5 +1,5 @@
 module.exports = async function (
-	{ deployer },
+	{ caller },
 	{
 		ethers: {
 			getNamedSigners,
@@ -8,7 +8,7 @@ module.exports = async function (
 	}
 ) {
 	const signers = await getNamedSigners();
-	const farming = await getContract("GymFarming", signers[deployer]);
+	const farming = await getContract("GymFarming", signers[caller]);
 
 	const tx = await farming.setRewardPerBlock();
 	return tx;

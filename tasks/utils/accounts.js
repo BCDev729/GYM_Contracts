@@ -2,9 +2,16 @@ const { normalizeHardhatNetworkAccountsConfig } = require("hardhat/internal/core
 
 const { BN, bufferToHex, privateToAddress, toBuffer } = require("ethereumjs-util");
 
+const getNetwork = function () {
+	const args = process.argv.slice(2);
+	const networkIndex = args.findIndex((el, i, arr) => {
+		return arr[i - 1] === "--network";
+	});
+	return networkIndex === -1 ? "hardhat" : args[networkIndex];
+};
+
 module.exports = async function (taskArguments, hre) {
-	const network = process.env.NETWORK || "hardhat";
-	const networkConfig = hre.config.networks[network];
+	const networkConfig = hre.config.networks[getNetwork()];
 
 	const accounts = normalizeHardhatNetworkAccountsConfig(networkConfig.accounts);
 

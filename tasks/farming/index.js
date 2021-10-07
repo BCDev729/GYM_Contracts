@@ -37,7 +37,7 @@ task("farming:pendingRewardBlock", "Call pendingRewardBlock from farming contrac
 
 task("farming:setRewardToken", "Call setRewardToken function from farming contract", require("./setRewardToken"))
 	.addParam("token", "Reward token address")
-	.addParam("owner", "Signer who will call function", "deployer");
+	.addParam("caller", "Signer who will call function", "deployer");
 
 task("farming:setRewardPerBlock", "Call setRewardPerBlock function from farming contract", require("./setRewardPerBlock"))
 	.addParam("user", "Signer who will call function", "deployer");
@@ -56,13 +56,13 @@ task("farming:add", "Call add function from farming contrat", require("./add"))
 	.addParam("allocPoint", "allocPoint for new pool", "0")
 	.addParam("lpToken", "address of lpToken for new pool", "0")
 	.addParam("withUpdate", "if true, update all pools", "false")
-	.addParam("owner", "Signer who will call function", "deployer"); // why deployer is owner ???
+	.addParam("caller", "Signer who will call function", "deployer");
 
 task("farming:set", "Call set function from farming contract", require("./set"))
 	.addParam("pid", "pool ID for which reward must be calculated", "0")
 	.addParam("allocPoint", "allocPoint for new pool", "0")
 	.addParam("withUpdate", "if true, update all pools", "0")
-	.addParam("owner", "Signer who will call function", "deployer");
+	.addParam("caller", "Signer who will call function", "deployer");
 
 task("farming:massUpdatePool", "Call massUpdatePool function from farming contract", require("./massUpdatePools"))
 	.addParam("caller", "Signer who will call function", "caller");

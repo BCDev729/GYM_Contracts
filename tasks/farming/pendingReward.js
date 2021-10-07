@@ -1,5 +1,3 @@
-const { ethers } = require("ethers");
-
 module.exports = async function (
 	{ pid, user, caller },
 	{

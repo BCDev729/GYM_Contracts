@@ -24,16 +24,28 @@ require("@nomiclabs/hardhat-solhint");
 
 require("./tasks");
 
+const network = require("./network.json");
+const getNetwork = function () {
+	const args = process.argv.slice(2);
+	const networkIndex = args.findIndex((el, i, arr) => {
+		return arr[i - 1] === "--network";
+	});
+	return networkIndex === -1 ? "hardhat" : args[networkIndex];
+};
+
+const getSolppDefs = function () {
+	if (getNetwork() === "hardhat" && network.networks.hardhat.forking.enabled) {
+		return require("./utils/constants/solpp")("fork");
+	}
+	return require("./utils/constants/solpp")(getNetwork());
+};
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 const TENDERLY_PROJECT = process.env.TENDERLY_PROJECT || "";
 const TENDERLY_USERNAME = process.env.TENDERLY_USERNAME || "";
-
-const { getEOAAccountsPublicKeys, getNamedAccountsConfig, VARIABLES } = require("./utils");
-
-const eoaAccountsPublicKeys = getEOAAccountsPublicKeys();
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -46,84 +58,120 @@ module.exports = {
 				settings: {
 					optimizer: {
 						enabled: false,
-						runs: 200,
-					},
-				},
+						runs: 200
+					}
+				}
 			},
 			{
 				version: "0.4.18",
 				settings: {
 					optimizer: {
 						enabled: false,
-						runs: 200,
-					},
-				},
-			},
-		],
+						runs: 200
+					}
+				}
+			}
+		]
 	},
 	namedAccounts: {
-		deployer: getNamedAccountsConfig(0, eoaAccountsPublicKeys[0]),
-		owner: getNamedAccountsConfig(1, eoaAccountsPublicKeys[1]),
-		caller: getNamedAccountsConfig(2, eoaAccountsPublicKeys[2]),
-		holder: getNamedAccountsConfig(3, eoaAccountsPublicKeys[3]),
-		vzgo: getNamedAccountsConfig(4, eoaAccountsPublicKeys[4]),
-		grno: getNamedAccountsConfig(5, eoaAccountsPublicKeys[5]),
-		toni: getNamedAccountsConfig(6),
-		chugun: getNamedAccountsConfig(7),
-		shumi: getNamedAccountsConfig(8),
-		ningi: getNamedAccountsConfig(9),
-		andon: getNamedAccountsConfig(10),
-		valod: getNamedAccountsConfig(11),
-		aroka: getNamedAccountsConfig(12),
-		mto: getNamedAccountsConfig(13),
-		benik: getNamedAccountsConfig(14),
-		samoka: getNamedAccountsConfig(15),
-		arni: getNamedAccountsConfig(16),
-		babken: getNamedAccountsConfig(17),
+		deployer: {
+			default: 0
+		},
+		owner: {
+			default: 1
+		},
+		caller: {
+			default: 2
+		},
+		holder: {
+			default: 3
+		},
+		vzgo: {
+			default: 4
+		},
+		grno: {
+			default: 5
+		},
+		toni: {
+			default: 6
+		},
+		chugun: {
+			default: 7
+		},
+		shumi: {
+			default: 8
+		},
+		ningi: {
+			default: 9
+		},
+		andon: {
+			default: 10
+		},
+		valod: {
+			default: 11
+		},
+		aroka: {
+			default: 12
+		},
+		mto: {
+			default: 13
+		},
+		benik: {
+			default: 14
+		},
+		samoka: {
+			default: 15
+		},
+		arni: {
+			default: 16
+		},
+		babken: {
+			default: 17
+		}
 	},
 	networks: {
-		hardhat: {},
+		hardhat: {}
 	},
 	solpp: {
-		defs: VARIABLES[`${process.env.NETWORK}`],
+		defs: getSolppDefs()
 	},
 	spdxLicenseIdentifier: {
 		overwrite: false,
-		runOnCompile: false,
+		runOnCompile: false
 	},
 	dependencyCompiler: {
-		paths: ["@openzeppelin/contracts/token/ERC20/IERC20.sol"],
+		paths: ["@openzeppelin/contracts/token/ERC20/IERC20.sol"]
 	},
 	docgen: {
 		path: "./docgen",
 		clear: true,
-		runOnCompile: true,
+		runOnCompile: true
 	},
-	localNetworksConfig: `${process.cwd()}/networks.json`,
+	localNetworksConfig: `${process.cwd()}/network.json`,
 	gasReporter: {
 		coinmarketcap: COINMARKETCAP_API_KEY,
 		enabled: process.env.REPORT_GAS !== undefined,
 		currency: "USD",
 		showMethodSig: false,
-		showTimeSpent: true,
+		showTimeSpent: true
 	},
 	etherscan: {
-		apiKey: process.env.ETHERSCAN_API_KEY,
+		apiKey: process.env.ETHERSCAN_API_KEY
 	},
 	typechain: {
 		outDir: "typechain",
-		target: "ethers-v5",
+		target: "ethers-v5"
 	},
 	contractSizer: {
 		alphaSort: true,
 		runOnCompile: false,
-		disambiguatePaths: false,
+		disambiguatePaths: false
 	},
 	tenderly: {
 		project: TENDERLY_PROJECT,
-		username: TENDERLY_USERNAME,
+		username: TENDERLY_USERNAME
 	},
 	mocha: {
-		timeout: 100000,
-	},
+		timeout: 100000
+	}
 };

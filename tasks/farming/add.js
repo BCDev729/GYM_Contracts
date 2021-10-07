@@ -1,6 +1,6 @@
 
 module.exports = async function (
-	{ allocPoint, lpToken, withUpdate, deployer },
+	{ allocPoint, lpToken, withUpdate, caller },
 	{
 		ethers: {
 			getNamedSigners,
@@ -10,7 +10,7 @@ module.exports = async function (
 ) {
 	const signers = await getNamedSigners();
 
-	const farming = await getContract("GymFarming", signers[deployer]);
+	const farming = await getContract("GymFarming", signers[caller]);
 
 	withUpdate = (withUpdate === "true");
 	allocPoint = parseInt(allocPoint);

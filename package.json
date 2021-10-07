@@ -3,7 +3,7 @@
 	"license": "MIT",
 	"scripts": {
 		"compile": "npm run prettier:solidity && npx hardhat compile",
-		"test": "npm run eslint:fix && npx hardhat test",
+		"test": "npm run eslint:fix && npx hardhat test test/hardhat/*",
 		"deploy": "npm run eslint:fix && npx hardhat deploy",
 		"verify": "npx hardhat etherscan-verify",
 		"node": "npx hardhat node",
