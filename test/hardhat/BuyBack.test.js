@@ -5,14 +5,14 @@ const {
 } = require("hardhat");
 const variables = require("../../utils/constants/solpp")("hardhat");
 
-let accounts, deployer, caller, holder;
-let gymToken, gymVaultsBank, buyBack, relationship, wantToken, wBNBMock, strategy, strategyAlpaca, routerMock;
-
-const transactionAmount = 500;
-const transferAmount = 5000;
-const buyBackPercent = variables.GymVaultsBank_BUY_AND_BURN;
-
 describe("BuyBack contract: ", function () {
+	let accounts, deployer, caller, holder;
+	let gymToken, gymVaultsBank, buyBack, relationship, wantToken, wBNBMock, strategy, strategyAlpaca, routerMock;
+	
+	const transactionAmount = 500;
+	const transferAmount = 5000;
+	const buyBackPercent = variables.GymVaultsBank_BUY_AND_BURN;
+	
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 		({ deployer, caller, holder } = accounts);
