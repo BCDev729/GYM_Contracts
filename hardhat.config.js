@@ -156,7 +156,7 @@ module.exports = {
 		showTimeSpent: true
 	},
 	etherscan: {
-		apiKey: "6ce6d20a-db6a-46e5-8fa5-9c4b16ec7549"
+		apiKey: process.env.ETHERSCAN_API_KEY
 	},
 	typechain: {
 		outDir: "typechain",
