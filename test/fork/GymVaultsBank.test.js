@@ -15,82 +15,85 @@ const { advanceBlockTo } = require("../utilities/time");
 const testVars = require("../utilities/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 
-let accounts, deployer, owner, caller, holder, vzgo, grno;
-
 describe("GymVaultsBank contract: ", function () {
+	let accounts, deployer, owner, caller, holder, vzgo, grno;
+	let wantToken1, wantToken2, gymToken, relationship, farming, buyBack, gymVaultsBank, WBNB, earnToken;
+	// eslint-disable-next-line no-unused-vars
+	let strategy, strategy1, strategy2, strategy3, routerMock, snapshotId;
+	const startBlock = 200;
 	before("Before All: ", async function () {
 		await fixture();
 		accounts = await getNamedSigners();
 		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
-		this.wantToken1 = await getContract("WantToken1", caller);
-		this.wantToken2 = await getContract("WantToken2", caller);
-		this.gymToken = await getContract("GymToken", caller);
-		this.relationship = await getContract("GymMLM", caller);
-		this.farming = await getContract("GymFarming", deployer);
-		await this.farming.connect(deployer).add(30, this.gymToken.address, false);
-		this.buyBack = await getContract("BuyBack", caller);
-		this.gymVaultsBank = await getContract("GymVaultsBank", deployer);
-		this.WBNB = await getContract("WBNBMock", caller);
-		this.earnToken = await getContract("EarnToken", caller);
-		this.strategy1 = await getContract("StrategyMock1", deployer);
-		this.strategy2 = await getContract("StrategyMock2", deployer);
-		this.strategy = await getContract("StrategyMock", caller);
-		this.routerMock = await getContract("RouterMock", caller);
+		wantToken1 = await getContract("WantToken1", caller);
+		wantToken2 = await getContract("WantToken2", caller);
+		gymToken = await getContract("GymToken", caller);
+		relationship = await getContract("GymMLM", caller);
+		farming = await getContract("GymFarming", deployer);
+		await farming.connect(deployer).add(30, gymToken.address, false);
+		buyBack = await getContract("BuyBack", caller);
+		gymVaultsBank = await getContract("GymVaultsBank", deployer);
+		WBNB = await getContract("WBNBMock", caller);
+		earnToken = await getContract("EarnToken", caller);
+		strategy1 = await getContract("StrategyMock1", deployer);
+		strategy2 = await getContract("StrategyMock2", deployer);
+		strategy = await getContract("StrategyMock", caller);
+		routerMock = await getContract("RouterMock", caller);
 
 		await run("gymMLM:setBankAddress", {
-			bankAddress: this.gymVaultsBank.address,
+			bankAddress: gymVaultsBank.address,
 			caller: "deployer"
 		});
 
 		await run("gymVaultsBank:setFarmingAddress", {
-			farmingAddress: this.farming.address,
+			farmingAddress: farming.address,
 			caller: "deployer"
 		});
 		await run("gymVaultsBank:setTreasuryAddress", {
 			treasuryAddress: owner.address,
 			caller: "deployer"
 		});
-		await this.gymVaultsBank.connect(deployer).setWithdrawFee(1000);
+		await gymVaultsBank.connect(deployer).setWithdrawFee(1000);
 		await run("gymVaultsBank:setWithdrawFee", {
 			withdrawFee: "1000",
 			caller: "deployer"
 		});
-		await this.WBNB.connect(deployer).deposit({
+		await WBNB.connect(deployer).deposit({
 			value: parseEther("10")
 		});
-		await this.gymToken.connect(holder).transfer(this.gymVaultsBank.address, parseEther("10000"));
-		await this.gymToken.connect(holder).delegate(this.buyBack.address);
-		await this.WBNB.connect(deployer).transfer(this.routerMock.address, parseEther("10"));
+		await gymToken.connect(holder).transfer(gymVaultsBank.address, parseEther("10000"));
+		await gymToken.connect(holder).delegate(buyBack.address);
+		await WBNB.connect(deployer).transfer(routerMock.address, parseEther("10"));
 		await deployer.sendTransaction({
 			value: parseEther("5000"),
-			to: this.routerMock.address
+			to: routerMock.address
 		});
-		await this.gymToken.connect(holder).approve(this.routerMock.address, parseEther("1000"));
+		await gymToken.connect(holder).approve(routerMock.address, parseEther("1000"));
 		await run("gymVaultsBank:add", {
-			want: this.WBNB.address,
+			want: WBNB.address,
 			allocPoint: "30",
 			withUpdate: "false",
-			strategy: this.strategy.address,
+			strategy: strategy.address,
 			caller: "deployer"
 		});
 
-		this.strategy3 = await getContract("StrategyMock3", deployer);
+		strategy3 = await getContract("StrategyMock3", deployer);
 
-		await this.wantToken2.connect(deployer).transfer(vzgo.address, testVars.WANTTOKEN_AMOUNT / 4);
-		await this.wantToken2.connect(deployer).transfer(grno.address, testVars.WANTTOKEN_AMOUNT / 4);
-		await this.wantToken2.connect(deployer).transfer(this.routerMock.address, testVars.WANTTOKEN_AMOUNT / 4);
+		await wantToken2.connect(deployer).transfer(vzgo.address, testVars.WANTTOKEN_AMOUNT / 4);
+		await wantToken2.connect(deployer).transfer(grno.address, testVars.WANTTOKEN_AMOUNT / 4);
+		await wantToken2.connect(deployer).transfer(routerMock.address, testVars.WANTTOKEN_AMOUNT / 4);
 
-		await this.wantToken1.connect(deployer).transfer(grno.address, testVars.WANTTOKEN_AMOUNT / 2);
-		await this.wantToken1.connect(deployer).transfer(vzgo.address, testVars.WANTTOKEN_AMOUNT / 2);
-		await this.gymToken.connect(holder).transfer(this.gymVaultsBank.address, 2000);
-		await this.gymToken.connect(holder).transfer(this.routerMock.address, parseEther(testVars.AMOUNT.toString()));
-		await this.earnToken.connect(deployer).transfer(this.gymVaultsBank.address, 5000);
+		await wantToken1.connect(deployer).transfer(grno.address, testVars.WANTTOKEN_AMOUNT / 2);
+		await wantToken1.connect(deployer).transfer(vzgo.address, testVars.WANTTOKEN_AMOUNT / 2);
+		await gymToken.connect(holder).transfer(gymVaultsBank.address, 2000);
+		await gymToken.connect(holder).transfer(routerMock.address, parseEther(testVars.AMOUNT.toString()));
+		await earnToken.connect(deployer).transfer(gymVaultsBank.address, 5000);
 	});
 
 	describe("Claim and deposit in farming:", function () {
 		// fork
 		before("Before: ", async function () {
-			this.snapshotId = await network.provider.request({
+			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
@@ -99,36 +102,36 @@ describe("GymVaultsBank contract: ", function () {
 		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotId]
+				params: [snapshotId]
 			});
 		});
 
 		it("Should deposit in gymVaultsbank, claim rewards and deposit in Farming", async function () {
-			await advanceBlockTo((await getBlockNumber()) + this.deploymentArgs.startBlock);
+			await advanceBlockTo((await getBlockNumber()) + startBlock);
 
 			await run("gymVaultsBank:add", {
-				want: this.wantToken2.address,
+				want: wantToken2.address,
 				allocPoint: "30",
 				withUpdate: "false",
-				strategy: this.strategy2.address,
+				strategy: strategy2.address,
 				caller: "deployer"
 			});
-			await this.wantToken2.connect(vzgo).approve(this.gymVaultsBank.address, testVars.AMOUNT);
+			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, testVars.AMOUNT);
 
 			await run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: testVars.AMOUNT.toString(),
-				referrerId: (await this.relationship.addressToId(deployer.address)).toString(),
+				referrerId: (await relationship.addressToId(deployer.address)).toString(),
 				caller: "vzgo"
 			});
 
 			await advanceBlockTo((await getBlockNumber()) + 150);
-			// await this.gymVaultsBank.connect(vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
+			// await gymVaultsBank.connect(vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
 			await run("gymVaultsBank:claimAndDeposit", {
 				pid: "1",
 				caller: "vzgo"
 			});
-			expect((await this.farming.userInfo(0, vzgo.address)).amount).to.equal(variables.ROUTER_MOCK_RETURN_AMOUNT);
+			expect((await farming.userInfo(0, vzgo.address)).amount).to.equal(variables.ROUTER_MOCK_RETURN_AMOUNT);
 		});
 	});
 });
