@@ -23,7 +23,8 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "double"],
     "semi": ["error", "always"],
-    "node/no-unpublished-require": "off"
+    "node/no-unpublished-require": "off",
+    "mocha/no-hooks-for-single-case": "off"
   },
   "plugins": ["prettier"]
 }

@@ -90,7 +90,7 @@ describe("GymVaultsBank contract: ", function () {
 		await this.earnToken.connect(accounts.deployer).transfer(this.gymVaultsBank.address, 5000);
 	});
 
-	xdescribe("Claim and deposit in farming:", function () {
+	describe("Claim and deposit in farming:", function () {
 		// fork
 		before("Before: ", async function () {
 			this.snapshotId = await network.provider.request({

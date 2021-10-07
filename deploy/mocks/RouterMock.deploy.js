@@ -19,5 +19,5 @@ module.exports = async function ({
 	}
 };
 
-module.exports.tags = ["RouterMock"];
+module.exports.tags = ["RouterMock", "Hardhat"];
 module.exports.dependencies = ["Tokens"];

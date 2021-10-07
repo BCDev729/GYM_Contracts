@@ -17,5 +17,5 @@ module.exports = async function ({
 		});
 	}
 };
-module.exports.tags = ["VaultMock"];
+module.exports.tags = ["VaultMock", "Hardhat"];
 module.exports.dependencies = ["Tokens"];

@@ -7,28 +7,29 @@ const {
 const { getContract, getNamedSigners } = ethers;
 const testVars = require("./../utilities/testVariables.json");
 
-let accounts;
+let accounts, deployer, owner, caller, holder, vzgo;
 
 describe("GymVaultsStrategyAlpaca contract: ", function () {
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		await fixture();
+		({ deployer, owner, caller, holder, vzgo } = accounts);
+		await fixture("Hardhat");
 
 		this.router = await getContract("RouterMock");
 		this.farm = await getContract("FarmMock");
 		this.vault = await getContract("VaultMock");
 		this.fairLaunch = await getContract("FairLaunchMock");
-		this.bank = await getContract("BankMock", accounts.caller);
-		this.gymToken = await getContract("GymToken", accounts.caller);
-		this.want = await getContract("WantToken1", accounts.caller);
-		this.earn = await getContract("EarnToken", accounts.caller);
-		this.tokenA = await getContract("TokenA", accounts.caller);
-		this.ibToken = await getContract("ibToken", accounts.caller);
+		this.bank = await getContract("BankMock", caller);
+		this.gymToken = await getContract("GymToken", caller);
+		this.want = await getContract("WantToken1", caller);
+		this.earn = await getContract("EarnToken", caller);
+		this.tokenA = await getContract("TokenA", caller);
+		this.ibToken = await getContract("ibToken", caller);
 
-		this.strategyAlpaca = await getContract("GymVaultsStrategyAlpaca", accounts.caller);
+		this.strategyAlpaca = await getContract("GymVaultsStrategyAlpaca", caller);
 
 		await deploy("GymVaultsStrategyAlpaca", {
-			from: accounts.deployer.address,
+			from: deployer.address,
 			args: [
 				this.bank.address,
 				true,
@@ -43,24 +44,24 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			deterministicDeployment: false
 		});
 
-		this.strategyAlpacaAutoComp = await getContract("GymVaultsStrategyAlpaca", accounts.caller);
+		this.strategyAlpacaAutoComp = await getContract("GymVaultsStrategyAlpaca", caller);
 
-		await this.want.connect(accounts.deployer).transfer(this.bank.address, testVars.TOKENS_MINT_AMOUNT / 4);
-		await this.want.connect(accounts.deployer).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT / 4);
-		await this.want.connect(accounts.deployer).transfer(this.farm.address, testVars.TOKENS_MINT_AMOUNT / 4);
-		await this.want.connect(accounts.deployer).transfer(accounts.vzgo.address, testVars.TOKENS_MINT_AMOUNT / 8);
-		await this.earn.connect(accounts.deployer).transfer(this.farm.address, testVars.TOKENS_MINT_AMOUNT / 2);
-		await this.earn.connect(accounts.deployer).transfer(this.fairLaunch.address, testVars.TOKENS_MINT_AMOUNT / 4);
-		await this.ibToken.connect(accounts.deployer).transfer(this.vault.address, testVars.TOKENS_MINT_AMOUNT / 2);
-		await this.gymToken.connect(accounts.holder).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT);
-		// await this.tokenA.connect(accounts.deployer).transfer(accounts.vzgo.address, variables.TOKENS_MINT_AMOUNT / 2)
-		// await this.tokenB.connect(accounts.deployer).transfer(this.router.address, variables.TOKENS_MINT_AMOUNT / 2)
+		await this.want.connect(deployer).transfer(this.bank.address, testVars.TOKENS_MINT_AMOUNT / 4);
+		await this.want.connect(deployer).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT / 4);
+		await this.want.connect(deployer).transfer(this.farm.address, testVars.TOKENS_MINT_AMOUNT / 4);
+		await this.want.connect(deployer).transfer(vzgo.address, testVars.TOKENS_MINT_AMOUNT / 8);
+		await this.earn.connect(deployer).transfer(this.farm.address, testVars.TOKENS_MINT_AMOUNT / 2);
+		await this.earn.connect(deployer).transfer(this.fairLaunch.address, testVars.TOKENS_MINT_AMOUNT / 4);
+		await this.ibToken.connect(deployer).transfer(this.vault.address, testVars.TOKENS_MINT_AMOUNT / 2);
+		await this.gymToken.connect(holder).transfer(this.router.address, testVars.TOKENS_MINT_AMOUNT);
+		// await this.tokenA.connect(deployer).transfer(vzgo.address, variables.TOKENS_MINT_AMOUNT / 2)
+		// await this.tokenB.connect(deployer).transfer(this.router.address, variables.TOKENS_MINT_AMOUNT / 2)
 	});
 
 	describe("Constructor: ", function () {
 		it("Should get the correct arguments after the constructor's work for first strategy: ", async function () {
-			expect(await this.strategyAlpaca.operator()).to.equal(accounts.deployer.address);
-			expect(await this.strategyAlpaca.strategist()).to.equal(accounts.deployer.address);
+			expect(await this.strategyAlpaca.operator()).to.equal(deployer.address);
+			expect(await this.strategyAlpaca.strategist()).to.equal(deployer.address);
 			expect(await this.strategyAlpaca.wantAddress()).to.equal(this.want.address);
 			expect(await this.strategyAlpaca.owner()).to.equal(this.bank.address);
 			expect(await this.strategyAlpaca.isAutoComp()).to.equal(false);
@@ -69,12 +70,12 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 
 	describe("isAuthorised function: ", function () {
 		it("Should return true if account is operator or strategist: ", async function () {
-			expect(await this.strategyAlpaca.isAuthorised(accounts.deployer.address)).to.equal(true);
+			expect(await this.strategyAlpaca.isAuthorised(deployer.address)).to.equal(true);
 		});
 
 		it("Should return false if account is not operator or strategist: ", async function () {
-			expect(await this.strategyAlpaca.isAuthorised(accounts.owner.address)).to.equal(false);
-			expect(await this.strategyAlpaca.isAuthorised(accounts.holder.address)).to.equal(false);
+			expect(await this.strategyAlpaca.isAuthorised(owner.address)).to.equal(false);
+			expect(await this.strategyAlpaca.isAuthorised(holder.address)).to.equal(false);
 			expect(await this.strategyAlpaca.isAuthorised(this.farm.address)).to.equal(false);
 		});
 	});
@@ -220,13 +221,13 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 
 			await this.bank.deposit(this.strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
 
-			const deployerEarnBal = Number(await this.earn.balanceOf(accounts.deployer.address));
+			const deployerEarnBal = Number(await this.earn.balanceOf(deployer.address));
 
-			await this.strategyAlpacaAutoComp.connect(accounts.deployer).setControllerFee(testVars.FEE);
+			await this.strategyAlpacaAutoComp.connect(deployer).setControllerFee(testVars.FEE);
 
 			await this.strategyAlpacaAutoComp.earn(0, new Date().getTime() + 20);
 
-			expect(await this.earn.balanceOf(accounts.deployer.address)).to.equal(
+			expect(await this.earn.balanceOf(deployer.address)).to.equal(
 				deployerEarnBal + (testVars.FAIR_LAUNCH_RETURN_AMOUNT * testVars.FEE) / feeMax
 			);
 		});
@@ -254,9 +255,9 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		});
 
 		it("Should revert with 'GymVaultsStrategyAlpaca: !authorised': ", async function () {
-			await this.strategyAlpacaAutoComp.connect(accounts.deployer).setNotPublic(true);
+			await this.strategyAlpacaAutoComp.connect(deployer).setNotPublic(true);
 			await expect(
-				this.strategyAlpacaAutoComp.connect(accounts.vzgo).earn(0, new Date().getTime() + 20)
+				this.strategyAlpacaAutoComp.connect(vzgo).earn(0, new Date().getTime() + 20)
 			).to.be.revertedWith("GymVaultsStrategyAlpaca: !authorised");
 		});
 
@@ -296,10 +297,8 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		});
 
 		it("Should convert dust tokens into earned tokens: ", async function () {
-			await this.want
-				.connect(accounts.deployer)
-				.transfer(this.strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
-			await this.earn.connect(accounts.deployer).transfer(this.router.address, testVars.TX_AMOUNT);
+			await this.want.connect(deployer).transfer(this.strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await this.earn.connect(deployer).transfer(this.router.address, testVars.TX_AMOUNT);
 
 			await this.strategyAlpacaAutoComp.convertDustToEarned(0, new Date().getTime() + 20);
 

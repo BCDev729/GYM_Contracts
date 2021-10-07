@@ -19,5 +19,5 @@ module.exports = async function ({
 	}
 };
 
-module.exports.tags = ["FarmMock"];
+module.exports.tags = ["FarmMock", "Hardhat"];
 module.exports.dependencies = ["RouterMock", "BankMock"];
