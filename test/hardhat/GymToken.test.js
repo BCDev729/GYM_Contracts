@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const {
 	deployments: { fixture },
 	network,
-	ethers: { getContract, getNamedSigners, BigNumber }
+	ethers: { getContract, getNamedSigners, BigNumber, constants }
 } = require("hardhat");
 const testVars = require("./../utilities/testVariables.json");
 const variables = require("../../utils/constants/solpp")("hardhat");
@@ -19,7 +19,7 @@ describe("GymToken contract: ", function () {
 		await this.gymToken.connect(accounts.holder).delegate(accounts.holder.address);
 	});
 
-	describe("Initialization: ", function () {
+	xdescribe("Initialization: ", function () {
 		beforeEach("BeforeEach: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -39,10 +39,11 @@ describe("GymToken contract: ", function () {
 			expect("\"" + (await this.gymToken.symbol()) + "\"").to.equal(variables.GymToken_SYMBOL);
 			expect(await this.gymToken.decimals()).to.equal(variables.GymToken_DECIMALS);
 			expect(await this.gymToken.totalSupply()).to.equal(variables.GymToken_TOTAL_SUPPLY);
+
 		});
 	});
 
-	describe("Burn function: ", function () {
+	xdescribe("Burn function: ", function () {
 		beforeEach("BeforeEach: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -69,7 +70,7 @@ describe("GymToken contract: ", function () {
 		});
 	});
 
-	describe("BurnFrom function: ", function () {
+	xdescribe("BurnFrom function: ", function () {
 		beforeEach("BeforeEach: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",

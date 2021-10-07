@@ -53,7 +53,7 @@ describe("GymFarming contract: ", function () {
 		this.startBlock = parseInt(await this.gymFarming.startBlock());
 	});
 
-	describe("Initialization: ", function () {
+	xdescribe("Initialization: ", function () {
 		it("Should initialize with correct values: ", async function () {
 			expect(await this.gymFarming.rewardToken()).to.equal(this.gym.address);
 			expect(await this.gymFarming.rewardPerBlock()).to.equal(parseEther(data.rewardPerBlock));
@@ -61,7 +61,7 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("PoolLength function: ", function () {
+	xdescribe("PoolLength function: ", function () {
 		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
@@ -84,7 +84,7 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Set function: ", function () {
+	xdescribe("Set function: ", function () {
 		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
@@ -115,7 +115,7 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("pendingReward function: ", function () {
+	xdescribe("pendingReward function: ", function () {
 		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
@@ -273,7 +273,7 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("setRewardPerBlock function", function () {
+	xdescribe("setRewardPerBlock function", function () {
 		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
@@ -328,7 +328,7 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Add function: ", function () {
+	xdescribe("Add function: ", function () {
 		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
@@ -352,15 +352,15 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Deposit function: ", function () {
-		before("Before: ", async function () {
+	xdescribe("Deposit function: ", function () {
+		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function () {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
@@ -379,17 +379,28 @@ describe("GymFarming contract: ", function () {
 			expect(await this.testLp.balanceOf(accounts.caller.address)).to.equal(accountLp.sub(amount));
 			expect(await this.testLp.balanceOf(this.gymFarming.address)).to.equal(amount); // contractLp
 		});
+
+		it("Emit event Deposit", async function () {
+			const pid = await this.gymFarming.poolLength();
+			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
+
+			await this.testLp.connect(accounts.caller).approve(this.gymFarming.address, amount);
+			expect(await this.gymFarming.connect(accounts.caller).deposit(pid, amount))
+				.to
+				.emit(this.gymFarming, "Deposit")
+				.withArgs(accounts.caller.address, pid, amount);
+		});
 	});
 
-	describe("Withdraw function: ", function () {
-		before("Before: ", async function () {
+	xdescribe("Withdraw function: ", function () {
+		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function () {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
@@ -411,20 +422,44 @@ describe("GymFarming contract: ", function () {
 			expect((await this.testLp.balanceOf(accounts.caller.address)).toString()).to.equal(accountLp);
 			expect((await this.testLp.balanceOf(this.gymFarming.address)).toString()).to.equal(contractLp);
 		});
+
+		it("Emit event Withdraw", async function () {
+			const pid = await this.gymFarming.poolLength();
+			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
+
+			await this.testLp.connect(accounts.caller).approve(this.gymFarming.address, amount);
+			await this.gymFarming.connect(accounts.caller).deposit(pid, amount);
+			await advanceBlock();
+			expect(await this.gymFarming.connect(accounts.caller).withdraw(pid, amount))
+				.to
+				.emit(this.gymFarming, "Withdraw")
+				.withArgs(accounts.caller.address, pid, amount);
+		});
+
+		it("Emit event Harvest", async function () {
+			const pid = await this.gymFarming.poolLength();
+			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
+
+			await this.testLp.connect(accounts.caller).approve(this.gymFarming.address, amount);
+			await this.gymFarming.connect(accounts.caller).deposit(pid, amount);
+			await advanceBlock();
+			const pending = await this.gymFarming.connect(accounts.caller).pendingReward(pid, accounts.caller.address);
+			expect(await this.gymFarming.connect(accounts.caller).withdraw(pid, amount))
+				.to
+				.emit(this.gymFarming, "Harvest")
+				.withArgs(accounts.caller.address, pid, pending);
+		});
 	});
 
-	describe("HarvestAll function: ", function () {
-		before("Before: ", async function () {
+	xdescribe("HarvestAll function: ", function () {
+		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
-
-			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, false);
-			await this.gymFarming.add(poolAllocPoint1, this.testLp1.address, true);
 		});
 
-		after("After tests: ", async function () {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [this.snapshotStart]
@@ -432,6 +467,9 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Should HarvestAll: Call HarvestAll function to get all assets at ones ", async function () {
+			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, false);
+			await this.gymFarming.add(poolAllocPoint1, this.testLp1.address, true);
+
 			await this.testLp.connect(accounts.vzgo).approve(this.gymFarming.address, amount);
 			await this.testLp1.connect(accounts.vzgo).approve(this.gymFarming.address, amount);
 
@@ -447,6 +485,23 @@ describe("GymFarming contract: ", function () {
 
 			expect((await this.gymFarming.userInfo(0, accounts.vzgo.address)).rewardDebt).to.not.equal(constants.Zero);
 			expect((await this.gymFarming.userInfo(1, accounts.vzgo.address)).rewardDebt).to.not.equal(constants.Zero);
+		});
+
+		it("Emit Harvest event", async function () {
+			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, false);
+
+			await this.testLp.connect(accounts.vzgo).approve(this.gymFarming.address, amount);
+
+			await this.gymFarming.connect(accounts.vzgo).deposit(0, amount);
+
+			// await advanceBlockTo((await this.gymFarming.poolInfo(0)).lastRewardBlock.add(10));
+			// await this.gymFarming.connect(accounts.vzgo).harvestAll();
+			const pending = await this.gymFarming.pendingReward(0, accounts.vzgo.address);
+			console.log(pending);
+			expect(await this.gymFarming.connect(accounts.vzgo).harvest(0))
+				.to
+				.emit(this.gymFarming, "Harvest")
+				.withArgs(accounts.vzgo.address, 0, pending);
 		});
 	});
 });
