@@ -9,7 +9,7 @@ const {
 		BigNumber,
 		provider: { getBlockNumber }
 	},
-	run,
+	run
 } = require("hardhat");
 
 const { advanceBlockTo } = require("./../utilities/time");
@@ -38,7 +38,7 @@ describe("GymVaultsBank contract: ", function () {
 		this.strategy2 = await getContract("StrategyMock2", accounts.deployer);
 		this.strategy = await getContract("StrategyMock", accounts.caller);
 		this.routerMock = await getContract("RouterMock", accounts.caller);
-		
+
 		await run("gymMLM:setBankAddress", {
 			bankAddress: this.gymVaultsBank.address,
 			caller: "deployer"
@@ -52,7 +52,7 @@ describe("GymVaultsBank contract: ", function () {
 			treasuryAddress: accounts.owner.address,
 			caller: "deployer"
 		});
-		await this.gymVaultsBank.connect(accounts.deployer).setWithdrawFee(1000);
+
 		await run("gymVaultsBank:setWithdrawFee", {
 			withdrawFee: "1000",
 			caller: "deployer"
@@ -448,10 +448,14 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should calculate rewards for 2 users in 2 different pools:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + startBlock);
-			await this.gymVaultsBank
-				.connect(accounts.deployer)
-				.add(this.wantToken2.address, allocPoint, false, this.strategy2.address);
-			// const poolAllocPoint1 = (await this.gymVaultsBank.poolInfo(1)).allocPoint;
+
+			await run("gymVaultsBank:add", {
+				want: this.wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: this.strategy2.address,
+				caller: "deployer"
+			});
 
 			await run("gymVaultsBank:add", {
 				want: this.wantToken1.address,
