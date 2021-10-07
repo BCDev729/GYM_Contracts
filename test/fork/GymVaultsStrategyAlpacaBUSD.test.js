@@ -15,8 +15,9 @@ const {
 
 const { advanceBlockTo } = require("../utilities/time");
 const variables = require("../../utils/constants/solpp")("fork");
+const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
 
-let accounts, rewardPerBlock;
+let accounts;
 
 
 describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
@@ -170,8 +171,8 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				this.gymToken,
 				[accounts.holder, this.gymVaultsBank],
 				[
-					pending.add(rewardPerBlock.div(2)),
-					pending.add(rewardPerBlock.div(2)).mul(ethers.constants.NegativeOne)
+					pending.add(farmingData.rewardPerBlock.div(2)),
+					pending.add(farmingData.rewardPerBlock.div(2)).mul(ethers.constants.NegativeOne)
 				]
 			);
 		});

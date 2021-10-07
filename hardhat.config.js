@@ -34,16 +34,11 @@ const getNetwork = function () {
 };
 
 const getSolppDefs = function () {
-	if (getNetwork() === "hardhat"){
-		if(!network.networks.hardhat.forking.enabled){
-			return require("./utils/constants/solpp")(getNetwork());
-		}else{
-			return require("./utils/constants/solpp")("fork");
-		}
+	if (getNetwork() === "hardhat" && network.networks.hardhat.forking.enabled) {
+		return require("./utils/constants/solpp")("fork");
 	}
 	return require("./utils/constants/solpp")(getNetwork());
 };
-
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
