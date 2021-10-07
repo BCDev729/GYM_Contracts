@@ -24,7 +24,8 @@
     "quotes": ["error", "double"],
     "semi": ["error", "always"],
     "node/no-unpublished-require": "off",
-    "mocha/no-hooks-for-single-case": "off"
+    "mocha/no-hooks-for-single-case": "off",
+    "mocha/no-setup-in-describe": "off"
   },
   "plugins": ["prettier"]
 }

@@ -6,6 +6,7 @@ const {
 const variables = require("../../utils/constants/solpp")("hardhat");
 
 let accounts, deployer, caller, holder;
+let gymToken, gymVaultsBank, buyBack, relationship, wantToken, wBNBMock, strategy, strategyAlpaca, routerMock;
 
 const transactionAmount = 500;
 const transferAmount = 5000;
@@ -16,53 +17,53 @@ describe("BuyBack contract: ", function () {
 		accounts = await getNamedSigners();
 		({ deployer, caller, holder } = accounts);
 		await fixture("Hardhat");
-		this.gymToken = await getContract("GymToken", caller);
-		this.gymVaultsBank = await getContract("GymVaultsBank", caller);
-		this.buyBack = await getContract("BuyBack", caller);
-		this.relationship = await getContract("GymMLM", caller);
-		await this.relationship.connect(deployer).setBankAddress(this.gymVaultsBank.address);
+		gymToken = await getContract("GymToken", caller);
+		gymVaultsBank = await getContract("GymVaultsBank", caller);
+		buyBack = await getContract("BuyBack", caller);
+		relationship = await getContract("GymMLM", caller);
+		await relationship.connect(deployer).setBankAddress(gymVaultsBank.address);
 
-		this.wantToken = await getContract("WantToken1", caller);
-		this.wBNBMock = await getContract("WBNBMock", caller);
-		this.strategy = await getContract("StrategyMock1", caller);
-		this.strategyAlpaca = await getContract("StrategyMock", caller);
-		this.routerMock = await getContract("RouterMock", caller);
+		wantToken = await getContract("WantToken1", caller);
+		wBNBMock = await getContract("WBNBMock", caller);
+		strategy = await getContract("StrategyMock1", caller);
+		strategyAlpaca = await getContract("StrategyMock", caller);
+		routerMock = await getContract("RouterMock", caller);
 
-		await this.gymToken.connect(holder).delegate(this.buyBack.address);
+		await gymToken.connect(holder).delegate(buyBack.address);
 
-		await this.gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
+		await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
 
-		await this.wantToken.connect(deployer).transfer(this.routerMock.address, transferAmount);
-		await this.wantToken.connect(deployer).transfer(holder.address, transferAmount);
+		await wantToken.connect(deployer).transfer(routerMock.address, transferAmount);
+		await wantToken.connect(deployer).transfer(holder.address, transferAmount);
 
-		await this.gymToken.connect(holder).transfer(this.gymVaultsBank.address, 100000);
-		await this.gymToken.connect(holder).transfer(this.routerMock.address, 100000);
+		await gymToken.connect(holder).transfer(gymVaultsBank.address, 100000);
+		await gymToken.connect(holder).transfer(routerMock.address, 100000);
 
-		await this.gymVaultsBank.connect(deployer).add(this.wBNBMock.address, 20, false, this.strategyAlpaca.address);
-		await this.gymVaultsBank.connect(deployer).add(this.wantToken.address, 20, true, this.strategy.address);
+		await gymVaultsBank.connect(deployer).add(wBNBMock.address, 20, false, strategyAlpaca.address);
+		await gymVaultsBank.connect(deployer).add(wantToken.address, 20, true, strategy.address);
 	});
 
 	it("Should buy and burn gym tokens for BNB transactions: ", async function () {
-		const gymTotalSupplyBefore = await this.gymToken.totalSupply();
+		const gymTotalSupplyBefore = await gymToken.totalSupply();
 
-		await this.gymVaultsBank
+		await gymVaultsBank
 			.connect(holder)
-			.deposit(0, 0, this.relationship.addressToId(deployer.address), 0, new Date().getTime() + 20, {
+			.deposit(0, 0, relationship.addressToId(deployer.address), 0, new Date().getTime() + 20, {
 				value: transactionAmount
 			});
 
-		expect(gymTotalSupplyBefore.sub(await this.gymToken.totalSupply())).to.equal(
+		expect(gymTotalSupplyBefore.sub(await gymToken.totalSupply())).to.equal(
 			(transactionAmount * buyBackPercent) / 100
 		);
 	});
 
 	it("Should buy and burn gym tokens for tokens transactions: ", async function () {
-		const gymTotalSupplyBefore = await this.gymToken.totalSupply();
+		const gymTotalSupplyBefore = await gymToken.totalSupply();
 
-		await this.wantToken.connect(holder).approve(this.gymVaultsBank.address, transactionAmount);
-		await this.gymVaultsBank.connect(holder).deposit(1, transactionAmount, 1, 0, new Date().getTime() + 20);
+		await wantToken.connect(holder).approve(gymVaultsBank.address, transactionAmount);
+		await gymVaultsBank.connect(holder).deposit(1, transactionAmount, 1, 0, new Date().getTime() + 20);
 
-		expect(gymTotalSupplyBefore.sub(await this.gymToken.totalSupply())).to.equal(
+		expect(gymTotalSupplyBefore.sub(await gymToken.totalSupply())).to.equal(
 			(transactionAmount * buyBackPercent) / 100
 		);
 	});
