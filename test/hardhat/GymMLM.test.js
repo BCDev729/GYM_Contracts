@@ -2,7 +2,8 @@ const { expect } = require("chai");
 const {
 	deployments: { fixture },
 	network,
-	ethers
+	ethers,
+	run
 } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
 const variables = require("../../utils/constants/solpp")("hardhat");
@@ -51,12 +52,20 @@ describe("GymMLM contract: ", function () {
 		await this.gymToken.connect(accounts.holder).transfer(this.gymVaultsBank.address, 100000);
 		await this.gymToken.connect(accounts.holder).transfer(this.routerMock.address, 100000);
 
-		await this.gymVaultsBank
-			.connect(accounts.deployer)
-			.add(this.WBNBMock.address, 20, false, this.strategyAlpaca.address);
-		await this.gymVaultsBank
-			.connect(accounts.deployer)
-			.add(this.wantToken.address, 20, true, this.strategy.address);
+		await run("gymVaultsBank:add", {
+			want: this.WBNBMock.address,
+			allocPoint: "20",
+			withUpdate: "false",
+			strategy: this.strategyAlpaca.address,
+			caller: "deployer"
+		});
+		await run("gymVaultsBank:add", {
+			want: this.wantToken.address,
+			allocPoint: "20",
+			withUpdate: "true",
+			strategy: this.strategy.address,
+			caller: "deployer"
+		});
 	});
 
 	describe("Initialization: ", function () {
@@ -100,9 +109,12 @@ describe("GymMLM contract: ", function () {
 			);
 
 			await this.wantToken.connect(accounts.vzgo).approve(this.gymVaultsBank.address, depositAmount);
-			await this.gymVaultsBank
-				.connect(accounts.vzgo)
-				.deposit(1, depositAmount, referrerId, 0, new Date().getTime() + 20);
+			await run("gymVaultsBank:deposit", {
+				pid: "1",
+				wantAmt: `${depositAmount}`,
+				referrerId: `${referrerId}`,
+				caller: "vzgo"
+			});
 
 			expect(await this.gymMLM.userToReferrer(await this.gymMLM.idToAddress(currentId))).to.equal(
 				await this.gymMLM.idToAddress(referrerId)
@@ -112,7 +124,12 @@ describe("GymMLM contract: ", function () {
 		it("Should revert with 'GymMLM::referrer is zero address': ", async function () {
 			await this.wantToken.connect(accounts.vzgo).approve(this.gymVaultsBank.address, depositAmount);
 			await expect(
-				this.gymVaultsBank.connect(accounts.vzgo).deposit(1, depositAmount, 4, 0, new Date().getTime() + 20)
+				run("gymVaultsBank:deposit", {
+					pid: "1",
+					wantAmt: `${depositAmount}`,
+					referrerId: "4",
+					caller: "vzgo"
+				})
 			).to.be.revertedWith("GymMLM::referrer is zero address");
 		});
 	});
@@ -144,15 +161,13 @@ describe("GymMLM contract: ", function () {
 				}
 
 				await this.wantToken.connect(accounts[signer]).approve(this.gymVaultsBank.address, depositAmount);
-				await this.gymVaultsBank
-					.connect(accounts[signer])
-					.deposit(
-						1,
-						depositAmount,
-						this.gymMLM.addressToId(accounts[prevSigner].address),
-						0,
-						new Date().getTime() + 20
-					);
+
+				await run("gymVaultsBank:deposit", {
+					pid: "1",
+					wantAmt: `${depositAmount}`,
+					referrerId: (await this.gymMLM.addressToId(accounts[prevSigner].address)).toString(),
+					caller: signer
+				});
 
 				if (index === 0) {
 					prevSigner = signer;
@@ -182,15 +197,12 @@ describe("GymMLM contract: ", function () {
 		it("Should transfer unmute tokens to treasure address: ", async function () {
 			let deployerAmtBefore = await this.wantToken.balanceOf(accounts.deployer.address);
 			await this.wantToken.connect(accounts.vzgo).approve(this.gymVaultsBank.address, depositAmount);
-			await this.gymVaultsBank
-				.connect(accounts.vzgo)
-				.deposit(
-					1,
-					depositAmount,
-					await this.gymMLM.addressToId(accounts.deployer.address),
-					0,
-					new Date().getTime() + 20
-				);
+			await run("gymVaultsBank:deposit", {
+				pid: "1",
+				wantAmt: `${depositAmount}`,
+				referrerId: (await this.gymMLM.addressToId(accounts.deployer.address)).toString(),
+				caller: "vzgo"
+			});
 
 			expect((await this.wantToken.balanceOf(accounts.deployer.address)).sub(deployerAmtBefore)).to.equal(
 				gymMLMAmount
@@ -198,15 +210,13 @@ describe("GymMLM contract: ", function () {
 			deployerAmtBefore = await this.wantToken.balanceOf(accounts.deployer.address);
 
 			await this.wantToken.connect(accounts.grno).approve(this.gymVaultsBank.address, depositAmount);
-			await this.gymVaultsBank
-				.connect(accounts.grno)
-				.deposit(
-					1,
-					depositAmount,
-					await this.gymMLM.addressToId(accounts.vzgo.address),
-					0,
-					new Date().getTime() + 20
-				);
+
+			await run("gymVaultsBank:deposit", {
+				pid: "1",
+				wantAmt: `${depositAmount}`,
+				referrerId: (await this.gymMLM.addressToId(accounts.vzgo.address)).toString(),
+				caller: "grno"
+			});
 
 			expect((await this.wantToken.balanceOf(accounts.deployer.address)).sub(deployerAmtBefore)).to.equal(
 				gymMLMAmount - (depositAmount * gymMLMBonuses[0]) / 100
@@ -240,19 +250,13 @@ describe("GymMLM contract: ", function () {
 				if (signer === "deployer") {
 					continue;
 				}
-
-				tx = await this.gymVaultsBank
-					.connect(accounts[signer])
-					.deposit(
-						0,
-						0,
-						await this.gymMLM.addressToId(accounts[prevSigner].address),
-						0,
-						new Date().getTime() + 20,
-						{
-							value: depositAmount
-						}
-					);
+				tx = await run("gymVaultsBank:deposit", {
+					pid: "0",
+					wantAmt: "0",
+					referrerId: (await this.gymMLM.addressToId(accounts[prevSigner].address)).toString(),
+					caller: signer,
+					bnbAmount: `${depositAmount}`
+				});
 
 				if (index === 0) {
 					prevSigner = signer;
@@ -282,20 +286,23 @@ describe("GymMLM contract: ", function () {
 
 		it("Should transfer unmute BNB to treasure address: ", async function () {
 			let deployerAmtBefore = await accounts.deployer.getBalance();
-			await this.gymVaultsBank
-				.connect(accounts.vzgo)
-				.deposit(0, 0, await this.gymMLM.addressToId(accounts.deployer.address), 0, new Date().getTime() + 20, {
-					value: depositAmount
-				});
+			await run("gymVaultsBank:deposit", {
+				pid: "0",
+				wantAmt: "0",
+				referrerId: (await this.gymMLM.addressToId(accounts.deployer.address)).toString(),
+				caller: "vzgo",
+				bnbAmount: `${depositAmount}`
+			});
 
 			expect((await accounts.deployer.getBalance()).sub(deployerAmtBefore)).to.equal(gymMLMAmount);
 			deployerAmtBefore = await accounts.deployer.getBalance();
-
-			await this.gymVaultsBank
-				.connect(accounts.grno)
-				.deposit(0, 0, await this.gymMLM.addressToId(accounts.vzgo.address), 0, new Date().getTime() + 20, {
-					value: depositAmount
-				});
+			await run("gymVaultsBank:deposit", {
+				pid: "0",
+				wantAmt: "0",
+				referrerId: (await this.gymMLM.addressToId(accounts.vzgo.address)).toString(),
+				caller: "grno",
+				bnbAmount: `${depositAmount}`
+			});
 
 			expect((await accounts.deployer.getBalance()).sub(deployerAmtBefore)).to.equal(
 				gymMLMAmount - (depositAmount * gymMLMBonuses[0]) / 100
