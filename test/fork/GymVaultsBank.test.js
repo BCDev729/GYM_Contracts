@@ -26,6 +26,7 @@ describe("GymVaultsBank contract: ", function () {
 		this.gymToken = await getContract("GymToken", accounts.caller);
 		this.relationship = await getContract("GymMLM", accounts.caller);
 		this.farming = await getContract("GymFarming", accounts.deployer);
+		//poxel
 		await this.farming.connect(accounts.deployer).add(30, this.gymToken.address, false);
 		this.buyBack = await getContract("BuyBack", accounts.caller);
 		this.gymVaultsBank = await getContract("GymVaultsBank", accounts.deployer);

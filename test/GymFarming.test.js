@@ -11,7 +11,7 @@ const poolAllocPoint1 = 30;
 const poolAllocPoint2 = 50;
 
 describe("GymFarming contract: ", function () {
-	before("Before All: ", async () => {
+	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 		await hre.run("deployMocks");
 		await prepare(this, ["ERC20Mock"]);
@@ -24,7 +24,7 @@ describe("GymFarming contract: ", function () {
 			from: accounts.deployer.address,
 			args: [deploymentArgs.holder],
 			log: true,
-			deterministicDeployment: false,
+			deterministicDeployment: false
 		});
 
 		deploymentArgs = await getDeploymentArgs(chainId, "GymVaultsBank");
@@ -34,7 +34,7 @@ describe("GymFarming contract: ", function () {
 			contract: "GymVaultsBank",
 			args: [deploymentArgs.startBlock, deploymentArgs.gymTokenAddress, deploymentArgs.rewardRate],
 			log: true,
-			deterministicDeployment: false,
+			deterministicDeployment: false
 		});
 
 		deploymentArgs = await getDeploymentArgs(chainId, "GymFarming");
@@ -45,10 +45,10 @@ describe("GymFarming contract: ", function () {
 				deploymentArgs.bank,
 				deploymentArgs.rewardToken,
 				deploymentArgs.rewardPerBlock,
-				deploymentArgs.startBlock,
+				deploymentArgs.startBlock
 			],
 			log: true,
-			deterministicDeployment: false,
+			deterministicDeployment: false
 		});
 
 		this.gymFarming = await ethers.getContract("GymFarming", accounts.deployer);
@@ -65,7 +65,7 @@ describe("GymFarming contract: ", function () {
 
 		await deploy(this, [
 			["testLp", this.ERC20Mock, ["LP Token", "LPT", getBigNumber(amount.mul(5))]],
-			["testLp1", this.ERC20Mock, ["LP Token1", "LPT", getBigNumber(amount.mul(5))]],
+			["testLp1", this.ERC20Mock, ["LP Token1", "LPT", getBigNumber(amount.mul(5))]]
 		]);
 
 		await this.testLp.transfer(accounts.caller.address, getBigNumber(amount));
@@ -77,30 +77,30 @@ describe("GymFarming contract: ", function () {
 		this.startBlock = parseInt(await this.gymFarming.startBlock());
 	});
 
-	describe("Initialization: ", async () => {
-		it("Should initialize with correct values: ", async () => {
+	describe("Initialization: ", function () {
+		it("Should initialize with correct values: ", async function () {
 			expect(await this.gymFarming.rewardToken()).to.equal(deploymentArgs.rewardToken);
 			expect(await this.gymFarming.rewardPerBlock()).to.equal(deploymentArgs.rewardPerBlock);
 			expect(await this.gymFarming.startBlock()).to.equal(deploymentArgs.startBlock);
 		});
 	});
 
-	describe("PoolLength function: ", async () => {
-		before("Before: ", async () => {
+	describe("PoolLength function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
 
-		after("After tests: ", async () => {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("PoolLength should execute: ", async () => {
+		it("PoolLength should execute: ", async function () {
 			await this.gymFarming.add(poolAllocPoint1, this.testLp.address, false);
 			await this.gymFarming.add(poolAllocPoint2, this.testLp1.address, true);
 
@@ -108,22 +108,22 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Set function: ", async () => {
-		beforeEach("Before: ", async () => {
+	describe("Set function: ", function () {
+		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
 
-		afterEach("After tests: ", async () => {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should set new allocPoint for pid: ", async () => {
+		it("Should set new allocPoint for pid: ", async function () {
 			await this.gymFarming.add(poolAllocPoint1, this.testLp.address, false);
 			await this.gymFarming.add(poolAllocPoint2, this.testLp1.address, true);
 
@@ -134,27 +134,27 @@ describe("GymFarming contract: ", function () {
 			expect((await this.gymFarming.poolInfo(1)).allocPoint).to.equal(poolAllocPoint1);
 		});
 
-		it("Should revert if invalid pool", async () => {
+		it("Should revert if invalid pool", async function () {
 			await expect(this.gymFarming.set(0, poolAllocPoint2, true)).to.be.revertedWith("Farming::UNKNOWN_POOL");
 		});
 	});
 
-	describe("pendingReward function: ", async () => {
-		beforeEach("Before: ", async () => {
+	describe("pendingReward function: ", function () {
+		beforeEach("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
 
-		afterEach("After tests: ", async () => {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("PendingReward should equal ExpectedGym: ", async () => {
+		it("PendingReward should equal ExpectedGym: ", async function () {
 			await advanceBlockTo(await ethers.provider.getBlockNumber());
 			const pid = await this.gymFarming.poolLength();
 			const blockToAdvance = 35;
@@ -185,7 +185,7 @@ describe("GymFarming contract: ", function () {
 			);
 		});
 
-		it("PendingReward should equal ExpectedGym (2 signers in 1 pool): ", async () => {
+		it("PendingReward should equal ExpectedGym (2 signers in 1 pool): ", async function () {
 			const pid = await this.gymFarming.poolLength();
 			const blockToAdvance = 5;
 			expect(pid).to.equal(0);
@@ -200,7 +200,7 @@ describe("GymFarming contract: ", function () {
 			const log1 = await this.gymFarming.connect(accounts.caller).deposit(pid, amount);
 			const log2 = await this.gymFarming.connect(accounts.chugun).deposit(pid, amount);
 
-			let pendingRewardCaller = await this.gymFarming.pendingReward(pid, accounts.caller.address);
+			const pendingRewardCaller = await this.gymFarming.pendingReward(pid, accounts.caller.address);
 			let pendingRewardChugun = await this.gymFarming.pendingReward(pid, accounts.chugun.address);
 			expect(pendingRewardCaller).to.equal(await this.gymFarming.rewardPerBlock());
 			expect(pendingRewardChugun).to.equal(0);
@@ -219,7 +219,7 @@ describe("GymFarming contract: ", function () {
 			);
 		});
 
-		it("PendingReward should equal ExpectedGym(4 signers in 2 pools): ", async () => {
+		it("PendingReward should equal ExpectedGym(4 signers in 2 pools): ", async function () {
 			const pid1 = await this.gymFarming.poolLength();
 			const blockToAdvance = 0;
 			expect(pid1).to.equal(0);
@@ -297,22 +297,22 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("setRewardPerBlock function", async () => {
-		before("Before: ", async () => {
+	describe("setRewardPerBlock function", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
 
-		after("After tests: ", async () => {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
-		it("Should change rewardPerBlock:", async () => {
-			let rewardPerBlock = await this.gymFarming.rewardPerBlock();
+		it("Should change rewardPerBlock:", async function () {
+			const rewardPerBlock = await this.gymFarming.rewardPerBlock();
 
 			await advanceBlockTo(this.startBlock + 15);
 
@@ -352,22 +352,22 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Add function: ", async () => {
-		before("Before: ", async () => {
+	describe("Add function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
-		after("After tests: ", async () => {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
-		it("Should add new pool for deposit: ", async () => {
+		it("Should add new pool for deposit: ", async function () {
 			const pid = await this.gymFarming.poolLength();
-			let tx = await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
+			const tx = await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
 
 			expect((await this.gymFarming.poolInfo(pid)).lpToken).to.equal(this.testLp.address);
 			expect((await this.gymFarming.poolInfo(pid)).allocPoint).to.equal(poolAllocPoint2);
@@ -376,26 +376,26 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Deposit function: ", async () => {
-		before("Before: ", async () => {
+	describe("Deposit function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
 
-		after("After tests: ", async () => {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should deposit in pool: ", async () => {
+		it("Should deposit in pool: ", async function () {
 			const pid = await this.gymFarming.poolLength();
 			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
 
-			let accountLp = await this.testLp.balanceOf(accounts.caller.address);
+			const accountLp = await this.testLp.balanceOf(accounts.caller.address);
 
 			await this.testLp.connect(accounts.caller).approve(this.gymFarming.address, amount);
 			await this.gymFarming.connect(accounts.caller).deposit(pid, amount);
@@ -405,28 +405,28 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("Withdraw function: ", async () => {
-		before("Before: ", async () => {
+	describe("Withdraw function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 		});
 
-		after("After tests: ", async () => {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("Withdraw lps from pool: ", async () => {
+		it("Withdraw lps from pool: ", async function () {
 			const pid = await this.gymFarming.poolLength();
 
 			tx = await this.gymFarming.add(poolAllocPoint2, this.testLp.address, true);
 
-			let accountLp = await this.testLp.balanceOf(accounts.caller.address);
-			let contractLp = await this.testLp.balanceOf(this.gymFarming.address);
+			const accountLp = await this.testLp.balanceOf(accounts.caller.address);
+			const contractLp = await this.testLp.balanceOf(this.gymFarming.address);
 			await this.testLp.connect(accounts.caller).approve(this.gymFarming.address, amount);
 			await this.gymFarming.connect(accounts.caller).deposit(pid, amount);
 			await advanceBlock();
@@ -437,25 +437,25 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("HarvestAll function: ", async () => {
-		before("Before: ", async () => {
+	describe("HarvestAll function: ", function () {
+		before("Before: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 
 			await this.gymFarming.add(poolAllocPoint2, this.testLp.address, false);
 			await this.gymFarming.add(poolAllocPoint1, this.testLp1.address, true);
 		});
 
-		after("After tests: ", async () => {
+		after("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should HarvestAll: Call HarvestAll function to get all assets at ones ", async () => {
+		it("Should HarvestAll: Call HarvestAll function to get all assets at ones ", async function () {
 			await this.testLp.connect(accounts.vzgo).approve(this.gymFarming.address, amount);
 			await this.testLp1.connect(accounts.vzgo).approve(this.gymFarming.address, amount);
 
@@ -478,10 +478,10 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("SpeedStake function: ", async () => {
-		//only work when forked
+	describe("SpeedStake function: ", function () {
+		// only work when forked
 		let router, factory, lpToken;
-		before("Before: ", async () => {
+		before("Before: ", async function () {
 			router = await ethers.getContractAt("IPancakeRouter02", "0x10ED43C718714eb63d5aA57B78B54704E256024E");
 			factory = await ethers.getContractAt("IPancakeFactory", await router.factory());
 
@@ -497,48 +497,48 @@ describe("GymFarming contract: ", function () {
 					accounts.holder.address,
 					new Date().getTime() + 20,
 					{
-						value: ethers.utils.parseEther("10"),
+						value: ethers.utils.parseEther("10")
 					}
 				);
 
 			lpToken = await factory.getPair(this.gym.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
 		});
-		beforeEach("BeforeEach: ", async () => {
+		beforeEach("BeforeEach: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 
 			await this.gymFarming.add(poolAllocPoint2, lpToken, true);
 		});
 
-		afterEach("AfterEach: ", async () => {
+		afterEach("AfterEach: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should deposit in pool: ", async () => {
+		it("Should deposit in pool: ", async function () {
 			await expect(() =>
 				hre.run("farming:speedStake", {
 					pid: "0",
 					caller: "holder",
-					bnbAmount: `${ethers.utils.parseEther("10")}`,
+					bnbAmount: `${ethers.utils.parseEther("10")}`
 				})
 			).to.changeTokenBalances(this.gym, [accounts.holder], [0]);
 
 			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount).to.not.equal(0);
 		});
 
-		it("Should deposit in pool: ", async () => {
+		it("Should deposit in pool: ", async function () {
 			await this.gym.connect(accounts.holder).approve(this.gymFarming.address, ethers.utils.parseEther("10"));
 			await expect(() =>
 				hre.run("farming:speedStake", {
 					pid: "0",
 					tokenAmount: `${ethers.utils.parseEther("10")}`,
 					caller: "holder",
-					bnbAmount: `${ethers.utils.parseEther("10")}`,
+					bnbAmount: `${ethers.utils.parseEther("10")}`
 				})
 			).to.changeTokenBalances(
 				this.gym,
@@ -549,13 +549,13 @@ describe("GymFarming contract: ", function () {
 			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount).to.not.equal(0);
 		});
 
-		it("Should deposit in pool: ", async () => {
+		it("Should deposit in pool: ", async function () {
 			await this.gym.connect(accounts.holder).approve(this.gymFarming.address, ethers.utils.parseEther("10"));
 			await expect(() =>
 				hre.run("farming:speedStake", {
 					pid: "0",
 					tokenAmount: `${ethers.utils.parseEther("10")}`,
-					caller: "holder",
+					caller: "holder"
 				})
 			).to.changeTokenBalances(
 				this.gym,
@@ -567,10 +567,10 @@ describe("GymFarming contract: ", function () {
 		});
 	});
 
-	describe("ClaimAndDeposit function: ", async () => {
-		//only work when forked
+	describe("ClaimAndDeposit function: ", function () {
+		// only work when forked
 		let router, factory, lpToken;
-		before("Before: ", async () => {
+		before("Before: ", async function () {
 			router = await ethers.getContractAt("IPancakeRouter02", "0x10ED43C718714eb63d5aA57B78B54704E256024E");
 			factory = await ethers.getContractAt("IPancakeFactory", await router.factory());
 
@@ -586,60 +586,60 @@ describe("GymFarming contract: ", function () {
 					accounts.holder.address,
 					new Date().getTime() + 20,
 					{
-						value: ethers.utils.parseEther("10"),
+						value: ethers.utils.parseEther("10")
 					}
 				);
 
 			lpToken = await factory.getPair(this.gym.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
 		});
-		beforeEach("BeforeEach: ", async () => {
+		beforeEach("BeforeEach: ", async function () {
 			this.snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
-				params: [],
+				params: []
 			});
 
 			await this.gymFarming.add(poolAllocPoint2, lpToken, true);
 		});
 
-		afterEach("AfterEach: ", async () => {
+		afterEach("AfterEach: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
-				params: [this.snapshotStart],
+				params: [this.snapshotStart]
 			});
 		});
 
-		it("Should claimA in pool: ", async () => {
-			let tx = await hre.run("farming:speedStake", {
+		it("Should claimA in pool: ", async function () {
+			const tx = await hre.run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
-				bnbAmount: `${ethers.utils.parseEther("10")}`,
+				bnbAmount: `${ethers.utils.parseEther("10")}`
 			});
 
 			await advanceBlockTo(tx.blockNumber + 200);
-			let userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
+			const userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
 
 			await hre.run("farming:claimAndDeposit", {
 				pid: "0",
-				caller: "holder",
+				caller: "holder"
 			});
 
 			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);
 		});
 
-		it("Should claimA in pool: ", async () => {
-			let tx = await hre.run("farming:speedStake", {
+		it("Should claimA in pool: ", async function () {
+			const tx = await hre.run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
-				bnbAmount: `${ethers.utils.parseEther("10")}`,
+				bnbAmount: `${ethers.utils.parseEther("10")}`
 			});
 
 			await advanceBlockTo(tx.blockNumber + 200);
-			let userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
+			const userAmount = (await this.gymFarming.userInfo(0, accounts.holder.address)).amount;
 
 			await hre.run("farming:claimAndDeposit", {
 				pid: "0",
 				caller: "holder",
-				bnbAmount: `${ethers.utils.parseEther("10")}`,
+				bnbAmount: `${ethers.utils.parseEther("10")}`
 			});
 
 			expect((await this.gymFarming.userInfo(0, accounts.holder.address)).amount.sub(userAmount)).to.not.equal(0);
