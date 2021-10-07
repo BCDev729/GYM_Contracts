@@ -1,7 +1,8 @@
 const { expect } = require("chai");
 const {
 	deployments: { fixture },
-	ethers: { getContract, getNamedSigners }
+	ethers: { getContract, getNamedSigners },
+	run
 } = require("hardhat");
 const variables = require("../../utils/constants/solpp")("hardhat");
 
@@ -37,23 +38,32 @@ describe("BuyBack contract: ", function () {
 		await this.gymToken.connect(accounts.holder).transfer(this.gymVaultsBank.address, 100000);
 		await this.gymToken.connect(accounts.holder).transfer(this.routerMock.address, 100000);
 
-		await this.gymVaultsBank
-			.connect(accounts.deployer)
-			.add(this.wBNBMock.address, 20, false, this.strategyAlpaca.address);
-		await this.gymVaultsBank
-			.connect(accounts.deployer)
-			.add(this.wantToken.address, 20, true, this.strategy.address);
+		await run("gymVaultsBank:add", {
+			want: this.wBNBMock.address,
+			allocPoint: "20",
+			withUpdate: "false",
+			strategy: this.strategyAlpaca.address,
+			caller: "deployer"
+		});
+		await run("gymVaultsBank:add", {
+			want: this.wantToken.address,
+			allocPoint: "20",
+			withUpdate: "true",
+			strategy: this.strategy.address,
+			caller: "deployer"
+		});
 	});
 
 	describe("BuyAndBurnToken function: ", function () {
 		it("Should buy and burn gym tokens for BNB transactions: ", async function () {
 			const gymTotalSupplyBefore = await this.gymToken.totalSupply();
-
-			await this.gymVaultsBank
-				.connect(accounts.holder)
-				.deposit(0, 0, this.relationship.addressToId(accounts.deployer.address), 0, new Date().getTime() + 20, {
-					value: transactionAmount
-				});
+			await run("gymVaultsBank:deposit", {
+				pid: "0",
+				wantAmt: "0",
+				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
+				caller: "holder",
+				bnbAmount: `${transactionAmount}`
+			});
 
 			expect(gymTotalSupplyBefore.sub(await this.gymToken.totalSupply())).to.equal(
 				(transactionAmount * buyBackPercent) / 100
@@ -64,9 +74,12 @@ describe("BuyBack contract: ", function () {
 			const gymTotalSupplyBefore = await this.gymToken.totalSupply();
 
 			await this.wantToken.connect(accounts.holder).approve(this.gymVaultsBank.address, transactionAmount);
-			await this.gymVaultsBank
-				.connect(accounts.holder)
-				.deposit(1, transactionAmount, 1, 0, new Date().getTime() + 20);
+			await run("gymVaultsBank:deposit", {
+				pid: "1",
+				wantAmt: `${transactionAmount}`,
+				referrerId: "1",
+				caller: "holder"
+			});
 
 			expect(gymTotalSupplyBefore.sub(await this.gymToken.totalSupply())).to.equal(
 				(transactionAmount * buyBackPercent) / 100

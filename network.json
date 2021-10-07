@@ -2,7 +2,7 @@
 	"networks": {
 		"hardhat": {
 			"forking": {
-				"enabled": true,
+				"enabled": false,
 				"url": "https://bsc.getblock.io/mainnet/?api_key=6ce6d20a-db6a-46e5-8fa5-9c4b16ec7549",
 				"blockNumber": 11534744
 			},
