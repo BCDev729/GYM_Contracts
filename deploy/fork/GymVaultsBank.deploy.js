@@ -1,18 +1,15 @@
 const args = require("../../utils/constants/data/fork/GymVaultsBank.json");
 module.exports = async function ({
+	config,
 	run,
-	config: { networks: { hardhat: {forking} }},
-	getChainId,
 	ethers: {
 		getContract,
 		utils: { parseEther },
 		provider: { getBlockNumber }
 	}
 }) {
-	const chainId = await getChainId();
-	if (chainId !== "31337" || !forking.enabled) {
-		return;
-	}
+	if(!config.networks.hardhat.forking.enabled) return;
+	
 	const blockNumber = await getBlockNumber();
 	const startBlock = blockNumber + args.startBlock;
 	const gymToken = await getContract("GymToken");

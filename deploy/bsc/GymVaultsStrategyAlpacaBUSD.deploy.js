@@ -1,10 +1,6 @@
 const args = require("../../utils/constants/data/bsc/GymVaultsStrategyAlpacaBUSD.json");
-module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
-	const chainId = await getChainId();
-	if (chainId !== "56") {
-		return;
-	}
 
+module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
 	const bank = await getContract("GymVaultsBank");
 	const isAutoComp = args.isAutoComp;
 	const vault = args.vault;
@@ -13,14 +9,8 @@ module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
 	const want = args.want;
 	const earn = args.earn;
 	const router = args.router;
-	const owner = bank.address;
-	const options = {
-		contractName: "GymVaultsStrategyAlpaca",
-		args: [bank.address, isAutoComp, vault, fairLaunch, pid, want, earn, router],
-		owner: owner
-	};
 
-	const deterministicDeploy = await run("deploy:gymVaultsStrategy", {
+	await run("deploy:gymVaultsStrategy", {
 		contractName: "GymVaultsStrategyAlpaca",
 		bank: bank.address,
 		isAutoComp: isAutoComp.toString(),
@@ -31,14 +21,6 @@ module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
 		earn: earn,
 		router: router
 	});
-	try {
-		await run("verify:verify", {
-			address: deterministicDeploy.address,
-			constructorArguments: options.args
-		});
-	} catch (e) {
-		console.log(e.toString());
-	}
 };
-module.exports.tags = ["GymVaultsStrategyAlpacaBUSD"];
+module.exports.tags = ["GymVaultsStrategyAlpacaBUSD", "bsc"];
 module.exports.dependencies = ["GymVaultsBank"];

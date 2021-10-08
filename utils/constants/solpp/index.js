@@ -1,3 +1,5 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
+
 module.exports = (network) => {
 	return {
 		...require(`./${network}/contracts.json`),
