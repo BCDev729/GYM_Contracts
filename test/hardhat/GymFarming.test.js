@@ -175,11 +175,11 @@ describe("GymFarming contract: ", function () {
 			const blockToAdvance = 35;
 			expect(pid).to.equal(0);
 
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await run("farming:add", {
 				allocPoint: `${poolAllocPoint2}`,
 				lpToken: testLp.address,
@@ -217,7 +217,7 @@ describe("GymFarming contract: ", function () {
 				pid: `${pid}`
 			});
 
-			expect(await gym.balanceOf(accounts.caller.address)).to.equal(
+			expect(await gym.balanceOf(caller.address)).to.equal(
 				await run("farming:getMultiplier", {
 					from: `${startBlock}`,
 					to: `${startBlock + blockToAdvance + 1}`,
@@ -272,7 +272,7 @@ describe("GymFarming contract: ", function () {
 				pid: `${pid}`
 			});
 
-			expect(await gym.balanceOf(accounts.caller.address)).to.equal(
+			expect(await gym.balanceOf(caller.address)).to.equal(
 				pendingRewardCaller.add((await gymFarming.rewardPerBlock()).div(2))
 			);
 
@@ -289,7 +289,7 @@ describe("GymFarming contract: ", function () {
 				caller: "chugun"
 			});
 
-			expect(await gym.balanceOf(accounts.chugun.address)).to.equal(
+			expect(await gym.balanceOf(chugun.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
 						from: `${log2.blockNumber}`,
@@ -326,11 +326,11 @@ describe("GymFarming contract: ", function () {
 				withUpdate: "true"
 			});
 
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
-			await testLp.connect(accounts.chugun).approve(gymFarming.address, amount);
-			await testLp.connect(accounts.vzgo).approve(gymFarming.address, getBigNumber(2));
-			await testLp1.connect(accounts.vzgo).approve(gymFarming.address, amount);
-			await testLp1.connect(accounts.grno).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await testLp.connect(chugun).approve(gymFarming.address, amount);
+			await testLp.connect(vzgo).approve(gymFarming.address, getBigNumber(2));
+			await testLp1.connect(vzgo).approve(gymFarming.address, amount);
+			await testLp1.connect(grno).approve(gymFarming.address, amount);
 			await run("farming:deposit", {
 				pid: `${pid1}`,
 				amount: `${amount}`
@@ -394,7 +394,7 @@ describe("GymFarming contract: ", function () {
 				pid: `${pid1}`
 			});
 
-			expect(await gym.balanceOf(accounts.caller.address)).to.equal(
+			expect(await gym.balanceOf(caller.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
 						from: `${log3.blockNumber}`,
@@ -411,7 +411,7 @@ describe("GymFarming contract: ", function () {
 				caller: "chugun"
 			});
 
-			expect(await gym.balanceOf(accounts.chugun.address)).to.equal(
+			expect(await gym.balanceOf(chugun.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
 						from: `${log3.blockNumber}`,
@@ -428,7 +428,7 @@ describe("GymFarming contract: ", function () {
 				caller: "vzgo"
 			});
 
-			expect(await gym.balanceOf(accounts.vzgo.address)).to.equal(
+			expect(await gym.balanceOf(vzgo.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
 						from: `${log3.blockNumber}`,
@@ -440,13 +440,13 @@ describe("GymFarming contract: ", function () {
 					.add(pendingReward3)
 			);
 
-			const vzgoGym = await gym.balanceOf(accounts.vzgo.address);
+			const vzgoGym = await gym.balanceOf(vzgo.address);
 			harvesttx = await run("farming:harvest", {
 				pid: `${pid2}`,
 				caller: "vzgo"
 			});
 
-			expect((await gym.balanceOf(accounts.vzgo.address)).sub(vzgoGym)).to.equal(
+			expect((await gym.balanceOf(vzgo.address)).sub(vzgoGym)).to.equal(
 				(
 					await run("farming:getMultiplier", {
 						from: `${log5.blockNumber}`,
@@ -463,7 +463,7 @@ describe("GymFarming contract: ", function () {
 				caller: "grno"
 			});
 
-			expect(await gym.balanceOf(accounts.grno.address)).to.equal(
+			expect(await gym.balanceOf(grno.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
 						from: `${log5.blockNumber}`,
@@ -561,14 +561,14 @@ describe("GymFarming contract: ", function () {
 	});
 
 	describe("Deposit function: ", function () {
-		before("Before: ", async function () {
+		beforeEach("Before: ", async function () {
 			snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function () {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshotStart]
@@ -588,26 +588,37 @@ describe("GymFarming contract: ", function () {
 
 			const accountLp = await testLp.balanceOf(caller.address);
 
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await run("farming:deposit", {
 				pid: `${pid}`,
 				amount: `${amount}`
 			});
 
-			expect(await testLp.balanceOf(accounts.caller.address)).to.equal(accountLp.sub(amount));
+			expect(await testLp.balanceOf(caller.address)).to.equal(accountLp.sub(amount));
 			expect(await testLp.balanceOf(gymFarming.address)).to.equal(amount);
+		});
+
+		it("Emit event Deposit", async function () {
+			const pid = await gymFarming.poolLength();
+			await gymFarming.add(poolAllocPoint2, testLp.address, true);
+
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			expect(await gymFarming.connect(caller).deposit(pid, amount))
+				.to
+				.emit(gymFarming, "Deposit")
+				.withArgs(caller.address, pid, amount);
 		});
 	});
 
 	describe("Withdraw function: ", function () {
-		before("Before: ", async function () {
+		beforeEach("Before: ", async function () {
 			snapshotStart = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 		});
 
-		after("After tests: ", async function () {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshotStart]
@@ -625,9 +636,9 @@ describe("GymFarming contract: ", function () {
 				withUpdate: "true"
 			});
 
-			const accountLp = await testLp.balanceOf(accounts.caller.address);
+			const accountLp = await testLp.balanceOf(caller.address);
 			const contractLp = await testLp.balanceOf(gymFarming.address);
-			await testLp.connect(accounts.caller).approve(gymFarming.address, amount);
+			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await run("farming:deposit", {
 				pid: `${pid}`,
 				amount: `${amount}`
@@ -642,14 +653,38 @@ describe("GymFarming contract: ", function () {
 			expect((await testLp.balanceOf(caller.address)).toString()).to.equal(accountLp);
 			expect((await testLp.balanceOf(gymFarming.address)).toString()).to.equal(contractLp);
 		});
+
+		it("Emit event Withdraw", async function () {
+			const pid = await gymFarming.poolLength();
+			await gymFarming.add(poolAllocPoint2, testLp.address, true);
+
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await gymFarming.connect(caller).deposit(pid, amount);
+			await advanceBlock();
+			expect(await gymFarming.connect(caller).withdraw(pid, amount))
+				.to
+				.emit(gymFarming, "Withdraw")
+				.withArgs(caller.address, pid, amount);
+		});
+
+		it("Emit event Harvest", async function () {
+			const pid = await gymFarming.poolLength();
+			await gymFarming.add(poolAllocPoint2, testLp.address, true);
+
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await gymFarming.connect(caller).deposit(pid, amount);
+			await advanceBlock();
+			const pending = await gymFarming.connect(caller).pendingReward(pid, caller.address);
+			expect(await gymFarming.connect(caller).withdraw(pid, amount))
+				.to
+				.emit(gymFarming, "Harvest")
+				.withArgs(caller.address, pid, pending);
+		});
 	});
 
 	describe("HarvestAll function: ", function () {
-		before("Before: ", async function () {
-			snapshotStart = await network.provider.request({
-				method: "evm_snapshot",
-				params: []
-			});
+		before(async function() {
+
 			await run("farming:add", {
 				allocPoint: `${poolAllocPoint2}`,
 				lpToken: testLp.address,
@@ -661,8 +696,14 @@ describe("GymFarming contract: ", function () {
 				withUpdate: "true"
 			});
 		});
+		beforeEach("Before: ", async function () {
+			snapshotStart = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+		});
 
-		after("After tests: ", async function () {
+		afterEach("After tests: ", async function () {
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshotStart]
@@ -670,8 +711,8 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Should HarvestAll: Call HarvestAll function to get all assets at ones ", async function () {
-			await testLp.connect(accounts.vzgo).approve(gymFarming.address, amount);
-			await testLp1.connect(accounts.vzgo).approve(gymFarming.address, amount);
+			await testLp.connect(vzgo).approve(gymFarming.address, amount);
+			await testLp1.connect(vzgo).approve(gymFarming.address, amount);
 			await run("farming:deposit", {
 				pid: "0",
 				amount: `${amount}`,
@@ -695,6 +736,19 @@ describe("GymFarming contract: ", function () {
 
 			expect((await gymFarming.userInfo(0, vzgo.address)).rewardDebt).to.not.equal(constants.Zero);
 			expect((await gymFarming.userInfo(1, vzgo.address)).rewardDebt).to.not.equal(constants.Zero);
+		});
+
+		it("Emit Harvest event", async function () {
+			await testLp.connect(vzgo).approve(gymFarming.address, amount);
+
+			await gymFarming.connect(vzgo).deposit(0, amount);
+
+			const pending = await gymFarming.pendingReward(0, vzgo.address);
+
+			expect(await gymFarming.connect(vzgo).harvest(0))
+				.to
+				.emit(gymFarming, "Harvest")
+				.withArgs(vzgo.address, 0, pending);
 		});
 	});
 });
