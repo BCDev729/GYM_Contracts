@@ -21,7 +21,7 @@ describe("GymToken contract: ", function () {
 		await gymToken.connect(holder).delegate(holder.address);
 	});
 
-	xdescribe("Initialization: ", function () {
+	describe("Initialization: ", function () {
 		beforeEach("BeforeEach: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -44,7 +44,7 @@ describe("GymToken contract: ", function () {
 		});
 	});
 
-	xdescribe("Burn function: ", function () {
+	describe("Burn function: ", function () {
 		beforeEach("BeforeEach: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -71,7 +71,7 @@ describe("GymToken contract: ", function () {
 		});
 	});
 
-	xdescribe("BurnFrom function: ", function () {
+	describe("BurnFrom function: ", function () {
 		beforeEach("BeforeEach: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
