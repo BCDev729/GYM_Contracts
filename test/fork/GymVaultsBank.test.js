@@ -8,7 +8,7 @@ const {
 		utils: { parseEther },
 		provider: { getBlockNumber }
 	},
-	run,
+	run
 } = require("hardhat");
 
 const { advanceBlockTo } = require("../utilities/time");
@@ -26,7 +26,7 @@ describe("GymVaultsBank contract: ", function () {
 		this.gymToken = await getContract("GymToken", accounts.caller);
 		this.relationship = await getContract("GymMLM", accounts.caller);
 		this.farming = await getContract("GymFarming", accounts.deployer);
-		//poxel
+
 		await this.farming.connect(accounts.deployer).add(30, this.gymToken.address, false);
 		this.buyBack = await getContract("BuyBack", accounts.caller);
 		this.gymVaultsBank = await getContract("GymVaultsBank", accounts.deployer);
@@ -36,7 +36,7 @@ describe("GymVaultsBank contract: ", function () {
 		this.strategy2 = await getContract("StrategyMock2", accounts.deployer);
 		this.strategy = await getContract("StrategyMock", accounts.caller);
 		this.routerMock = await getContract("RouterMock", accounts.caller);
-		
+
 		await run("gymMLM:setBankAddress", {
 			bankAddress: this.gymVaultsBank.address,
 			caller: "deployer"
