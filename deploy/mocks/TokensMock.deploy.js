@@ -50,5 +50,5 @@ module.exports = async function ({
 	}
 };
 
-module.exports.tags = ["Tokens"];
+module.exports.tags = ["Tokens", "Hardhat", "Fork"];
 module.exports.dependencies = [];

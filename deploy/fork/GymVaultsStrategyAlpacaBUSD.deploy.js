@@ -22,14 +22,9 @@ module.exports = async function ({
 	const want = args.want;
 	const earn = args.earn;
 	const router = args.router;
-	const owner = bank.address;
-	const options = {
-		contractName: "GymVaultsStrategyAlpaca",
-		args: [bank.address, isAutoComp, vault, fairLaunch, pid, want, earn, router],
-		owner: owner
-	};
+	// const owner = bank.address;
 
-	const deterministicDeploy = await run("deploy:gymVaultsStrategy", {
+	await run("deploy:gymVaultsStrategy", {
 		contractName: "GymVaultsStrategyAlpaca",
 		bank: bank.address,
 		isAutoComp: isAutoComp.toString(),
@@ -40,14 +35,7 @@ module.exports = async function ({
 		earn: earn,
 		router: router
 	});
-	try {
-		await run("verify:verify", {
-			address: deterministicDeploy.address,
-			constructorArguments: options.args
-		});
-	} catch (e) {
-		console.log(e.toString());
-	}
+
 };
-module.exports.tags = ["GymVaultsStrategyAlpacaBUSD"];
+module.exports.tags = ["GymVaultsStrategyAlpacaBUSD", "Fork"];
 module.exports.dependencies = ["GymVaultsBank"];
