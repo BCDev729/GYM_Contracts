@@ -18,24 +18,11 @@ module.exports = async function ({
 	const gymToken = await getContract("GymToken");
 	const rewardRate = parseEther(args.rewardRate);
 
-	const options = {
-		contractName: "GymVaultsBank",
-		args: [startBlock, gymToken.address, rewardRate]
-	};
-	const deterministicDeploy = await run("deploy:gymVaultsBank", {
+	await run("deploy:gymVaultsBank", {
 		startblock: startBlock.toString(),
 		gymtokenaddress: gymToken.address,
 		rewardrate: rewardRate.toString()
 	});
-	
-	try {
-		await run("verify:verify", {
-			address: deterministicDeploy.address,
-			constructorArguments: options.args
-		});
-	} catch (e) {
-		console.log(e.toString());
-	}
 };
-module.exports.tags = ["GymVaultsBank"];
+module.exports.tags = ["GymVaultsBank", "Fork"];
 module.exports.dependencies = ["GymToken", "BuyBack", "GymMLM"];

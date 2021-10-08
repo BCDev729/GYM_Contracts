@@ -17,5 +17,5 @@ module.exports = async function ({
 	}
 };
 
-module.exports.tags = ["Config"];
+module.exports.tags = ["Config", "Hardhat"];
 module.exports.dependencies = ["WBNBMock"];

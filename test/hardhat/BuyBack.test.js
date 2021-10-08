@@ -6,74 +6,76 @@ const {
 } = require("hardhat");
 const variables = require("../../utils/constants/solpp")("hardhat");
 
-let accounts;
-
-const transactionAmount = 500;
-const transferAmount = 5000;
-const buyBackPercent = variables.GymVaultsBank_BUY_AND_BURN;
-
 describe("BuyBack contract: ", function () {
+	let accounts, deployer, caller, holder;
+	let gymToken, gymVaultsBank, buyBack, relationship, wantToken, wBNBMock, strategy, strategyAlpaca, routerMock;
+
+	const transactionAmount = 500;
+	const transferAmount = 5000;
+	const buyBackPercent = variables.GymVaultsBank_BUY_AND_BURN;
+
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		await fixture();
-		this.gymToken = await getContract("GymToken", accounts.caller);
-		this.gymVaultsBank = await getContract("GymVaultsBank", accounts.caller);
-		this.buyBack = await getContract("BuyBack", accounts.caller);
-		this.relationship = await getContract("GymMLM", accounts.caller);
-		await this.relationship.connect(accounts.deployer).setBankAddress(this.gymVaultsBank.address);
+		({ deployer, caller, holder } = accounts);
+		await fixture("Hardhat");
+		gymToken = await getContract("GymToken", caller);
+		gymVaultsBank = await getContract("GymVaultsBank", caller);
+		buyBack = await getContract("BuyBack", caller);
+		relationship = await getContract("GymMLM", caller);
+		await relationship.connect(deployer).setBankAddress(gymVaultsBank.address);
 
-		this.wantToken = await getContract("WantToken1", accounts.caller);
-		this.wBNBMock = await getContract("WBNBMock", accounts.caller);
-		this.strategy = await getContract("StrategyMock1", accounts.caller);
-		this.strategyAlpaca = await getContract("StrategyMock", accounts.caller);
-		this.routerMock = await getContract("RouterMock", accounts.caller);
+		wantToken = await getContract("WantToken1", caller);
+		wBNBMock = await getContract("WBNBMock", caller);
+		strategy = await getContract("StrategyMock1", caller);
+		strategyAlpaca = await getContract("StrategyMock", caller);
+		routerMock = await getContract("RouterMock", caller);
 
-		await this.gymToken.connect(accounts.holder).delegate(this.buyBack.address);
+		await gymToken.connect(holder).delegate(buyBack.address);
 
-		await this.gymVaultsBank.connect(accounts.deployer).setTreasuryAddress(accounts.deployer.address);
+		await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
 
-		await this.wantToken.connect(accounts.deployer).transfer(this.routerMock.address, transferAmount);
-		await this.wantToken.connect(accounts.deployer).transfer(accounts.holder.address, transferAmount);
+		await wantToken.connect(deployer).transfer(routerMock.address, transferAmount);
+		await wantToken.connect(deployer).transfer(holder.address, transferAmount);
 
-		await this.gymToken.connect(accounts.holder).transfer(this.gymVaultsBank.address, 100000);
-		await this.gymToken.connect(accounts.holder).transfer(this.routerMock.address, 100000);
+		await gymToken.connect(holder).transfer(gymVaultsBank.address, 100000);
+		await gymToken.connect(holder).transfer(routerMock.address, 100000);
 
 		await run("gymVaultsBank:add", {
-			want: this.wBNBMock.address,
+			want: wBNBMock.address,
 			allocPoint: "20",
 			withUpdate: "false",
-			strategy: this.strategyAlpaca.address,
+			strategy: strategyAlpaca.address,
 			caller: "deployer"
 		});
 		await run("gymVaultsBank:add", {
-			want: this.wantToken.address,
+			want: wantToken.address,
 			allocPoint: "20",
 			withUpdate: "true",
-			strategy: this.strategy.address,
+			strategy: strategy.address,
 			caller: "deployer"
 		});
 	});
 
 	describe("BuyAndBurnToken function: ", function () {
 		it("Should buy and burn gym tokens for BNB transactions: ", async function () {
-			const gymTotalSupplyBefore = await this.gymToken.totalSupply();
+			const gymTotalSupplyBefore = await gymToken.totalSupply();
 			await run("gymVaultsBank:deposit", {
 				pid: "0",
 				wantAmt: "0",
-				referrerId: (await this.relationship.addressToId(accounts.deployer.address)).toString(),
+				referrerId: (await relationship.addressToId(accounts.deployer.address)).toString(),
 				caller: "holder",
 				bnbAmount: `${transactionAmount}`
 			});
 
-			expect(gymTotalSupplyBefore.sub(await this.gymToken.totalSupply())).to.equal(
+			expect(gymTotalSupplyBefore.sub(await gymToken.totalSupply())).to.equal(
 				(transactionAmount * buyBackPercent) / 100
 			);
 		});
 
 		it("Should buy and burn gym tokens for tokens transactions: ", async function () {
-			const gymTotalSupplyBefore = await this.gymToken.totalSupply();
+			const gymTotalSupplyBefore = await gymToken.totalSupply();
 
-			await this.wantToken.connect(accounts.holder).approve(this.gymVaultsBank.address, transactionAmount);
+			await wantToken.connect(accounts.holder).approve(gymVaultsBank.address, transactionAmount);
 			await run("gymVaultsBank:deposit", {
 				pid: "1",
 				wantAmt: `${transactionAmount}`,
@@ -81,7 +83,7 @@ describe("BuyBack contract: ", function () {
 				caller: "holder"
 			});
 
-			expect(gymTotalSupplyBefore.sub(await this.gymToken.totalSupply())).to.equal(
+			expect(gymTotalSupplyBefore.sub(await gymToken.totalSupply())).to.equal(
 				(transactionAmount * buyBackPercent) / 100
 			);
 		});

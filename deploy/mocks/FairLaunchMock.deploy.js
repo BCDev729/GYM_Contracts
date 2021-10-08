@@ -14,5 +14,5 @@ module.exports = async function ({
 	}
 };
 
-module.exports.tags = ["FairLaunchMock"];
+module.exports.tags = ["FairLaunchMock", "Hardhat"];
 module.exports.dependencies = [];
