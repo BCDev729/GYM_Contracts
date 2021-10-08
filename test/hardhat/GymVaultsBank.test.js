@@ -214,7 +214,6 @@ describe("GymVaultsBank contract: ", function () {
 	describe("Add function: ", function () {
 		const allocPoint = 20;
 		const corePoolAllocPoint = 30;
-		let poolLength;
 
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
@@ -230,52 +229,47 @@ describe("GymVaultsBank contract: ", function () {
 			});
 		});
 		it("Should add Pool:", async function () {
-			poolLength = await gymVaultsBank.poolLength();
 			await advanceBlockTo((await getBlockNumber()) + 200);
 
-			const { tx } = await run("gymVaultsBank:add", {
+			const { tx, pid, totalAllocPoint } = await run("gymVaultsBank:add", {
 				want: wantToken2.address,
 				allocPoint: `${allocPoint}`,
 				withUpdate: "false",
 				strategy: strategy1.address,
 				caller: "deployer"
 			});
-			poolLength = poolLength.add(1);
 
-			expect(await gymVaultsBank.poolLength()).to.equal(poolLength);
-			expect(await gymVaultsBank.poolInfo(poolLength.sub(1))).to.deep.equal([
+			expect(await gymVaultsBank.poolLength()).to.equal(pid + 1);
+			expect(await gymVaultsBank.poolInfo(pid)).to.deep.equal([
 				wantToken2.address,
 				BigNumber.from(20),
 				BigNumber.from(tx.blockNumber),
 				BigNumber.from(0),
 				strategy1.address
 			]);
-			expect(await gymVaultsBank.totalAllocPoint()).to.equal(allocPoint + corePoolAllocPoint);
+			expect(totalAllocPoint).to.equal(allocPoint + corePoolAllocPoint);
 		});
 
 		it("Should set new allocation point:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
-			await run("gymVaultsBank:add", {
+			const { pid, totalAllocPoint } = await run("gymVaultsBank:add", {
 				want: wantToken2.address,
 				allocPoint: `${allocPoint}`,
 				withUpdate: "false",
 				strategy: strategy1.address,
 				caller: "deployer"
 			});
-			const totalAllocPoint = await gymVaultsBank.totalAllocPoint();
-			const poolAllocPoint = (await gymVaultsBank.poolInfo(poolLength.sub(1))).allocPoint;
+
 			const newAllocPoint = BigNumber.from(30);
 
-			await run("gymVaultsBank:set", {
-				pid: `${poolLength.sub(1)}`,
+			const { newTotalAllocPoint } = await run("gymVaultsBank:set", {
+				pid: `${pid}`,
 				allocPoint: `${newAllocPoint}`,
 				caller: "deployer"
 			});
-			expect(await gymVaultsBank.totalAllocPoint()).to.equal(
-				totalAllocPoint.sub(poolAllocPoint).add(newAllocPoint)
-			);
-			expect((await gymVaultsBank.poolInfo(poolLength.sub(1))).allocPoint).to.equal(newAllocPoint);
+			expect(newTotalAllocPoint).to.equal(totalAllocPoint.sub(allocPoint).add(newAllocPoint));
+			expect((await gymVaultsBank.poolInfo(pid)).allocPoint).to.equal(newAllocPoint);
 		});
 
 		it("Should: Reset Strategy", async function () {

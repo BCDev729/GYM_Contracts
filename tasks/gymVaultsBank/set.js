@@ -4,6 +4,7 @@ module.exports = async function ({ pid, allocPoint, caller }, { ethers: { getNam
 	const gymVaultsBank = await getContract("GymVaultsBank", signers[caller]);
 
 	const tx = await gymVaultsBank.connect(signers[caller]).set(pid, allocPoint);
+	const newTotalAllocPoint = await gymVaultsBank.totalAllocPoint();
 
-	return { tx, pid, allocPoint };
+	return { tx, pid, newTotalAllocPoint, allocPoint };
 };
