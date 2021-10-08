@@ -38,7 +38,7 @@ describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
 		await fixture("Hardhat");
 		accounts = await getNamedSigners();
-		({deployer, owner, caller, holder, vzgo, grno} = accounts);
+		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
 		wantToken1 = await getContract("WantToken1", caller);
 		wantToken2 = await getContract("WantToken2", caller);
 		gymToken = await getContract("GymToken", caller);
@@ -233,7 +233,7 @@ describe("GymVaultsBank contract: ", function () {
 			poolLength = await gymVaultsBank.poolLength();
 			await advanceBlockTo((await getBlockNumber()) + 200);
 
-			const tx = await run("gymVaultsBank:add", {
+			const { tx } = await run("gymVaultsBank:add", {
 				want: wantToken2.address,
 				allocPoint: `${allocPoint}`,
 				withUpdate: "false",
@@ -528,7 +528,7 @@ describe("GymVaultsBank contract: ", function () {
 				caller: "deployer"
 			});
 
-			const tx = await run("gymVaultsBank:deposit", {
+			const { depositTx } = await run("gymVaultsBank:deposit", {
 				pid: "0",
 				wantAmt: "0",
 				referrerId: (await relationship.addressToId(deployer.address)).toString(),
@@ -536,7 +536,7 @@ describe("GymVaultsBank contract: ", function () {
 				bnbAmount: `${parseEther(testVars.AMOUNT.toString())}`
 			});
 
-			const fee = (await tx.wait()).gasUsed * tx.gasPrice;
+			const fee = (await depositTx.wait()).gasUsed * depositTx.gasPrice;
 			const finalBalance = vzgoBalance - parseEther(testVars.AMOUNT.toString()) - fee;
 			expect(Number(await vzgo.getBalance())).to.be.closeTo(
 				Number(finalBalance),
@@ -930,7 +930,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			const vzgoBalance = (await vzgo.getBalance()).toString();
 
-			const depositTx = await run("gymVaultsBank:deposit", {
+			const { depositTx } = await run("gymVaultsBank:deposit", {
 				pid: "0",
 				wantAmt: "0",
 				referrerId: (await relationship.addressToId(deployer.address)).toString(),
@@ -946,7 +946,7 @@ describe("GymVaultsBank contract: ", function () {
 				user: vzgo.address
 			});
 
-			const withdrawTx = await run("gymVaultsBank:withdraw", {
+			const { withdrawTx } = await run("gymVaultsBank:withdraw", {
 				pid: "0",
 				wantAmt: `${parseEther(testVars.AMOUNT.toString())}`,
 				caller: "vzgo"

@@ -153,10 +153,10 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     function resetStrategy(uint256 _pid, address _strategy) external onlyOwner {
         PoolInfo storage pool = poolInfo[_pid];
         require(
-            pool.want.balanceOf(poolInfo[_pid].strategy) == 0 || pool.accRewardPerShare == 0,
+            pool.want.balanceOf(pool.strategy) == 0 || pool.accRewardPerShare == 0,
             "GymVaultsBank: Strategy not empty"
         );
-        poolInfo[_pid].strategy = _strategy;
+        pool.strategy = _strategy;
     }
 
     /**

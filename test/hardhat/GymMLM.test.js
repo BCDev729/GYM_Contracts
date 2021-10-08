@@ -9,7 +9,6 @@ const { getContract, getNamedSigners } = ethers;
 const variables = require("../../utils/constants/solpp")("hardhat");
 
 describe("GymMLM contract: ", function () {
-
 	let accounts, snapshotId, deployer, owner, caller, holder, grno, vzgo;
 	let gymVaultsBank, gymToken, buyBack, gymMLM, wantToken, WBNBMock, strategy, strategyAlpaca, routerMock;
 	const depositAmount = 500;
@@ -19,7 +18,7 @@ describe("GymMLM contract: ", function () {
 	const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		({caller, holder, deployer, grno, vzgo, owner} = accounts);
+		({ caller, holder, deployer, grno, vzgo, owner } = accounts);
 
 		await fixture("Hardhat");
 
@@ -75,14 +74,10 @@ describe("GymMLM contract: ", function () {
 			expect(await gymMLM.bankAddress()).to.equal(gymVaultsBank.address);
 			expect(await gymMLM.addressToId(deployer.address)).to.equal(1);
 			expect(await gymMLM.idToAddress(1)).to.equal(deployer.address);
-			expect(await gymMLM.userToReferrer(await gymMLM.idToAddress(1))).to.equal(
-				deployer.address
-			);
+			expect(await gymMLM.userToReferrer(await gymMLM.idToAddress(1))).to.equal(deployer.address);
 			expect(await gymMLM.currentId()).to.equal(2);
 			for (let i = 0; i < variables.GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH; i++) {
-				expect(await gymMLM.directReferralBonuses(i)).to.equal(
-					variables.GymMLM_DIRECT_REFERRAL_BONUSES[i]
-				);
+				expect(await gymMLM.directReferralBonuses(i)).to.equal(variables.GymMLM_DIRECT_REFERRAL_BONUSES[i]);
 			}
 		});
 	});
@@ -206,9 +201,7 @@ describe("GymMLM contract: ", function () {
 				caller: "vzgo"
 			});
 
-			expect((await wantToken.balanceOf(deployer.address)).sub(deployerAmtBefore)).to.equal(
-				gymMLMAmount
-			);
+			expect((await wantToken.balanceOf(deployer.address)).sub(deployerAmtBefore)).to.equal(gymMLMAmount);
 			deployerAmtBefore = await wantToken.balanceOf(deployer.address);
 
 			await wantToken.connect(accounts.grno).approve(gymVaultsBank.address, depositAmount);
@@ -246,13 +239,12 @@ describe("GymMLM contract: ", function () {
 			let index = 0;
 			let prevSignerBal;
 			let ownerBal = (await owner.getBalance()).sub(depositAmount);
-			let tx;
 
 			for (const signer in accounts) {
 				if (signer === "deployer") {
 					continue;
 				}
-				tx = await run("gymVaultsBank:deposit", {
+				const { depositTx } = await run("gymVaultsBank:deposit", {
 					pid: "0",
 					wantAmt: "0",
 					referrerId: (await gymMLM.addressToId(accounts[prevSigner].address)).toString(),
@@ -263,7 +255,7 @@ describe("GymMLM contract: ", function () {
 				if (index === 0) {
 					prevSigner = signer;
 					prevSignerBal = await accounts[signer].getBalance();
-					ownerBal = ownerBal.sub((await tx.wait()).gasUsed * tx.gasPrice);
+					ownerBal = ownerBal.sub((await depositTx.wait()).gasUsed * depositTx.gasPrice);
 					index++;
 					continue;
 				}

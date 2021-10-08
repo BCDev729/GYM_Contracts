@@ -12,5 +12,10 @@ module.exports = async function (
 	const tx = await gymVaultsBank
 		.connect(signers[caller])
 		.claimAndDeposit(pid, amountTokenMin, amountETHMIn, minAmountOut, deadline);
-	return tx;
+
+	const newAccRewardPerShare = (await gymVaultsBank.poolInfo(pid)).accRewardPerShare;
+
+	const newRewardDebt = (await gymVaultsBank.userInfo(pid, signers[caller].address)).rewardDebt;
+
+	return { tx, pid, newAccRewardPerShare, newRewardDebt };
 };

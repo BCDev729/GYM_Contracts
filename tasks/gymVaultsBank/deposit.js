@@ -9,9 +9,15 @@ module.exports = async function (
 
 	const gymVaultsBank = await getContract("GymVaultsBank", signers[caller]);
 
-	const tx = await gymVaultsBank.connect(signers[caller]).deposit(pid, wantAmt, referrerId, minBurnAmt, deadline, {
+	const depositTx = await gymVaultsBank.connect(signers[caller]).deposit(pid, wantAmt, referrerId, minBurnAmt, deadline, {
 		value: bnbAmount
 	});
 
-	return tx;
+	const newAccRewardPerShare = (await gymVaultsBank.poolInfo(pid)).accRewardPerShare;
+
+	const newRewardDebt = (await gymVaultsBank.userInfo(pid, signers[caller].address)).rewardDebt;
+
+	const newUserShares = (await gymVaultsBank.userInfo(pid, signers[caller].address)).shares;
+
+	return { depositTx, pid, newAccRewardPerShare, newRewardDebt, newUserShares };
 };

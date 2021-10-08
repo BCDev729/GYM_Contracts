@@ -3,7 +3,13 @@ module.exports = async function ({ pid, wantAmt, caller }, { ethers: { getNamedS
 
 	const gymVaultsBank = await getContract("GymVaultsBank", signers[caller]);
 
-	const tx = await gymVaultsBank.connect(signers[caller]).withdraw(pid, wantAmt);
+	const withdrawTx = await gymVaultsBank.connect(signers[caller]).withdraw(pid, wantAmt);
 
-	return tx;
+	const newAccRewardPerShare = (await gymVaultsBank.poolInfo(pid)).accRewardPerShare;
+
+	const newRewardDebt = (await gymVaultsBank.userInfo(pid, signers[caller].address)).rewardDebt;
+
+	const newUserShares = (await gymVaultsBank.userInfo(pid, signers[caller].address)).shares;
+
+	return { withdrawTx, pid, newAccRewardPerShare, newRewardDebt, newUserShares };
 };
