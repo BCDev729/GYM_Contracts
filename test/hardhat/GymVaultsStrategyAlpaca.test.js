@@ -9,8 +9,7 @@ const testVars = require("./../utilities/testVariables.json");
 
 describe("GymVaultsStrategyAlpaca contract: ", function () {
 	let accounts, deployer, owner, caller, holder, vzgo;
-	// eslint-disable-next-line no-unused-vars
-	let router, farm, vault, fairLaunch, bank, gymToken, want, earn, tokenA, ibToken;
+	let router, farm, vault, fairLaunch, bank, gymToken, want, earn, ibToken;
 	let strategyAlpacaAutoComp, strategyAlpaca, snapshotStart;
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
@@ -25,7 +24,6 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		gymToken = await getContract("GymToken", caller);
 		want = await getContract("WantToken1", caller);
 		earn = await getContract("EarnToken", caller);
-		tokenA = await getContract("TokenA", caller);
 		ibToken = await getContract("ibToken", caller);
 
 		strategyAlpaca = await getContract("GymVaultsStrategyAlpaca", caller);
@@ -56,8 +54,6 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		await earn.connect(deployer).transfer(fairLaunch.address, testVars.TOKENS_MINT_AMOUNT / 4);
 		await ibToken.connect(deployer).transfer(vault.address, testVars.TOKENS_MINT_AMOUNT / 2);
 		await gymToken.connect(holder).transfer(router.address, testVars.TOKENS_MINT_AMOUNT);
-		// await tokenA.connect(deployer).transfer(vzgo.address, variables.TOKENS_MINT_AMOUNT / 2)
-		// await tokenB.connect(deployer).transfer(router.address, variables.TOKENS_MINT_AMOUNT / 2)
 	});
 
 	describe("Constructor: ", function () {
