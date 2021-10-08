@@ -37,5 +37,5 @@ module.exports = async function ({
 	}
 };
 
-module.exports.tags = ["Strategies"];
+module.exports.tags = ["Strategies", "Hardhat", "Fork"];
 module.exports.dependencies = ["Tokens", "WBNBMock"];

@@ -21,26 +21,12 @@ module.exports = async function ({
 	const rewardPerBlock = parseEther(args.rewardPerBlock);
 	const startBlock = blockNumber + args.startBlock;
 
-	const options = {
-		contractName: "GymFarming",
-		args: [bank.address, rewardToken.address, rewardPerBlock, startBlock]
-	};
-
-	const deterministicDeploy = await run("deploy:farming", {
+	await run("deploy:farming", {
 		bankAddress: bank.address,
 		rewardTokenAddress: rewardToken.address,
 		rewardPerBlock: rewardPerBlock.toString(),
 		startBlock: startBlock.toString()
 	});
-
-	try {
-		await run("verify:verify", {
-			address: deterministicDeploy.address,
-			constructorArguments: options.args
-		});
-	} catch (e) {
-		console.log(e.toString());
-	}
 };
 
 module.exports.tags = ["Farming", "Fork"];

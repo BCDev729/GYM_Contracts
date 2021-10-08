@@ -3,6 +3,7 @@ require("./utils");
 require("./deploy");
 require("./gymVaultsBank");
 require("./gymMLM");
+require("./farming");
 
 task("setupNext", "Add liquidity without args").setAction(
 	async (
