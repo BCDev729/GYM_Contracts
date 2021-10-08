@@ -38,7 +38,7 @@ describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
 		await fixture("Hardhat");
 		accounts = await getNamedSigners();
-		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
+		({deployer, owner, caller, holder, vzgo, grno} = accounts);
 		wantToken1 = await getContract("WantToken1", caller);
 		wantToken2 = await getContract("WantToken2", caller);
 		gymToken = await getContract("GymToken", caller);
@@ -67,7 +67,6 @@ describe("GymVaultsBank contract: ", function () {
 			treasuryAddress: owner.address,
 			caller: "deployer"
 		});
-		await gymVaultsBank.connect(deployer).setWithdrawFee(1000);
 		await run("gymVaultsBank:setWithdrawFee", {
 			withdrawFee: "1000",
 			caller: "deployer"
@@ -448,8 +447,14 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should calculate rewards for 2 users in 2 different pools:", async function () {
 			await advanceBlockTo((await getBlockNumber()) + startBlock);
-			await gymVaultsBank.connect(deployer).add(wantToken2.address, allocPoint, false, strategy2.address);
-			// const poolAllocPoint1 = (await gymVaultsBank.poolInfo(1)).allocPoint;
+
+			await run("gymVaultsBank:add", {
+				want: wantToken2.address,
+				allocPoint: `${allocPoint}`,
+				withUpdate: "false",
+				strategy: strategy2.address,
+				caller: "deployer"
+			});
 
 			await run("gymVaultsBank:add", {
 				want: wantToken1.address,
