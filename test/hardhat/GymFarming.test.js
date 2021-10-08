@@ -16,7 +16,6 @@ const {
 const variables = require("../../utils/constants/solpp")("hardhat");
 const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
-
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder, chugun, vzgo, grno;
 	let gymFarming, gym, startBlock, snapshotStart, testLp, testLp1;
@@ -604,8 +603,7 @@ describe("GymFarming contract: ", function () {
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
 			expect(await gymFarming.connect(caller).deposit(pid, amount))
-				.to
-				.emit(gymFarming, "Deposit")
+				.to.emit(gymFarming, "Deposit")
 				.withArgs(caller.address, pid, amount);
 		});
 	});
@@ -662,8 +660,7 @@ describe("GymFarming contract: ", function () {
 			await gymFarming.connect(caller).deposit(pid, amount);
 			await advanceBlock();
 			expect(await gymFarming.connect(caller).withdraw(pid, amount))
-				.to
-				.emit(gymFarming, "Withdraw")
+				.to.emit(gymFarming, "Withdraw")
 				.withArgs(caller.address, pid, amount);
 		});
 
@@ -676,15 +673,13 @@ describe("GymFarming contract: ", function () {
 			await advanceBlock();
 			const pending = await gymFarming.connect(caller).pendingReward(pid, caller.address);
 			expect(await gymFarming.connect(caller).withdraw(pid, amount))
-				.to
-				.emit(gymFarming, "Harvest")
+				.to.emit(gymFarming, "Harvest")
 				.withArgs(caller.address, pid, pending);
 		});
 	});
 
 	describe("HarvestAll function: ", function () {
-		before(async function() {
-
+		before(async function () {
 			await run("farming:add", {
 				allocPoint: `${poolAllocPoint2}`,
 				lpToken: testLp.address,
@@ -746,8 +741,7 @@ describe("GymFarming contract: ", function () {
 			const pending = await gymFarming.pendingReward(0, vzgo.address);
 
 			expect(await gymFarming.connect(vzgo).harvest(0))
-				.to
-				.emit(gymFarming, "Harvest")
+				.to.emit(gymFarming, "Harvest")
 				.withArgs(vzgo.address, 0, pending);
 		});
 	});
