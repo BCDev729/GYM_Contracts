@@ -173,5 +173,8 @@ module.exports = {
 	},
 	mocha: {
 		timeout: 100000
+	},
+	paths: {
+		deploy: "./deploy/deploy"
 	}
 };
