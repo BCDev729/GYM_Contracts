@@ -201,14 +201,6 @@ describe("GymVaultsBank contract: ", function () {
 				Math.floor((rewardPerBlock * variables.GymVaultsBank_COEFFICIENT ** 3) / 1e12 ** 3)
 			);
 		});
-
-		it("Should revert with message: Ownable: caller is not the owner", async function () {
-			await expect(
-				run("gymVaultsBank:updateRewardPerBlock", {
-					caller: "caller"
-				})
-			).to.be.revertedWith("Ownable: caller is not the owner");
-		});
 	});
 
 	describe("Add function: ", function () {
