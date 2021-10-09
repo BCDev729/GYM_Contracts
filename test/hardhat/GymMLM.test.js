@@ -244,7 +244,7 @@ describe("GymMLM contract: ", function () {
 				if (signer === "deployer") {
 					continue;
 				}
-				const { depositTx } = await run("gymVaultsBank:deposit", {
+				const deposit = await run("gymVaultsBank:deposit", {
 					pid: "0",
 					wantAmt: "0",
 					referrerId: (await gymMLM.addressToId(accounts[prevSigner].address)).toString(),
@@ -255,7 +255,7 @@ describe("GymMLM contract: ", function () {
 				if (index === 0) {
 					prevSigner = signer;
 					prevSignerBal = await accounts[signer].getBalance();
-					ownerBal = ownerBal.sub((await depositTx.wait()).gasUsed * depositTx.gasPrice);
+					ownerBal = ownerBal.sub((await deposit.tx.wait()).gasUsed * deposit.tx.gasPrice);
 					index++;
 					continue;
 				}
