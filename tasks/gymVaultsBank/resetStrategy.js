@@ -5,5 +5,5 @@ module.exports = async function ({ pid, strategy, caller }, { ethers: { getNamed
 
 	const tx = await gymVaultsBank.connect(signers[caller]).resetStrategy(pid, strategy);
 
-	return { tx, pid, strategy };
+	return { tx };
 };

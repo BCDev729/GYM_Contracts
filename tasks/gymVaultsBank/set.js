@@ -6,5 +6,5 @@ module.exports = async function ({ pid, allocPoint, caller }, { ethers: { getNam
 	const tx = await gymVaultsBank.connect(signers[caller]).set(pid, allocPoint);
 	const newTotalAllocPoint = await gymVaultsBank.totalAllocPoint();
 
-	return { tx, pid, newTotalAllocPoint, allocPoint };
+	return { tx, newTotalAllocPoint };
 };

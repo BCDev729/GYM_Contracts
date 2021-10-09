@@ -11,5 +11,5 @@ module.exports = async function (
 	const pid = (await gymVaultsBank.poolLength()) - 1;
 	const totalAllocPoint = await gymVaultsBank.totalAllocPoint();
 
-	return { tx, pid, totalAllocPoint, want, allocPoint, withUpdate, strategy };
+	return { tx, pid, allocPoint, totalAllocPoint };
 };

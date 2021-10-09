@@ -5,5 +5,5 @@ module.exports = async function ({ farmingAddress, caller }, { ethers: { getName
 
 	const tx = await gymVaultsBank.connect(signers[caller]).setFarmingAddress(farmingAddress);
 
-	return { tx, farmingAddress };
+	return { tx };
 };

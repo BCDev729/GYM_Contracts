@@ -5,9 +5,7 @@ module.exports = async function ({ caller }, { ethers: { getNamedSigners, getCon
 
 	const tx = await gymVaultsBank.connect(signers[caller]).updateRewardPerBlock();
 
-	const newRewardPerBlock = (await gymVaultsBank.rewardPoolInfo).rewardPerBlock;
-	const newRewardPerBlockChangesCount = await gymVaultsBank.rewardPerBlockChangesCount;
-	const newLastChangeBlock = await gymVaultsBank.lastChangeBlock;
+	const newRewardPerBlock = Math.floor((await gymVaultsBank.rewardPoolInfo()).rewardPerBlock);
 
-	return { tx, newRewardPerBlock, newRewardPerBlockChangesCount, newLastChangeBlock };
+	return { tx, newRewardPerBlock };
 };

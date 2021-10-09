@@ -5,5 +5,5 @@ module.exports = async function ({ withdrawFee, caller }, { ethers: { getNamedSi
 
 	const tx = await gymVaultsBank.connect(signers[caller]).setWithdrawFee(withdrawFee);
 
-	return { tx, withdrawFee };
+	return { tx };
 };

@@ -12,5 +12,5 @@ module.exports = async function (
 
 	const newRewardDebt = (await gymVaultsBank.userInfo(pid, signers[caller].address)).rewardDebt;
 
-	return {tx, pid, newAccRewardPerShare, newRewardDebt};
+	return {tx, newAccRewardPerShare, newRewardDebt};
 };

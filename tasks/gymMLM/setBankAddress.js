@@ -5,5 +5,5 @@ module.exports = async function ({ bankAddress, caller }, { ethers: { getNamedSi
 
 	const tx = await gymMLM.connect(signers[caller]).setBankAddress(bankAddress);
 
-	return { tx, bankAddress };
+	return { tx };
 };

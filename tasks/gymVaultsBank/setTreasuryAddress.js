@@ -5,5 +5,5 @@ module.exports = async function ({ treasuryAddress, caller }, { ethers: { getNam
 
 	const tx = await gymVaultsBank.connect(signers[caller]).setTreasuryAddress(treasuryAddress);
 
-	return { tx, treasuryAddress };
+	return { tx };
 };
