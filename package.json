@@ -59,6 +59,7 @@
 		"typechain": "^5.0.0"
 	},
 	"dependencies": {
+		"@openzeppelin/contracts-upgradeable": "^4.0.0",
 		"ethereumjs-util": "^7.1.0",
 		"hardhat-local-networks-config-plugin": "^0.0.6"
 	}
