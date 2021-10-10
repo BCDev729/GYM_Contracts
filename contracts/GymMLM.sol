@@ -11,10 +11,11 @@ contract GymMLM is Ownable {
     uint256 public currentId;
     address public bankAddress;
     uint8[$(GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH)] public directReferralBonuses;
+    uint256[$(GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH)] public levels;
 
     mapping(address => uint256) public addressToId;
     mapping(uint256 => address) public idToAddress;
-
+    mapping(address => uint256) public investment;
     mapping(address => address) public userToReferrer;
 
     event NewReferral(address indexed user, address indexed referral);
@@ -27,6 +28,7 @@ contract GymMLM is Ownable {
         idToAddress[1] = $(GymMLM_OWNER);
         userToReferrer[$(GymMLM_OWNER)] = $(GymMLM_OWNER);
         currentId = 2;
+        levels = $(GymMLM_LEVELS);
         transferOwnership($(GymMLM_OWNER)); // deployer address
     }
 
@@ -106,12 +108,16 @@ contract GymMLM is Ownable {
             return;
         }
 
+        investment[_user] += _wantAmt;
+
         while (index < length && addressToId[userToReferrer[_user]] != 1) {
             address referrer = userToReferrer[_user];
-            uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
-            IWETH($(WBNB_TOKEN)).withdraw(reward);
-            payable(referrer).transfer(reward);
-            emit ReferralRewardReceved(referrer, _user, reward);
+            if(investment[referrer] >= levels[index]) {
+                uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
+                IWETH($(WBNB_TOKEN)).withdraw(reward);
+                payable(referrer).transfer(reward);
+                emit ReferralRewardReceved(referrer, _user, reward);
+            }
             _user = userToReferrer[_user];
             index++;
         }

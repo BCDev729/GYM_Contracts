@@ -1,25 +1,29 @@
 const { expect } = require("chai");
 const {
+	config: {
+		solpp: { defs }
+	},
 	deployments: { fixture },
 	network,
-	ethers,
+	ethers: {
+		getContract,
+		getNamedSigners,
+		utils: { parseEther }
+	},
 	run
 } = require("hardhat");
-const { getContract, getNamedSigners } = ethers;
-const variables = require("../../utils/constants/solpp")("hardhat");
 
 describe("GymMLM contract: ", function () {
-
 	let accounts, snapshotId, deployer, owner, caller, holder, grno, vzgo;
 	let gymVaultsBank, gymToken, buyBack, gymMLM, wantToken, WBNBMock, strategy, strategyAlpaca, routerMock;
 	const depositAmount = 500;
 	const transferAmount = 5000;
-	const gymMLMReward = variables.GymVaultsBank_RELATIONSHIP_REWARD;
-	const gymMLMBonuses = variables.GymMLM_DIRECT_REFERRAL_BONUSES;
+	const gymMLMReward = defs.GymVaultsBank_RELATIONSHIP_REWARD;
+	const gymMLMBonuses = defs.GymMLM_DIRECT_REFERRAL_BONUSES;
 	const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		({caller, holder, deployer, grno, vzgo, owner} = accounts);
+		({ caller, holder, deployer, grno, vzgo, owner } = accounts);
 
 		await fixture("Hardhat");
 
@@ -51,8 +55,8 @@ describe("GymMLM contract: ", function () {
 		await wantToken.connect(deployer).transfer(routerMock.address, transferAmount);
 		await wantToken.connect(deployer).transfer(grno.address, transferAmount);
 
-		await gymToken.connect(holder).transfer(gymVaultsBank.address, 100000);
-		await gymToken.connect(holder).transfer(routerMock.address, 100000);
+		await gymToken.connect(holder).transfer(gymVaultsBank.address, parseEther("200000"));
+		await gymToken.connect(holder).transfer(routerMock.address, parseEther("200000"));
 
 		await run("gymVaultsBank:add", {
 			want: WBNBMock.address,
@@ -75,14 +79,11 @@ describe("GymMLM contract: ", function () {
 			expect(await gymMLM.bankAddress()).to.equal(gymVaultsBank.address);
 			expect(await gymMLM.addressToId(deployer.address)).to.equal(1);
 			expect(await gymMLM.idToAddress(1)).to.equal(deployer.address);
-			expect(await gymMLM.userToReferrer(await gymMLM.idToAddress(1))).to.equal(
-				deployer.address
-			);
+			expect(await gymMLM.userToReferrer(await gymMLM.idToAddress(1))).to.equal(deployer.address);
 			expect(await gymMLM.currentId()).to.equal(2);
-			for (let i = 0; i < variables.GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH; i++) {
-				expect(await gymMLM.directReferralBonuses(i)).to.equal(
-					variables.GymMLM_DIRECT_REFERRAL_BONUSES[i]
-				);
+			for (let i = 0; i < defs.GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH; i++) {
+				expect(await gymMLM.directReferralBonuses(i)).to.equal(defs.GymMLM_DIRECT_REFERRAL_BONUSES[i]);
+				expect(await gymMLM.levels(i)).to.equal(parseEther(defs.GymMLM_LEVELS[i].replace(" ether", "")));
 			}
 		});
 	});
@@ -206,9 +207,7 @@ describe("GymMLM contract: ", function () {
 				caller: "vzgo"
 			});
 
-			expect((await wantToken.balanceOf(deployer.address)).sub(deployerAmtBefore)).to.equal(
-				gymMLMAmount
-			);
+			expect((await wantToken.balanceOf(deployer.address)).sub(deployerAmtBefore)).to.equal(gymMLMAmount);
 			deployerAmtBefore = await wantToken.balanceOf(deployer.address);
 
 			await wantToken.connect(accounts.grno).approve(gymVaultsBank.address, depositAmount);
