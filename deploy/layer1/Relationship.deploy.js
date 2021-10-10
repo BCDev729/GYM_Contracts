@@ -1,5 +1,4 @@
 module.exports = async function ({ run }) {
-	const tx = await run("deploy:gymMLM");
-	console.log("🚀 ~ file: Relationship.deploy.js ~ line 3 ~ tx", tx.address);
+	await run("deploy:gymMLM");
 };
 module.exports.tags = ["GymMLM", "Hardhat", "Fork", "bsc", "bsc-testnet", "layer1"];
