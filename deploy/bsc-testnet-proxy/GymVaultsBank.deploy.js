@@ -15,9 +15,9 @@ module.exports = async function ({
 
 	await run("deploy:gymVaultsBankProxy", {
 		startblock: startBlock.toString(),
-		gymtokenaddress: gymToken.address,
-		rewardrate: rewardRate.toString()
+		gymTokenAddress: gymToken.address,
+		rewardRate: rewardRate.toString()
 	});
 };
-module.exports.tags = ["GymVaultsBank", "Proxy"];
+module.exports.tags = ["GymVaultsBankProxy", "Proxy"];
 module.exports.dependencies = ["GymToken", "BuyBack"];

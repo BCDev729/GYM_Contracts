@@ -1,7 +1,6 @@
 const args = require("../../utils/constants/data/bsc/GymVaultsStrategyAlpacaBUSD.json");
 
-module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
-	const bank = await getContract("GymVaultsBankProxy");
+module.exports = async function ({ run }) {
 	const isAutoComp = args.isAutoComp;
 	const vault = args.vault;
 	const fairLaunch = args.fairLaunch;
@@ -9,10 +8,11 @@ module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
 	const want = args.want;
 	const earn = args.earn;
 	const router = args.router;
+	const { proxies } = require("./../../.openzeppelin/unknown-56.json");
 
 	await run("deploy:gymVaultsStrategyProxy", {
 		contractName: "GymVaultsStrategyAlpacaProxy",
-		bank: bank.address,
+		bank: proxies[proxies.length - 1].address,
 		isAutoComp: isAutoComp.toString(),
 		vault: vault,
 		fairLaunch: fairLaunch,
@@ -22,5 +22,5 @@ module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
 		router: router
 	});
 };
-module.exports.tags = ["GymVaultsStrategyAlpacaBUSD", "Proxy"];
-module.exports.dependencies = ["GymVaultsBank"];
+module.exports.tags = ["GymVaultsStrategyAlpacaBUSDProxy", "Proxy"];
+module.exports.dependencies = ["GymVaultsBankProxy"];

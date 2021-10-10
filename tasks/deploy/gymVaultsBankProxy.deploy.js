@@ -1,11 +1,12 @@
 module.exports = async function (
-	{ startblock, gymtokenaddress, rewardrate },
+	{ startblock, gymTokenAddress, rewardRate },
 	{ ethers: { getContractFactory }, upgrades: { deployProxy } }
 ) {
 	const GymVaultsBank = await getContractFactory("GymVaultsBankProxy");
-	const gymVaultsBank = await deployProxy(GymVaultsBank, [startblock, gymtokenaddress, rewardrate], {
+	const gymVaultsBank = await deployProxy(GymVaultsBank, [startblock, gymTokenAddress, rewardRate], {
 		unsafeAllowCustomTypes: true
 	});
 	await gymVaultsBank.deployed();
-	return gymVaultsBank.address;
+	console.log(gymVaultsBank.address);
+	return gymVaultsBank;
 };

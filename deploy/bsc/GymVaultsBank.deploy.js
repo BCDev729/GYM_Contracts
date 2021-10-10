@@ -1,4 +1,4 @@
-const args = require("../../utils/constants/data/bsc/GymVaultsBank.json");
+const args = require("../../utils/constants/data/bsc-testnet/GymVaultsBank.json");
 
 module.exports = async function ({
 	run,
@@ -13,11 +13,11 @@ module.exports = async function ({
 	const gymToken = await getContract("GymToken");
 	const rewardRate = parseEther(args.rewardRate);
 
-	await run("deploy:gymVaultsBank", {
+	await run("deploy:gymVaultsBankProxy", {
 		startblock: startBlock.toString(),
-		gymtokenaddress: gymToken.address,
-		rewardrate: rewardRate.toString()
+		gymTokenAddress: gymToken.address,
+		rewardRate: rewardRate.toString()
 	});
 };
-module.exports.tags = ["GymVaultsBank", "bsc"];
+module.exports.tags = ["GymVaultsBankProxy", "Proxy"];
 module.exports.dependencies = ["GymToken", "BuyBack"];

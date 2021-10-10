@@ -19,13 +19,13 @@ task("deploy:farming", "Deploy GymFarming contract", require("./farming.deploy")
 
 task("deploy:gymVaultsBank", "Deploy GymVaultsBank contract", require("./gymVaultsBank.deploy"))
 	.addParam("startblock", "startBlock")
-	.addParam("gymtokenaddress", "GymTokenAddress address")
-	.addParam("rewardrate", "rewardRate");
+	.addParam("gymTokenAddress", "gymTokenAddress address")
+	.addParam("rewardRate", "rewardRate");
 
 task("deploy:gymVaultsBankProxy", "Deploy GymVaultsBankProxy contract", require("./gymVaultsBankProxy.deploy"))
 	.addParam("startblock", "startBlock")
-	.addParam("gymtokenaddress", "GymTokenAddress address")
-	.addParam("rewardrate", "rewardRate");
+	.addParam("gymTokenAddress", "gymTokenAddress address")
+	.addParam("rewardRate", "rewardRate");
 
 task("deploy:gymMLM", "Deploy GymMLM contract", require("./gymMLM.deploy"));
 

@@ -1,7 +1,6 @@
 const args = require("../../utils/constants/data/bsc-testnet/GymVaultsStrategyAlpacaBUSD.json");
-const { proxies } = require("./../../.openzeppelin/unknown-97.json");
 
-module.exports = async function ({ run}) {
+module.exports = async function ({ run }) {
 	const isAutoComp = args.isAutoComp;
 	const vault = args.vault;
 	const fairLaunch = args.fairLaunch;
@@ -9,6 +8,7 @@ module.exports = async function ({ run}) {
 	const want = args.want;
 	const earn = args.earn;
 	const router = args.router;
+	const { proxies } = require("./../../.openzeppelin/unknown-97.json");
 
 	await run("deploy:gymVaultsStrategyProxy", {
 		contractName: "GymVaultsStrategyAlpacaProxy",
@@ -22,5 +22,5 @@ module.exports = async function ({ run}) {
 		router: router
 	});
 };
-module.exports.tags = ["GymVaultsStrategyAlpacaBUSD", "Proxy"];
-module.exports.dependencies = ["GymVaultsBank"];
+module.exports.tags = ["GymVaultsStrategyAlpacaBUSDProxy", "Proxy"];
+module.exports.dependencies = ["GymVaultsBankProxy"];
