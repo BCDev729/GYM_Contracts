@@ -268,13 +268,24 @@ describe("GymMLM contract: ", function () {
 					continue;
 				}
 
+				const levelBNB = await gymMLM.levels(index > 15 ? index = 14 : index - 1);
+				const investAmount = await gymMLM.investment(accounts[signer].address);
+				if (investAmount.gte(levelBNB)) {
+					Math.floor((depositAmount * gymMLMBonuses[index - 1]) / 100);
+				}
+
 				if (index === 16) {
 					expect((await owner.getBalance()).sub(ownerBal)).to.equal(0);
 				} else {
-					expect((await owner.getBalance()).sub(ownerBal)).to.equal(
-						Math.floor((depositAmount * gymMLMBonuses[index - 1]) / 100)
-					);
+					if (investAmount.lt(levelBNB)) {
+						expect((await owner.getBalance()).sub(ownerBal)).to.equal(0);
+					} else {
+						expect((await owner.getBalance()).sub(ownerBal)).to.equal(
+							Math.floor((depositAmount * gymMLMBonuses[index - 1]) / 100)
+						);
+					}
 				}
+
 				expect((await accounts[prevSigner].getBalance()).sub(prevSignerBal)).to.equal(
 					Math.floor((depositAmount * gymMLMBonuses[0]) / 100)
 				);
