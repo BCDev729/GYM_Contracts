@@ -182,7 +182,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     /**
      * @notice Updates amount of reward tokens  per block that user will get. Can only be called by the owner
      */
-    function updateRewardPerBlock() external nonReentrant onlyOwner {
+    function updateRewardPerBlock() external nonReentrant {
         massUpdatePools();
         if (block.number - lastChangeBlock > $(GymVaultsBank_REWARD_CHANGE_BLOCKS) && rewardPerBlockChangesCount > 0) {
             rewardPoolInfo.rewardPerBlock = (rewardPoolInfo.rewardPerBlock * $(GymVaultsBank_COEFFICIENT)) / 1e12;

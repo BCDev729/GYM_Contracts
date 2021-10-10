@@ -164,6 +164,21 @@
       "address": "0xB703945e98a940c505A4a83ea70bdee7E1dCcBD4",
       "txHash": "0x7c954f5ce5a0e455f871e118a81f66a37ddf9431424603323581e3687fc144fd",
       "kind": "transparent"
+    },
+    {
+      "address": "0xb73A84E46F6f368963097C1b1E05A5Df2897524d",
+      "txHash": "0x5c54c54973e3fda3046e1a195625098832078a89f2737082a23062768fe97950",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xf69974d35207b79d60259276e460e11893cB4eb2",
+      "txHash": "0x93903ebc93bf3a1f9dcc1e5767727248ddcab5e9d1c12a3bf234cc5bd5cb2046",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x01eBfb98e568d9EC0dB27b1B8fA2BF67c9382d42",
+      "txHash": "0x2b9c5f0d33dbc2cc44013c2033314df7e1c719f8f19c860c333cde0c589f34ed",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -3160,6 +3175,205 @@
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "7e490986f781fca29f4206f838f9978d849395a617008c4160c8503e0289a91c": {
+      "address": "0xfe249AB42b555B1563A9bb18d9183FF0AF654e63",
+      "txHash": "0x4e49b29ec843dc3703ad7e192995ab2860714f370dfc99b469845f765b8a9781",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:30"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:21"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:77"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "totalAllocPoint",
+            "type": "t_uint256",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:85"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "startBlock",
+            "type": "t_uint256",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:87"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "withdrawFee",
+            "type": "t_uint256",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:88"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "farming",
+            "type": "t_address",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:91"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "treasuryAddress",
+            "type": "t_address",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:95"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "poolInfo",
+            "type": "t_array(t_struct(PoolInfo)3246_storage)dyn_storage",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:97"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "userInfo",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(UserInfo)3234_storage))",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:99"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "rewardPoolInfo",
+            "type": "t_struct(RewardPoolInfo)3251_storage",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:101"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "alpacaToWBNB",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:103"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "lastChangeBlock",
+            "type": "t_uint256",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:104"
+          },
+          {
+            "contract": "GymVaultsBankProxy",
+            "label": "rewardPerBlockChangesCount",
+            "type": "t_uint256",
+            "src": "cache/solpp-generated-contracts/GymVaultsBankProxy.sol:105"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_struct(PoolInfo)3246_storage)dyn_storage": {
+            "label": "struct GymVaultsBankProxy.PoolInfo[]"
+          },
+          "t_struct(PoolInfo)3246_storage": {
+            "label": "struct GymVaultsBankProxy.PoolInfo",
+            "members": [
+              {
+                "label": "want",
+                "type": "t_contract(IERC20Upgradeable)306"
+              },
+              {
+                "label": "allocPoint",
+                "type": "t_uint256"
+              },
+              {
+                "label": "lastRewardBlock",
+                "type": "t_uint256"
+              },
+              {
+                "label": "accRewardPerShare",
+                "type": "t_uint256"
+              },
+              {
+                "label": "strategy",
+                "type": "t_address"
+              }
+            ]
+          },
+          "t_contract(IERC20Upgradeable)306": {
+            "label": "contract IERC20Upgradeable"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_struct(UserInfo)3234_storage))": {
+            "label": "mapping(uint256 => mapping(address => struct GymVaultsBankProxy.UserInfo))"
+          },
+          "t_mapping(t_address,t_struct(UserInfo)3234_storage)": {
+            "label": "mapping(address => struct GymVaultsBankProxy.UserInfo)"
+          },
+          "t_struct(UserInfo)3234_storage": {
+            "label": "struct GymVaultsBankProxy.UserInfo",
+            "members": [
+              {
+                "label": "shares",
+                "type": "t_uint256"
+              },
+              {
+                "label": "rewardDebt",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_struct(RewardPoolInfo)3251_storage": {
+            "label": "struct GymVaultsBankProxy.RewardPoolInfo",
+            "members": [
+              {
+                "label": "rewardToken",
+                "type": "t_address"
+              },
+              {
+                "label": "rewardPerBlock",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
           }
         }
       }
