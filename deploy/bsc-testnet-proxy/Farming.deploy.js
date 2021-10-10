@@ -1,4 +1,5 @@
 const args = require("../../utils/constants/data/bsc-testnet/GymFarming.json");
+const { proxies } = require("./../../.openzeppelin/unknown-97.json");
 
 module.exports = async function ({
 	run,
@@ -9,13 +10,12 @@ module.exports = async function ({
 	}
 }) {
 	const blockNumber = await getBlockNumber();
-	const bank = await getContract("GymVaultsBankProxy");
 	const rewardToken = await getContract("GymToken");
 	const rewardPerBlock = parseEther(args.rewardPerBlock);
 	const startBlock = blockNumber + args.startBlock;
 
 	await run("deploy:farming", {
-		bankAddress: bank.address,
+		bankAddress: proxies[proxies.length - 1].address,
 		rewardTokenAddress: rewardToken.address,
 		rewardPerBlock: rewardPerBlock.toString(),
 		startBlock: startBlock.toString()

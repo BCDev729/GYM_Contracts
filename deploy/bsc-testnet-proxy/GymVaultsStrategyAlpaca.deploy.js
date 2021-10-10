@@ -1,7 +1,7 @@
 const args = require("../../utils/constants/data/bsc-testnet/GymVaultsStrategyAlpaca.json");
+const { proxies } = require("./../../.openzeppelin/unknown-97.json");
 
-module.exports = async function ({ run, ethers: { getContract } }) {
-	const bank = await getContract("GymVaultsBankProxy");
+module.exports = async function ({ run }) {
 	const isAutoComp = args.isAutoComp;
 	const vault = args.vault;
 	const fairLaunch = args.fairLaunch;
@@ -12,7 +12,7 @@ module.exports = async function ({ run, ethers: { getContract } }) {
 
 	await run("deploy:gymVaultsStrategyProxy", {
 		contractName: "GymVaultsStrategyAlpacaProxy",
-		bank: bank.address,
+		bank: proxies[proxies.length - 1].address,
 		isAutoComp: isAutoComp.toString(),
 		vault: vault,
 		fairLaunch: fairLaunch,
