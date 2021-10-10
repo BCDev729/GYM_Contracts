@@ -21,6 +21,7 @@ describe("GymMLM contract: ", function () {
 	const gymMLMReward = defs.GymVaultsBank_RELATIONSHIP_REWARD;
 	const gymMLMBonuses = defs.GymMLM_DIRECT_REFERRAL_BONUSES;
 	const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
+
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 		({ caller, holder, deployer, grno, vzgo, owner } = accounts);
@@ -83,7 +84,7 @@ describe("GymMLM contract: ", function () {
 			expect(await gymMLM.currentId()).to.equal(2);
 			for (let i = 0; i < defs.GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH; i++) {
 				expect(await gymMLM.directReferralBonuses(i)).to.equal(defs.GymMLM_DIRECT_REFERRAL_BONUSES[i]);
-				expect(await gymMLM.levels(i)).to.equal(parseEther(defs.GymMLM_LEVELS[i].replace(" ether", "")));
+				expect(await gymMLM.levels(i)).to.equal(defs.GymMLM_LEVELS[i]);
 			}
 		});
 	});
