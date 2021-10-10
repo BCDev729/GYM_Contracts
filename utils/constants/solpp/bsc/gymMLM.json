@@ -1,5 +1,22 @@
 {
     "GymMLM_DIRECT_REFERRAL_BONUSES": [10, 7, 5, 4, 4, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1],
     "GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH": 15,
+    "GymMLM_LEVELS": [
+		"0.1 ether",
+		"0.1 ether",
+		"0.1 ether",
+		"0.1 ether",
+		"1 ether",
+		"3 ether",
+		"10 ether",
+		"20 ether",
+		"30 ether",
+		"50 ether",
+		"60 ether",
+		"70 ether",
+		"80 ether",
+		"100 ether",
+		"200 ether"
+	],
     "GymMLM_OWNER": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 }
