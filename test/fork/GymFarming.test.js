@@ -54,7 +54,6 @@ describe("GymFarming contract: ", function () {
 				lpToken: `${lpToken}`,
 				withUpdate: "true"
 			});
-			// await gymFarming.add(poolAllocPoint2, lpToken, true);
 		});
 
 		afterEach("AfterEach: ", async function () {
@@ -73,12 +72,6 @@ describe("GymFarming contract: ", function () {
 				})
 			).to.changeTokenBalances(gym, [holder], [0]);
 
-			// await expect(() =>
-			// 	gymFarming.connect(holder).speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-			// 		value: parseEther("10")
-			// 	})
-			// ).to.changeTokenBalances(gym, [holder], [0]);
-
 			expect((await gymFarming.userInfo(0, holder.address)).amount).to.not.equal(0);
 		});
 
@@ -93,11 +86,6 @@ describe("GymFarming contract: ", function () {
 					bnbAmount: `${parseEther("10")}`
 				})
 			).to.changeTokenBalances(gym, [holder], [parseEther("10").mul(constants.NegativeOne)]);
-			// await expect(() =>
-			// 	gymFarming.connect(holder).speedStake(0, parseEther("10"), 0, 0, 0, new Date().getTime() + 20, {
-			// 		value: parseEther("10")
-			// 	})
-			// ).to.changeTokenBalances(gym, [holder], [parseEther("10").mul(constants.NegativeOne)]);
 
 			expect((await gymFarming.userInfo(0, holder.address)).amount).to.not.equal(0);
 		});
@@ -111,10 +99,6 @@ describe("GymFarming contract: ", function () {
 					caller: "holder"
 				})
 			).to.changeTokenBalances(gym, [holder], [parseEther("10").mul(constants.NegativeOne)]);
-
-			// await expect(() =>
-			// 	gymFarming.connect(holder).speedStake(0, parseEther("10"), 0, 0, 0, new Date().getTime() + 20)
-			// ).to.changeTokenBalances(gym, [holder], [parseEther("10").mul(constants.NegativeOne)]);
 
 			expect((await gymFarming.userInfo(0, holder.address)).amount).to.not.equal(0);
 		});
@@ -146,7 +130,6 @@ describe("GymFarming contract: ", function () {
 				lpToken: `${lpToken}`,
 				withUpdate: "true"
 			});
-			// await gymFarming.add(poolAllocPoint2, lpToken, true);
 		});
 
 		afterEach("AfterEach: ", async function () {
@@ -157,15 +140,11 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Should claimA in pool: ", async function () {
-			const tx = run("farming:speedStake", {
+			const tx = await run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
-				bnbAmount: `${parseEther("10")}`
+				bnbAmount: parseEther("10").toString()
 			});
-
-			// const tx = await gymFarming.connect(holder).speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-			// 	value: parseEther("10")
-			// });
 
 			await advanceBlockTo(tx.blockNumber + 200);
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
@@ -174,20 +153,15 @@ describe("GymFarming contract: ", function () {
 				caller: "holder"
 			});
 
-			// await gymFarming.connect(holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20);
-
 			expect((await gymFarming.userInfo(0, holder.address)).amount.sub(userAmount)).to.not.equal(0);
 		});
 
 		it("Should claimA in pool with additional BNB: ", async function () {
-			const tx = run("farming:speedStake", {
+			const tx = await run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
 				bnbAmount: `${parseEther("10")}`
 			});
-			// const tx = await gymFarming.connect(holder).speedStake(0, 0, 0, 0, 0, new Date().getTime() + 20, {
-			// 	value: parseEther("10")
-			// });
 
 			await advanceBlockTo(tx.blockNumber + 200);
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
@@ -196,9 +170,6 @@ describe("GymFarming contract: ", function () {
 				caller: "holder",
 				bnbAmount: `${parseEther("1")}`
 			});
-			// await gymFarming.connect(holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20, {
-			// 	value: parseEther("1")
-			// });
 
 			expect((await gymFarming.userInfo(0, holder.address)).amount.sub(userAmount)).to.not.equal(0);
 		});
