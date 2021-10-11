@@ -30,17 +30,15 @@ task("farming:claimAndDeposit", "Call claimAndDeposit function from farming cont
 	.addParam("caller", "Signer who will call function", "caller")
 	.addParam("bnbAmount", "Amount of bnb for speedStake", "0");
 
-task("farming:pendingRewardBlock", "Call pendingRewardBlock from farming contract", require("./pendingRewardBlock"))
-	.addParam("user", "caller address", "caller")
-	.addParam("caller", "Signer who will call function", "caller");
-
-
 task("farming:setRewardToken", "Call setRewardToken function from farming contract", require("./setRewardToken"))
 	.addParam("token", "Reward token address")
 	.addParam("caller", "Signer who will call function", "deployer");
 
-task("farming:setRewardPerBlock", "Call setRewardPerBlock function from farming contract", require("./setRewardPerBlock"))
-	.addParam("user", "Signer who will call function", "deployer");
+task(
+	"farming:setRewardPerBlock",
+	"Call setRewardPerBlock function from farming contract",
+	require("./setRewardPerBlock")
+).addParam("user", "Signer who will call function", "deployer");
 
 task("farming:getMultiplier", "Call getMultiplier function from farming contract", require("./getMultiplier"))
 	.addParam("from", "block from which the reward is calculated", "0")
@@ -64,8 +62,11 @@ task("farming:set", "Call set function from farming contract", require("./set"))
 	.addParam("withUpdate", "if true, update all pools", "0")
 	.addParam("caller", "Signer who will call function", "deployer");
 
-task("farming:massUpdatePool", "Call massUpdatePool function from farming contract", require("./massUpdatePools"))
-	.addParam("caller", "Signer who will call function", "caller");
+task(
+	"farming:massUpdatePool",
+	"Call massUpdatePool function from farming contract",
+	require("./massUpdatePools")
+).addParam("caller", "Signer who will call function", "caller");
 
 task("farming:updatePool", "Call updatePool function from farming contract", require("./updatePool"))
 	.addParam("pid", "pool ID for which the reward variables should be updated")
@@ -75,8 +76,11 @@ task("farming:harvest", "Call harvest function from farming contract", require("
 	.addParam("pid", "pool ID from which the accumulated reward tokens should be received")
 	.addParam("caller", "Signer who will call function", "caller");
 
-task("farming:harvestAll", "Call harvestAll function from farming contract", require("./harvestAll"))
-	.addParam("caller", "Signer who will call function", "caller");
+task("farming:harvestAll", "Call harvestAll function from farming contract", require("./harvestAll")).addParam(
+	"caller",
+	"Signer who will call function",
+	"caller"
+);
 
 task("farming:withdraw", "Call withdraw function from framing contract", require("./withdraw"))
 	.addParam("pid", "pool ID from which the LP tokens should be withdrawn")
@@ -88,5 +92,8 @@ task("farming:deposit", "Call deposite function from farming contract", require(
 	.addParam("amount", "the amount of LP tokens that should be withdrawn", "0")
 	.addParam("caller", "Signer who will call function", "caller");
 
-task("farming:poolLength", "Call poolLength function from farming contract", require("./poolLenghth"))
-	.addParam("caller", "Signer who will call function", "caller");
+task("farming:poolLength", "Call poolLength function from farming contract", require("./poolLenghth")).addParam(
+	"caller",
+	"Signer who will call function",
+	"caller"
+);

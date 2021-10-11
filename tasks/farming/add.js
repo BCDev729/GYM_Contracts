@@ -8,7 +8,9 @@ module.exports = async function (
 
 	withUpdate = withUpdate === "true";
 	allocPoint = parseInt(allocPoint);
+
 	const tx = await farming.add(allocPoint, lpToken, withUpdate);
+
 	const totalAllocPoint = await farming.totalAllocPoint();
 	const pid = (await farming.poolLength()) - 1;
 	const accRewardPerShare = (await farming.poolInfo(pid)).accRewardPerShare;

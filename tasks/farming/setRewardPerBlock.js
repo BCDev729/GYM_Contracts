@@ -11,5 +11,8 @@ module.exports = async function (
 	const farming = await getContract("GymFarming", signers[caller]);
 
 	const tx = await farming.setRewardPerBlock();
-	return tx;
+
+	const rewardPerBlock = await farming.rewardPerBlock();
+
+	return {tx, rewardPerBlock};
 };

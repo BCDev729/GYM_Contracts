@@ -9,10 +9,10 @@ module.exports = async function ({ pid, amount, caller }, { ethers: { getNamedSi
 	amount = BigNumber.from(amount);
 
 	const tx = await farming.deposit(pid, amount);
-	// const accRewardPerShare = (await farming.poolInfo(pid)).accRewardPerShare;
-	// const lastRewardBlock = (await farming.poolInfo(pid)).lastRewardBlock;
-	// const userAmount = (await farming.UserInfo(pid, caller.address)).amount;
-	// const userRewardDebt = (await farming.UserInfo(pid, caller.address)).rewardDebt;
+	const accRewardPerShare = (await farming.poolInfo(pid)).accRewardPerShare;
+	const lastRewardBlock = (await farming.poolInfo(pid)).lastRewardBlock;
+	const userAmount = (await farming.userInfo(pid, caller.address)).amount;
+	const userRewardDebt = (await farming.userInfo(pid, caller.address)).rewardDebt;
 
-	return tx;
+	return { tx, poolInfo: { accRewardPerShare, lastRewardBlock }, userInfo: { userAmount, userRewardDebt } };
 };

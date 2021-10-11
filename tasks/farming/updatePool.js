@@ -1,12 +1,4 @@
-module.exports = async function (
-	{ pid, caller },
-	{
-		ethers: {
-			getNamedSigners,
-			getContract,
-		},
-	}
-) {
+module.exports = async function ({ pid, caller }, { ethers: { getNamedSigners, getContract } }) {
 	const signers = await getNamedSigners();
 
 	const farming = await getContract("GymFarming", signers[caller]);
@@ -15,5 +7,8 @@ module.exports = async function (
 
 	const tx = await farming.updatePool(pid);
 
-	return tx;
+	const accRewardPerShare = (await farming.poolInfo(pid)).accRewardPerShare;
+	const lastRewardBlock = (await farming.poolInfo(pid)).lastRewardBlock;
+
+	return { tx, poolInfo: { accRewardPerShare, lastRewardBlock } };
 };

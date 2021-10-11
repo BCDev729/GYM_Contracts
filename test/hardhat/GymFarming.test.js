@@ -291,8 +291,8 @@ describe("GymFarming contract: ", function () {
 			expect(await gym.balanceOf(chugun.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
-						from: `${log2.blockNumber}`,
-						to: `${harvesttx.blockNumber}`,
+						from: `${log2.tx.blockNumber}`,
+						to: `${harvesttx.tx.blockNumber}`,
 						caller: "deployer"
 					})
 				).div(2)
@@ -339,6 +339,7 @@ describe("GymFarming contract: ", function () {
 				amount: `${amount}`,
 				caller: "chugun"
 			});
+
 			const log3 = await run("farming:deposit", {
 				pid: `${pid1}`,
 				amount: `${getBigNumber(2)}`,
@@ -396,8 +397,8 @@ describe("GymFarming contract: ", function () {
 			expect(await gym.balanceOf(caller.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
-						from: `${log3.blockNumber}`,
-						to: `${harvesttx.blockNumber}`,
+						from: `${log3.tx.blockNumber}`,
+						to: `${harvesttx.tx.blockNumber}`,
 						caller: "deployer"
 					})
 				)
@@ -413,8 +414,8 @@ describe("GymFarming contract: ", function () {
 			expect(await gym.balanceOf(chugun.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
-						from: `${log3.blockNumber}`,
-						to: `${harvesttx.blockNumber}`,
+						from: `${log3.tx.blockNumber}`,
+						to: `${harvesttx.tx.blockNumber}`,
 						caller: "deployer"
 					})
 				)
@@ -430,8 +431,8 @@ describe("GymFarming contract: ", function () {
 			expect(await gym.balanceOf(vzgo.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
-						from: `${log3.blockNumber}`,
-						to: `${harvesttx.blockNumber}`,
+						from: `${log3.tx.blockNumber}`,
+						to: `${harvesttx.tx.blockNumber}`,
 						caller: "deployer"
 					})
 				)
@@ -448,8 +449,8 @@ describe("GymFarming contract: ", function () {
 			expect((await gym.balanceOf(vzgo.address)).sub(vzgoGym)).to.equal(
 				(
 					await run("farming:getMultiplier", {
-						from: `${log5.blockNumber}`,
-						to: `${harvesttx.blockNumber}`,
+						from: `${log5.tx.blockNumber}`,
+						to: `${harvesttx.tx.blockNumber}`,
 						caller: "deployer"
 					})
 				)
@@ -465,8 +466,8 @@ describe("GymFarming contract: ", function () {
 			expect(await gym.balanceOf(grno.address)).to.equal(
 				(
 					await run("farming:getMultiplier", {
-						from: `${log5.blockNumber}`,
-						to: `${harvesttx.blockNumber}`,
+						from: `${log5.tx.blockNumber}`,
+						to: `${harvesttx.tx.blockNumber}`,
 						caller: "deployer"
 					})
 				)
