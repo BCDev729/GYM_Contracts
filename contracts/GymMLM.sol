@@ -8,6 +8,7 @@ import "./interfaces/IWETH.sol";
 import "hardhat/console.sol";
 
 contract GymMLM is Ownable {
+    uint256 public constant denominator = 1e12;
     uint256 public currentId;
     address public bankAddress;
     uint8[$(GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH)] public directReferralBonuses;
@@ -17,10 +18,11 @@ contract GymMLM is Ownable {
     mapping(uint256 => address) public idToAddress;
     mapping(address => uint256) public investment;
     mapping(address => address) public userToReferrer;
+    mapping(address => uint256) public scoring;
 
     event NewReferral(address indexed user, address indexed referral);
 
-    event ReferralRewardReceved(address indexed user, address indexed referral, uint256 amount);
+    event ReferralRewardReceved(address indexed user, address indexed referral, uint256 amount, address wantAddress);
 
     constructor() {
         directReferralBonuses = $(GymMLM_DIRECT_REFERRAL_BONUSES);
@@ -37,9 +39,13 @@ contract GymMLM is Ownable {
         _;
     }
 
-    receive() external payable {} 
+    receive() external payable {}
 
     fallback() external payable {}
+
+    function updateScoring(address _token, uint256 _score) external onlyOwner {
+        scoring[_token] = _score;
+    }
 
     function _addUser(address _user, address _referrer) private {
         addressToId[_user] = currentId;
@@ -92,11 +98,14 @@ contract GymMLM is Ownable {
 
         IERC20 token = IERC20(_wantAddr);
         if (_wantAddr != $(WBNB_TOKEN)) {
+            investment[_user] += (_wantAmt * scoring[_wantAddr]) / denominator;
             while (index < length && addressToId[userToReferrer[_user]] != 1) {
                 address referrer = userToReferrer[_user];
-                uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
-                token.transfer(referrer, reward);
-                emit ReferralRewardReceved(referrer, _user, reward);
+                if (investment[referrer] >= levels[index]) {
+                    uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
+                    token.transfer(referrer, reward);
+                    emit ReferralRewardReceved(referrer, _user, reward, _wantAddr);
+                }
                 _user = userToReferrer[_user];
                 index++;
             }
@@ -112,11 +121,11 @@ contract GymMLM is Ownable {
 
         while (index < length && addressToId[userToReferrer[_user]] != 1) {
             address referrer = userToReferrer[_user];
-            if(investment[referrer] >= levels[index]) {
+            if (investment[referrer] >= levels[index]) {
                 uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
                 IWETH($(WBNB_TOKEN)).withdraw(reward);
                 payable(referrer).transfer(reward);
-                emit ReferralRewardReceved(referrer, _user, reward);
+                emit ReferralRewardReceved(referrer, _user, reward, _wantAddr);
             }
             _user = userToReferrer[_user];
             index++;

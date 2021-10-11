@@ -88,7 +88,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     address public constant buyBack = $(BUYBACK);
     address public farming;
     // contracts[7] - RelationShip address
-    address public constant relationship = $(RELATIONSHIP);
+    address public relationship = $(RELATIONSHIP);
     /// Treasury address where will be sent all unused assets
     address public treasuryAddress;
     /// Info of each pool.
@@ -133,6 +133,11 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     receive() external payable {}
 
     fallback() external payable {}
+
+
+    function setMLMAddress(address _relationship) external onlyOwner {
+        relationship = _relationship;
+    }
 
     /**
      * @notice Update the given pool's reward allocation point. Can only be called by the owner

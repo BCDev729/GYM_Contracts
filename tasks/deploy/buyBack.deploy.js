@@ -8,6 +8,7 @@ module.exports = async function ({ msg }, { deployments: { deterministic }, ethe
 		log: true,
 		deterministicDeployment: true
 	});
+	console.log("🚀 ~ file: buyBack.deploy.js ~ line 11 ~ deterministicDeploy", deterministicDeploy.address);
 
 	await deterministicDeploy.deploy();
 	return deterministicDeploy;
