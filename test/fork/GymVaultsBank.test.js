@@ -15,7 +15,7 @@ const { advanceBlockTo } = require("../utilities/time");
 const testVars = require("../utilities/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 
-describe("GymVaultsBank contract: ", function () {
+xdescribe("GymVaultsBank contract: ", function () {
 	let accounts, deployer, owner, caller, holder, vzgo, grno;
 	let wantToken1, wantToken2, gymToken, relationship, farming, buyBack, gymVaultsBank, WBNB, earnToken;
 	// eslint-disable-next-line no-unused-vars
