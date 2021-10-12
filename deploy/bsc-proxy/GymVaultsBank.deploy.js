@@ -1,6 +1,6 @@
-const args = require("../../utils/constants/data/hardhat/GymVaultsBank.json");
+const args = require("../../utils/constants/data/bsc/GymVaultsBank.json");
+
 module.exports = async function ({
-	config,
 	run,
 	ethers: {
 		getContract,
@@ -8,18 +8,16 @@ module.exports = async function ({
 		provider: { getBlockNumber }
 	}
 }) {
-	if(config.networks.hardhat.forking.enabled) return;
-
-	const startBlock = args.startBlock;
+	const blockNumber = await getBlockNumber();
+	const startBlock = blockNumber + args.startBlock;
 	const gymToken = await getContract("GymToken");
 	const rewardRate = parseEther(args.rewardRate);
 
-	await run("deploy:gymVaultsBank", {
+	await run("deploy:gymVaultsBankProxy", {
 		startblock: startBlock.toString(),
 		gymTokenAddress: gymToken.address,
 		rewardRate: rewardRate.toString()
 	});
-
 };
-module.exports.tags = ["GymVaultsBank", "Hardhat"];
-module.exports.dependencies = ["GymToken", "BuyBack", "GymMLM"];
+module.exports.tags = ["GymVaultsBank", "Proxy"];
+module.exports.dependencies = ["GymToken", "BuyBack"];

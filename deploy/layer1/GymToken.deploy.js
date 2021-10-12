@@ -5,4 +5,4 @@ module.exports = async function ({ run, getNamedAccounts }) {
 		holder: holder
 	});
 };
-module.exports.tags = ["GymToken", "Hardhat", "Fork", "bsc", "bsc-testnet", "layer1"];
+module.exports.tags = ["GymToken", "Hardhat", "Fork", "bsc", "bsc-testnet", "layer1", "Proxy"];
