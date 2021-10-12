@@ -96,9 +96,10 @@ contract GymMLM is Ownable {
         uint256 index;
         uint256 length = directReferralBonuses.length;
 
+        investment[_user] += (_wantAmt * scoring[_wantAddr]) / denominator;
         IERC20 token = IERC20(_wantAddr);
+        
         if (_wantAddr != $(WBNB_TOKEN)) {
-            investment[_user] += (_wantAmt * scoring[_wantAddr]) / denominator;
             while (index < length && addressToId[userToReferrer[_user]] != 1) {
                 address referrer = userToReferrer[_user];
                 if (investment[referrer] >= levels[index]) {
@@ -116,8 +117,6 @@ contract GymMLM is Ownable {
 
             return;
         }
-
-        investment[_user] += _wantAmt;
 
         while (index < length && addressToId[userToReferrer[_user]] != 1) {
             address referrer = userToReferrer[_user];

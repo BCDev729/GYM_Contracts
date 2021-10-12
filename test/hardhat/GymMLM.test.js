@@ -73,6 +73,9 @@ describe("GymMLM contract: ", function () {
 			strategy: strategy.address,
 			caller: "deployer"
 		});
+
+		await gymMLM.updateScoring(WBNBMock.address, 1e12);
+		await gymMLM.updateScoring(wantToken.address, 1e11);
 	});
 
 	describe("Initialization: ", function () {
@@ -180,12 +183,19 @@ describe("GymMLM contract: ", function () {
 					continue;
 				}
 
+				const levelBNB = await gymMLM.levels(index > 15 ? index = 14 : index - 1);
+				const investAmount = await gymMLM.investment(accounts[signer].address);
+
 				if (index === 16) {
 					expect((await wantToken.balanceOf(owner.address)).sub(ownerBal)).to.equal(0);
 				} else {
-					expect((await wantToken.balanceOf(owner.address)).sub(ownerBal)).to.equal(
-						Math.floor((depositAmount * gymMLMBonuses[index - 1]) / 100)
-					);
+					if (investAmount.lt(levelBNB)) {
+						expect((await wantToken.balanceOf(owner.address)).sub(ownerBal)).to.equal(0);
+					} else {
+						expect((await wantToken.balanceOf(owner.address)).sub(ownerBal)).to.equal(
+							Math.floor((depositAmount * gymMLMBonuses[index - 1]) / 100)
+						);
+					}
 				}
 				expect((await wantToken.balanceOf(accounts[prevSigner].address)).sub(prevSignerBal)).to.equal(
 					Math.floor((depositAmount * gymMLMBonuses[0]) / 100)
@@ -270,10 +280,7 @@ describe("GymMLM contract: ", function () {
 
 				const levelBNB = await gymMLM.levels(index > 15 ? index = 14 : index - 1);
 				const investAmount = await gymMLM.investment(accounts[signer].address);
-				if (investAmount.gte(levelBNB)) {
-					Math.floor((depositAmount * gymMLMBonuses[index - 1]) / 100);
-				}
-
+				
 				if (index === 16) {
 					expect((await owner.getBalance()).sub(ownerBal)).to.equal(0);
 				} else {
