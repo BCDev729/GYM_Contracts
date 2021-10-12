@@ -1,17 +1,17 @@
 const { expect } = require("chai");
-const { advanceBlockTo } = require("../utilities");
 const {
 	deployments: { fixture },
 	network,
 	ethers: {
 		utils: { parseEther },
+		provider: { getBlockNumber },
 		getContract,
 		getContractAt,
 		getNamedSigners,
 		constants
-	}
+	},
+	timeAndMine
 } = require("hardhat");
-
 
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder;
@@ -25,7 +25,6 @@ describe("GymFarming contract: ", function () {
 		gymFarming = await getContract("GymFarming", deployer);
 		gym = await getContract("GymToken", caller);
 		await gym.connect(holder).transfer(gymFarming.address, parseEther("1000000"));
-
 	});
 
 	describe("SpeedStake function: ", function () {
@@ -128,7 +127,7 @@ describe("GymFarming contract: ", function () {
 				value: parseEther("10")
 			});
 
-			await advanceBlockTo(tx.blockNumber + 200);
+			await timeAndMine.mine(tx.blockNumber + 200 - (await getBlockNumber()));
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
 			await gymFarming.connect(holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20);
 
@@ -140,7 +139,7 @@ describe("GymFarming contract: ", function () {
 				value: parseEther("10")
 			});
 
-			await advanceBlockTo(tx.blockNumber + 200);
+			await timeAndMine.mine(tx.blockNumber + 200 - (await getBlockNumber()));
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
 			await gymFarming.connect(holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20, {
 				value: parseEther("1")
