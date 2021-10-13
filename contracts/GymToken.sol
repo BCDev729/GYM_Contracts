@@ -68,7 +68,6 @@ contract GymToken {
 
     constructor(address account) {
         balances[account] = uint96(totalSupply);
-		console.log("TRANSFER");
         emit Transfer(address(0), account, totalSupply);
     }
 
@@ -334,13 +333,6 @@ contract GymToken {
             checkpoints[delegatee][nCheckpoints] = Checkpoint(blockNumber, newVotes);
             numCheckpoints[delegatee] = nCheckpoints + 1;
         }
-		console.log("sol delegatee src is: ", delegatee);
-		console.log("sol oldVotes  src is: ", oldVotes);
-		console.log("sol newVotes  src is: ", newVotes);
-
-		console.log("sol delegatee dst is: ", delegatee);
-		console.log("sol oldVotes  dst is: ", oldVotes);
-		console.log("sol newVotes  dst is: ", newVotes);
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
