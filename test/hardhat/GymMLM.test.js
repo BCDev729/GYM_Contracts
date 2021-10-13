@@ -19,7 +19,7 @@ describe("GymMLM contract: ", function () {
 	const gymMLMAmount = (depositAmount * gymMLMReward) / 100;
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
-		({caller, holder, deployer, grno, vzgo, owner} = accounts);
+		({ caller, holder, deployer, grno, vzgo, owner } = accounts);
 
 		await fixture("Hardhat");
 
@@ -151,12 +151,11 @@ describe("GymMLM contract: ", function () {
 			});
 		});
 
-		it("Should distribute rewards for referrers: ", async function () {
+		it("Should emit ReferralRewardReceved event with correct args", async function () {
 			let prevSigner = "deployer";
 			let index = 0;
 			let prevSignerBal;
 			let ownerBal = (await wantToken.balanceOf(owner.address)).sub(depositAmount);
-
 			for (const signer in accounts) {
 				if (signer === "deployer") {
 					continue;
