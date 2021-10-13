@@ -346,7 +346,6 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			});
 
 			const earnedAddress = await strategyAlpacaAutoComp.earnedAddress();
-			console.log(`Earned amount is: ${earnedAmt}`);
 
 			await expect(strategyAlpacaAutoComp.earn(0, new Date().getTime() + 20))
 				.to

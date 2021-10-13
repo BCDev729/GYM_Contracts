@@ -71,29 +71,16 @@ describe("GymToken contract: ", function () {
 			const totalSupply = await gymToken.totalSupply();
 			await gymToken.connect(caller).burn(testVars.TX_AMOUNT);
 
-			console.log("aaaaaaaaaaaaaaaaaaaaaaaa");
-
 			expect(await gymToken.balanceOf(caller.address)).to.equal(callerBal - testVars.TX_AMOUNT);
 			expect(await gymToken.totalSupply()).to.equal(BigNumber.from(totalSupply).sub(testVars.TX_AMOUNT));
 		});
 
 		it("Emit", async function () {
 			const srcRepNum = await gymToken.numCheckpoints(holder.address);
-			console.log("\n\n srcRepNum is: " + srcRepNum ); // get
 			const checkpoint1Votes = (await gymToken.checkpoints(holder.address, srcRepNum - 1)).votes;
-			console.log("checkpoint1Votes is: " + checkpoint1Votes);
 			const oldVotes = srcRepNum > 0 ? checkpoint1Votes : 0;
-			console.log("oldVotes is: " + oldVotes);
 			const amnt = BigNumber.from(testVars.TX_AMOUNT);
 			const newVotes = oldVotes.sub(amnt.mul(10**2));
-			console.log("\n\n newVotes is: " + newVotes + "\n\n");
-
-			const delegatee = await gymToken.delegates(holder.address);
-
-			console.log("delegatee is: " + delegatee);
-			console.log("oldVotes  is: " + oldVotes);
-			console.log("newVotes  is: " + newVotes);
-
 
 			await expect(gymToken.connect(holder).transfer(caller.address, amnt.mul(10**2)))
 				.to
