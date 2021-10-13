@@ -6,16 +6,16 @@ const {
 		getNamedSigners,
 		getContract,
 		getContractAt,
+		provider: { getBlockNumber },
 		getSigner,
 		utils: { parseEther }
 	},
-	ethers
+	ethers,
+	timeAndMine
 } = require("hardhat");
 
-const { advanceBlockTo } = require("../utilities/time");
 const variables = require("../../utils/constants/solpp")("fork");
 const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
-
 
 describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 	let accounts, deployer, owner, caller, holder;
@@ -66,17 +66,9 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 
 		await router
 			.connect(holder)
-			.addLiquidityETH(
-				gymToken.address,
-				parseEther("1000"),
-				0,
-				0,
-				farming.address,
-				new Date().getTime() + 20,
-				{
-					value: parseEther("100")
-				}
-			);
+			.addLiquidityETH(gymToken.address, parseEther("1000"), 0, 0, farming.address, new Date().getTime() + 20, {
+				value: parseEther("100")
+			});
 
 		lpGymBnb = await factory.getPair(gymToken.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
 
@@ -157,7 +149,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				.connect(holder)
 				.deposit(1, ethers.utils.parseEther("0.1"), 1, 0, new Date().getTime() + 20);
 
-			await advanceBlockTo(tx.blockNumber + 100);
+			await timeAndMine.mine(tx.blockNumber + 100 - (await getBlockNumber()));
 
 			const pending = await gymVaultsBank.pendingReward(1, holder.address);
 
@@ -194,7 +186,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				.connect(holder)
 				.deposit(1, ethers.utils.parseEther("0.1"), 1, 0, new Date().getTime() + 20);
 
-			await advanceBlockTo(tx.blockNumber + 100);
+			await timeAndMine.mine(tx.blockNumber + 100 - (await getBlockNumber()));
 
 			await expect(() =>
 				gymVaultsBank.connect(holder).withdraw(1, ethers.utils.parseEther("0.04"))
@@ -224,7 +216,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				.connect(holder)
 				.deposit(1, ethers.utils.parseEther("0.1"), 1, 0, new Date().getTime() + 20);
 
-			await advanceBlockTo(tx.blockNumber + 100);
+			await timeAndMine.mine(tx.blockNumber + 100 - (await getBlockNumber()));
 
 			await gymVaultsBank.connect(holder).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
 			expect((await farming.userInfo(0, holder.address)).amount).to.not.equal(0);

@@ -12,7 +12,7 @@ describe("GymToken contract: ", function () {
 	let accounts, snapshotId, caller, holder;
 	let gymToken;
 	before("Before All: ", async function () {
-		await fixture();
+		await fixture("Hardhat");
 
 		accounts = await getNamedSigners();
 		({ caller, holder } = accounts);

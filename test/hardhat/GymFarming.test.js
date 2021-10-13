@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { advanceBlock, advanceBlockTo, getBigNumber } = require("../utilities");
+const { getBigNumber } = require("../utilities");
 const {
 	deployments: { fixture, deploy },
 	network,
@@ -11,7 +11,8 @@ const {
 		BigNumber,
 		constants
 	},
-	run
+	run,
+	timeAndMine
 } = require("hardhat");
 const variables = require("../../utils/constants/solpp")("hardhat");
 const data = require("../../utils/constants/data/hardhat/GymFarming.json");
@@ -25,7 +26,7 @@ describe("GymFarming contract: ", function () {
 	before("Before All: ", async function () {
 		accounts = await getNamedSigners();
 		({ caller, deployer, holder, chugun, vzgo, grno } = accounts);
-		await fixture();
+		await fixture("Hardhat");
 		gymFarming = await getContract("GymFarming", deployer);
 		gym = await getContract("GymToken", caller);
 		await gym.connect(holder).transfer(gymFarming.address, parseEther("1000000"));
@@ -166,7 +167,6 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("PendingReward should equal ExpectedGym: ", async function () {
-			await advanceBlockTo(await getBlockNumber());
 			const pid = await run("farming:poolLength", {
 				caller: "deployer"
 			});
@@ -197,7 +197,7 @@ describe("GymFarming contract: ", function () {
 
 			expect(pendingReward).to.equal(0);
 
-			await advanceBlockTo(startBlock + blockToAdvance);
+			await timeAndMine.mine(startBlock + blockToAdvance - (await getBlockNumber()));
 
 			pendingReward = await run("farming:pendingReward", {
 				pid: `${pid}`,
@@ -236,7 +236,8 @@ describe("GymFarming contract: ", function () {
 			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await testLp.connect(chugun).approve(gymFarming.address, amount);
 
-			await advanceBlockTo(startBlock + blockToAdvance);
+			await timeAndMine.mine(startBlock + blockToAdvance - (await getBlockNumber()));
+
 			await run("farming:add", {
 				allocPoint: `${poolAllocPoint2}`,
 				lpToken: testLp.address,
@@ -307,7 +308,7 @@ describe("GymFarming contract: ", function () {
 			const blockToAdvance = 0;
 			expect(pid1).to.equal(0);
 
-			await advanceBlockTo(startBlock + blockToAdvance);
+			await timeAndMine.mine(startBlock + blockToAdvance - (await getBlockNumber()));
 
 			await run("farming:add", {
 				allocPoint: `${poolAllocPoint2}`,
@@ -494,11 +495,11 @@ describe("GymFarming contract: ", function () {
 		it("Should change rewardPerBlock:", async function () {
 			const rewardPerBlock = await gymFarming.rewardPerBlock();
 
-			await advanceBlockTo(startBlock + 15);
+			await timeAndMine.mine(startBlock + 15 - (await getBlockNumber()));
 
 			expect(await gymFarming.rewardPerBlock()).to.equal(rewardPerBlock);
 
-			await advanceBlockTo(startBlock + 20);
+			await timeAndMine.mine(startBlock + 20 - (await getBlockNumber()));
 
 			await run("farming:setRewardPerBlock", {});
 
@@ -506,21 +507,20 @@ describe("GymFarming contract: ", function () {
 				Math.floor((rewardPerBlock * variables.GymFarming_COEFFICIENT) / 1e12)
 			);
 
-			await advanceBlockTo(startBlock + 41);
+			await timeAndMine.mine(startBlock + 41 - (await getBlockNumber()));
 			await run("farming:setRewardPerBlock", {});
 
 			expect(Math.floor(BigNumber.from(await gymFarming.rewardPerBlock()))).to.equal(
 				Math.floor((rewardPerBlock * variables.GymFarming_COEFFICIENT ** 2) / 1e12 ** 2)
 			);
 
-			await advanceBlockTo(startBlock + 62);
+			await timeAndMine.mine(startBlock + 62 - (await getBlockNumber()));
 			await run("farming:setRewardPerBlock", {});
 
 			expect(Math.floor(BigNumber.from(await gymFarming.rewardPerBlock()))).to.equal(
 				Math.floor((rewardPerBlock * variables.GymFarming_COEFFICIENT ** 3) / 1e12 ** 3)
 			);
-
-			await advanceBlockTo(startBlock + 890);
+			await timeAndMine.mine(startBlock + 890 - (await getBlockNumber()));
 			await run("farming:setRewardPerBlock", {});
 
 			expect(Math.floor(BigNumber.from(await gymFarming.rewardPerBlock()))).to.equal(
@@ -643,7 +643,7 @@ describe("GymFarming contract: ", function () {
 				amount: `${amount}`
 			});
 
-			await advanceBlock();
+			await timeAndMine.mine();
 			await run("farming:withdraw", {
 				pid: `${pid}`,
 				amount: `${amount}`
@@ -659,7 +659,7 @@ describe("GymFarming contract: ", function () {
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await gymFarming.connect(caller).deposit(pid, amount);
-			await advanceBlock();
+			await timeAndMine.mine();
 			expect(await gymFarming.connect(caller).withdraw(pid, amount))
 				.to.emit(gymFarming, "Withdraw")
 				.withArgs(caller.address, pid, amount);
@@ -671,7 +671,7 @@ describe("GymFarming contract: ", function () {
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await gymFarming.connect(caller).deposit(pid, amount);
-			await advanceBlock();
+			await timeAndMine.mine();
 			const pending = await gymFarming.connect(caller).pendingReward(pid, caller.address);
 			expect(await gymFarming.connect(caller).withdraw(pid, amount))
 				.to.emit(gymFarming, "Harvest")
@@ -723,9 +723,8 @@ describe("GymFarming contract: ", function () {
 			});
 
 			expect((await gymFarming.poolInfo(0)).lastRewardBlock).to.equal(startBlock);
-
-			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
-
+			await timeAndMine.mine((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
+			// await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
 			await run("farming:harvestAll", {
 				caller: "vzgo"
 			});
