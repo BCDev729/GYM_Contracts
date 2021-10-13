@@ -38,7 +38,7 @@ describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
 		await fixture("Hardhat");
 		accounts = await getNamedSigners();
-		({deployer, owner, caller, holder, vzgo, grno} = accounts);
+		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
 		wantToken1 = await getContract("WantToken1", caller);
 		wantToken2 = await getContract("WantToken2", caller);
 		gymToken = await getContract("GymToken", caller);
@@ -101,6 +101,7 @@ describe("GymVaultsBank contract: ", function () {
 		await gymToken.connect(holder).transfer(gymVaultsBank.address, 2000);
 		await gymToken.connect(holder).transfer(routerMock.address, parseEther(testVars.AMOUNT.toString()));
 		await earnToken.connect(deployer).transfer(gymVaultsBank.address, 5000);
+		await timeAndMine.mine(await getBlockNumber());
 	});
 	describe("Initialization: ", function () {
 		beforeEach("Before: ", async function () {
@@ -127,8 +128,8 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should revert:GymVaultsBank: Start block must have a bigger value", async function () {
 			const startBlock = await getBlockNumber();
-			await timeAndMine.mine(startBlock + 10 - (await getBlockNumber()));
-
+			await timeAndMine.mine(10);
+			
 			await expect(
 				deploy("GymVaultsBank", {
 					from: deployer.address,
@@ -246,7 +247,6 @@ describe("GymVaultsBank contract: ", function () {
 		});
 
 		it("Should set new allocation point:", async function () {
-
 			await timeAndMine.mine(150);
 
 			await run("gymVaultsBank:add", {

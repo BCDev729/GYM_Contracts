@@ -2,11 +2,14 @@ const { expect } = require("chai");
 const {
 	deployments: { fixture },
 	network,
-	ethers: { getContract, getNamedSigners, BigNumber }
+	ethers: {
+		getContract,
+		getNamedSigners,
+		BigNumber
+	}
 } = require("hardhat");
 const testVars = require("./../utilities/testVariables.json");
 const variables = require("../../utils/constants/solpp")("hardhat");
-
 
 describe("GymToken contract: ", function () {
 	let accounts, snapshotId, caller, holder;

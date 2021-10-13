@@ -183,7 +183,7 @@ describe("GymMLM contract: ", function () {
 					continue;
 				}
 
-				const levelBNB = await gymMLM.levels(index > 15 ? index = 14 : index - 1);
+				const levelBNB = await gymMLM.levels(index > 15 ? (index = 14) : index - 1);
 				const investAmount = await gymMLM.investment(accounts[signer].address);
 
 				if (index === 16) {
@@ -278,9 +278,9 @@ describe("GymMLM contract: ", function () {
 					continue;
 				}
 
-				const levelBNB = await gymMLM.levels(index > 15 ? index = 14 : index - 1);
+				const levelBNB = await gymMLM.levels(index > 15 ? (index = 14) : index - 1);
 				const investAmount = await gymMLM.investment(accounts[signer].address);
-				
+
 				if (index === 16) {
 					expect((await owner.getBalance()).sub(ownerBal)).to.equal(0);
 				} else {
