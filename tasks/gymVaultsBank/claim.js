@@ -8,9 +8,9 @@ module.exports = async function (
 
 	const tx = await gymVaultsBank.connect(signers[caller]).claim(pid);
 
-	const newAccRewardPerShare = (await gymVaultsBank.poolInfo(pid)).accRewardPerShare;
+	const accRewardPerShare = (await gymVaultsBank.poolInfo(pid)).accRewardPerShare;
+	const lastRewardBlock = (await gymVaultsBank.poolInfo(pid)).lastRewardBlock;
+	const userRewardDebt = (await gymVaultsBank.userInfo(pid, signers[caller].address)).rewardDebt;
 
-	const newRewardDebt = (await gymVaultsBank.userInfo(pid, signers[caller].address)).rewardDebt;
-
-	return {tx, newAccRewardPerShare, newRewardDebt};
+	return { tx, poolInfo: { accRewardPerShare, lastRewardBlock }, userInfo: { userRewardDebt } };
 };

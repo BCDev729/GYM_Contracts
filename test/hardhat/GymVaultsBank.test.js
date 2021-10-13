@@ -523,7 +523,7 @@ describe("GymVaultsBank contract: ", function () {
 				Number(finalBalance),
 				Number(parseEther("0.00000005"))
 			);
-			expect(Number(deposit.userShares)).to.equal(
+			expect(Number(deposit.userInfo.userShares)).to.equal(
 				(variables.GymVaultsBank_VAULTS_SAVING / 100) * Number(parseEther(testVars.AMOUNT.toString()))
 			);
 		});
@@ -682,7 +682,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
-				wantAmt: `${deposit.userShares}`,
+				wantAmt: `${deposit.userInfo.userShares}`,
 				caller: "vzgo"
 			});
 			expect((await wantToken2.balanceOf(vzgo.address)).sub(1)).to.equal(
@@ -691,7 +691,7 @@ describe("GymVaultsBank contract: ", function () {
 						(testVars.AMOUNT *
 							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
 							100 -
-						deposit.userShares / 10
+						deposit.userInfo.userShares / 10
 				)
 			);
 			expect(BigNumber.from(await gymToken.balanceOf(vzgo.address))).to.equal(
@@ -727,7 +727,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
-				wantAmt: `${deposit.userShares - 20}`,
+				wantAmt: `${deposit.userInfo.userShares - 20}`,
 				caller: "vzgo"
 			});
 
@@ -738,7 +738,7 @@ describe("GymVaultsBank contract: ", function () {
 						(testVars.AMOUNT *
 							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
 							100 -
-						(deposit.userShares - 20) / 10
+						(deposit.userInfo.userShares - 20) / 10
 				)
 			);
 			expect(BigNumber.from(await gymToken.balanceOf(vzgo.address))).to.equal(
@@ -799,7 +799,7 @@ describe("GymVaultsBank contract: ", function () {
 						(testVars.AMOUNT *
 							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
 							100 -
-						vzgoDeposit.userShares / 10
+						vzgoDeposit.userInfo.userShares / 10
 				)
 			);
 			expect(BigNumber.from(await gymToken.balanceOf(vzgo.address))).to.equal(
@@ -825,7 +825,7 @@ describe("GymVaultsBank contract: ", function () {
 						(testVars.AMOUNT *
 							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
 							100 -
-						grnoDeposit.userShares / 10
+						grnoDeposit.userInfo.userShares / 10
 				)
 			);
 			expect(BigNumber.from(await gymToken.balanceOf(grno.address))).to.equal(
@@ -869,7 +869,7 @@ describe("GymVaultsBank contract: ", function () {
 							(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
 							100
 					)
-					.sub(deposit.userShares.div(10))
+					.sub(deposit.userInfo.userShares.div(10))
 			);
 			expect(await gymToken.balanceOf(vzgo.address)).to.equal(bankGymBalance);
 		});
@@ -933,7 +933,7 @@ describe("GymVaultsBank contract: ", function () {
 							)
 							.div(100)
 					)
-					.sub(deposit.userShares.div(10)),
+					.sub(deposit.userInfo.userShares.div(10)),
 				BigNumber.from(fee)
 			);
 			expect(await gymToken.balanceOf(vzgo.address)).to.be.closeTo(
