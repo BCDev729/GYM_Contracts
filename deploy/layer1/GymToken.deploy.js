@@ -1,8 +1,24 @@
-module.exports = async function ({ run, getNamedAccounts }) {
+module.exports = async function ({ run, getNamedAccounts, getChainId }) {
+	const chainId = await getChainId();
 	const { holder } = await getNamedAccounts();
 
-	await run("deploy:gymToken", {
+	const options = {
+		contractName: "GymToken",
+		args: [holder]
+	};
+
+	const deterministicDeploy = await run("deploy:gymToken", {
 		holder: holder
 	});
+	if (chainId !== "31337") {
+		try {
+			await run("verify:verify", {
+				address: deterministicDeploy.address,
+				constructorArguments: options.args
+			});
+		} catch (e) {
+			console.log(e.toString());
+		}
+	}
 };
-module.exports.tags = ["GymToken", "Hardhat", "Fork", "bsc", "bsc-testnet", "layer1", "Proxy"];
+module.exports.tags = ["GymToken", "Hardhat", "Fork"];

@@ -723,7 +723,6 @@ describe("GymFarming contract: ", function () {
 
 			expect((await gymFarming.poolInfo(0)).lastRewardBlock).to.equal(startBlock);
 			await timeAndMine.mine((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
-			// await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
 			await run("farming:harvestAll", {
 				caller: "vzgo"
 			});

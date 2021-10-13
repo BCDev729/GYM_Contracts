@@ -1,5 +1,16 @@
-module.exports = async function ({ run }) {
-	await run("deploy:buyBack");
+module.exports = async function ({ run, getChainId }) {
+	const chainId = await getChainId();
+	const deterministicDeploy = await run("deploy:buyBack");
+
+	if (chainId !== "31337") {
+		try {
+			await run("verify:verify", {
+				address: deterministicDeploy.address
+			});
+		} catch (e) {
+			console.log(e.toString());
+		}
+	}
 };
-module.exports.tags = ["BuyBack", "Hardhat", "Fork", "bsc", "bsc-testnet", "layer1", "Proxy"];
+module.exports.tags = ["BuyBack", "Hardhat", "Fork"];
 module.exports.dependencies = [];

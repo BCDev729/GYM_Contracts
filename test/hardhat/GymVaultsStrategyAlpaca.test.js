@@ -4,8 +4,12 @@ const {
 	network,
 	ethers
 } = require("hardhat");
-const { getContract, getNamedSigners } = ethers;
+const {
+	getContract,
+	getNamedSigners,
+	constants: { AddressZero } } = ethers;
 const testVars = require("../../utils/constants/data/testVariables.json");
+
 
 describe("GymVaultsStrategyAlpaca contract: ", function () {
 	let accounts, deployer, owner, caller, holder, vzgo;
@@ -93,6 +97,13 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			});
 		});
 
+		it("Should emit Deposit event with correct args", async function () {
+			await expect(bank.connect(deployer).deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT))
+				.to
+				.emit(strategyAlpacaAutoComp, "Deposit")
+				.withArgs(testVars.TX_AMOUNT);
+		});
+
 		it("Should receive first deposit from user: ", async function () {
 			await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT);
 			expect(await want.balanceOf(strategyAlpaca.address)).to.equal(testVars.TX_AMOUNT);
@@ -133,6 +144,15 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			expect(await want.balanceOf(vault.address)).to.equal(Number(farmBalBefore) + testVars.TX_AMOUNT);
 			expect(await strategyAlpacaAutoComp.wantLockedTotal()).to.equal(testVars.TX_AMOUNT);
 		});
+
+		it("Should emit Farm event with correct args", async function () {
+			const wantAmt = await want.balanceOf(strategyAlpacaAutoComp.address);
+			await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await expect(strategyAlpacaAutoComp.farm())
+				.to
+				.emit(strategyAlpacaAutoComp, "Farm")
+				.withArgs(wantAmt);
+		});
 	});
 
 	describe("Withdraw function: ", function () {
@@ -156,6 +176,15 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			await expect(bank.withdraw(strategyAlpaca.address, 0)).to.be.revertedWith(
 				"GymVaultsStrategyAlpaca: !_wantAmt"
 			);
+		});
+
+		it("Should emit Withdraw event with correct values", async function () {
+			const withdrawAmount = testVars.TX_AMOUNT / 4;
+			await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await expect(bank.withdraw(strategyAlpacaAutoComp.address, withdrawAmount))
+				.to
+				.emit(strategyAlpacaAutoComp, "Withdraw")
+				.withArgs(withdrawAmount);
 		});
 
 		it("Should withdraw tokens(isAutoComp): ", async function () {
@@ -227,6 +256,38 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 				deployerEarnBal + (testVars.FAIR_LAUNCH_RETURN_AMOUNT * testVars.FEE) / feeMax
 			);
 		});
+
+		it("Should emit DistributeFee event with correct args", async function () {
+			const snapshot1 = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+
+			await bank.connect(vzgo).deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await fairLaunch.connect(vzgo).harvest(0);
+			const earnedAmt = await earn.balanceOf(vzgo.address);
+
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshot1]
+			});
+			await strategyAlpacaAutoComp.connect(deployer).setControllerFee(testVars.FEE);
+
+			await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+
+			await strategyAlpacaAutoComp.earn(0, new Date().getTime() + 20);
+
+
+			const earnedAddress = await strategyAlpacaAutoComp.earnedAddress();
+			const controllerFeeMax = await strategyAlpacaAutoComp.controllerFeeMax();
+			const controllerFee = await strategyAlpacaAutoComp.controllerFee();
+			const operator = await strategyAlpacaAutoComp.operator();
+			const fee = await (earnedAmt * controllerFee) / controllerFeeMax;
+			await expect(strategyAlpacaAutoComp.earn(0, new Date().getTime() + 20))
+				.to
+				.emit(strategyAlpacaAutoComp, "DistributeFee")
+				.withArgs(earnedAddress, fee, operator);
+		});
 	});
 
 	describe("Earn function: ", function () {
@@ -269,6 +330,50 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 				Number(vaultBalBefore) + testVars.FAIR_LAUNCH_RETURN_AMOUNT
 			);
 		});
+
+		it("Should emit Earned event with correct args", async function () {
+			const snapshot1 = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+
+			await bank.connect(vzgo).deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await fairLaunch.connect(vzgo).harvest(0);
+			const earnedAmt = await earn.balanceOf(vzgo.address);
+
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshot1]
+			});
+
+			const earnedAddress = await strategyAlpacaAutoComp.earnedAddress();
+
+			await expect(strategyAlpacaAutoComp.earn(0, new Date().getTime() + 20))
+				.to
+				.emit(strategyAlpacaAutoComp, "Earned")
+				.withArgs(earnedAddress, earnedAmt);
+		});
+
+		it("Should emit Compound event with correct args", async function () {
+			const snapshot1 = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+
+			await bank.connect(vzgo).deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await fairLaunch.connect(vzgo).harvest(0);
+			const earnedAmt = await earn.balanceOf(vzgo.address);
+
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshot1]
+			});
+
+			await expect(strategyAlpacaAutoComp.earn(0, new Date().getTime() + 20))
+				.to
+				.emit(strategyAlpacaAutoComp, "Compound")
+				.withArgs(want.address, earnedAmt, AddressZero, 0);
+		});
 	});
 
 	describe("convertDustToEarned function: ", function () {
@@ -299,6 +404,20 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			await strategyAlpacaAutoComp.convertDustToEarned(0, new Date().getTime() + 20);
 
 			expect(await earn.balanceOf(strategyAlpacaAutoComp.address)).to.equal(testVars.TX_AMOUNT);
+		});
+
+		it("Should emit ConvertDustToEarned event with correct args", async function () {
+			await want.connect(deployer).transfer(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			await earn.connect(deployer).transfer(router.address, testVars.TX_AMOUNT);
+
+			const wantAddress = await want.address;
+			const earnAddress = await earn.address;
+			const wantAmt = await want.balanceOf(strategyAlpacaAutoComp.address);
+
+			await expect(strategyAlpacaAutoComp.convertDustToEarned(0, new Date().getTime() + 20))
+				.to
+				.emit(strategyAlpacaAutoComp, "ConvertDustToEarned")
+				.withArgs(wantAddress, earnAddress, wantAmt);
 		});
 	});
 });
