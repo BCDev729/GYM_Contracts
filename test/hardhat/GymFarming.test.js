@@ -1,5 +1,4 @@
 const { expect } = require("chai");
-const { getBigNumber } = require("../utilities");
 const {
 	deployments: { fixture, deploy },
 	network,
@@ -20,7 +19,7 @@ const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder, chugun, vzgo, grno;
 	let gymFarming, gym, startBlock, snapshotStart, testLp, testLp1;
-	const amount = getBigNumber(4);
+	const amount = parseEther("4");
 	const poolAllocPoint1 = 30;
 	const poolAllocPoint2 = 50;
 	before("Before All: ", async function () {
@@ -34,23 +33,23 @@ describe("GymFarming contract: ", function () {
 		await deploy("testLp", {
 			from: deployer.address,
 			contract: "ERC20Mock",
-			args: ["LP Token", "LPT", getBigNumber(amount.mul(5))],
+			args: ["LP Token", "LPT", parseEther(amount.mul(5).toString())],
 			log: true
 		});
 		testLp = await getContract("testLp");
 		await deploy("testLp1", {
 			from: deployer.address,
 			contract: "ERC20Mock",
-			args: ["LP Tokenq", "LPT1", getBigNumber(amount.mul(5))],
+			args: ["LP Tokenq", "LPT1", parseEther(amount.mul(5).toString())],
 			log: true
 		});
 		testLp1 = await getContract("testLp1");
 
-		await testLp.transfer(caller.address, getBigNumber(amount));
-		await testLp.transfer(chugun.address, getBigNumber(amount));
-		await testLp.transfer(vzgo.address, getBigNumber(amount));
-		await testLp1.transfer(vzgo.address, getBigNumber(amount));
-		await testLp1.transfer(grno.address, getBigNumber(amount));
+		await testLp.transfer(caller.address, parseEther(amount.toString()));
+		await testLp.transfer(chugun.address, parseEther(amount.toString()));
+		await testLp.transfer(vzgo.address, parseEther(amount.toString()));
+		await testLp1.transfer(vzgo.address, parseEther(amount.toString()));
+		await testLp1.transfer(grno.address, parseEther(amount.toString()));
 
 		startBlock = parseInt(await gymFarming.startBlock());
 	});
@@ -328,7 +327,7 @@ describe("GymFarming contract: ", function () {
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await testLp.connect(chugun).approve(gymFarming.address, amount);
-			await testLp.connect(vzgo).approve(gymFarming.address, getBigNumber(2));
+			await testLp.connect(vzgo).approve(gymFarming.address, parseEther("2"));
 			await testLp1.connect(vzgo).approve(gymFarming.address, amount);
 			await testLp1.connect(grno).approve(gymFarming.address, amount);
 			await run("farming:deposit", {
@@ -343,7 +342,7 @@ describe("GymFarming contract: ", function () {
 
 			const log3 = await run("farming:deposit", {
 				pid: `${pid1}`,
-				amount: `${getBigNumber(2)}`,
+				amount: `${parseEther("2")}`,
 				caller: "vzgo"
 			});
 

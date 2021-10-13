@@ -11,7 +11,7 @@ const {
 	timeAndMine
 } = require("hardhat");
 
-const testVars = require("../utilities/testVariables.json");
+const testVars = require("../../utils/constants/data/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 
 describe("GymVaultsBank contract: ", function () {

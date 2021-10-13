@@ -13,7 +13,7 @@ const {
 	timeAndMine
 } = require("hardhat");
 
-const testVars = require("./../utilities/testVariables.json");
+const testVars = require("../../utils/constants/data/testVariables.json");
 const variables = require("../../utils/constants/solpp")("hardhat");
 
 describe("GymVaultsBank contract: ", function () {
@@ -129,7 +129,7 @@ describe("GymVaultsBank contract: ", function () {
 		it("Should revert:GymVaultsBank: Start block must have a bigger value", async function () {
 			const startBlock = await getBlockNumber();
 			await timeAndMine.mine(10);
-			
+
 			await expect(
 				deploy("GymVaultsBank", {
 					from: deployer.address,
