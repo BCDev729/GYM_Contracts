@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.7;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./interfaces/IStrategy.sol";
 import "./interfaces/IERC20Burnable.sol";
 import "./interfaces/IWETH.sol";
@@ -13,8 +13,8 @@ import "./interfaces/IFarming.sol";
 import "./interfaces/IGymMLM.sol";
 import "hardhat/console.sol";
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @notice GymVaultsBank contract:
@@ -24,8 +24,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  *   # Withdraw assets
  */
 
-contract GymVaultsBank is ReentrancyGuard, Ownable {
-    using SafeERC20 for IERC20;
+contract GymVaultsBankProxy is ReentrancyGuardUpgradeable, OwnableUpgradeable {
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /**
      * @notice Info of each user
@@ -53,7 +53,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
      * @param strategy: Address of strategy contract
      */
     struct PoolInfo {
-        IERC20 want;
+        IERC20Upgradeable want;
         uint256 allocPoint;
         uint256 lastRewardBlock;
         uint256 accRewardPerShare; 
@@ -88,7 +88,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     address public constant buyBack = $(BUYBACK);
     address public farming;
     // contracts[7] - RelationShip address
-    address public relationship = $(RELATIONSHIP);
+    address public constant relationship = $(RELATIONSHIP);
     /// Treasury address where will be sent all unused assets
     address public treasuryAddress;
     /// Info of each pool.
@@ -109,11 +109,13 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
     event RewardPaid(address indexed token, address indexed user, uint256 amount);
 
-    constructor(
+    function initialize(
         uint256 _startBlock,
         address _gym,
         uint256 _gymRewardRate
-    ){
+    ) public initializer {
+        __Ownable_init();
+
         require(block.number < _startBlock, "GymVaultsBank: Start block must have a bigger value");
 
         startBlock = _startBlock;
@@ -134,11 +136,6 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
 
     fallback() external payable {}
 
-
-    function setMLMAddress(address _relationship) external onlyOwner {
-        relationship = _relationship;
-    }
-
     /**
      * @notice Update the given pool's reward allocation point. Can only be called by the owner
      * @param _pid: Pool id that will be updated
@@ -158,10 +155,10 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     function resetStrategy(uint256 _pid, address _strategy) external onlyOwner {
         PoolInfo storage pool = poolInfo[_pid];
         require(
-            pool.want.balanceOf(pool.strategy) == 0 || pool.accRewardPerShare == 0,
+            pool.want.balanceOf(poolInfo[_pid].strategy) == 0 || pool.accRewardPerShare == 0,
             "GymVaultsBank: Strategy not empty"
         );
-        pool.strategy = _strategy;
+        poolInfo[_pid].strategy = _strategy;
     }
 
     /**
@@ -187,7 +184,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     /**
      * @notice Updates amount of reward tokens  per block that user will get. Can only be called by the owner
      */
-    function updateRewardPerBlock() external nonReentrant {
+    function updateRewardPerBlock() external nonReentrant onlyOwner {
         massUpdatePools();
         if (block.number - lastChangeBlock > $(GymVaultsBank_REWARD_CHANGE_BLOCKS) && rewardPerBlockChangesCount > 0) {
             rewardPoolInfo.rewardPerBlock = (rewardPoolInfo.rewardPerBlock * $(GymVaultsBank_COEFFICIENT)) / 1e12;
@@ -279,7 +276,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         updatePool(_pid);
         uint256 pending = (user.shares * pool.accRewardPerShare) / (1e18) - (user.rewardDebt);
         if (pending > 0) {
-            IERC20(rewardPoolInfo.rewardToken).approve(farming, pending);
+            IERC20Upgradeable(rewardPoolInfo.rewardToken).approve(farming, pending);
             IFarming(farming).autoDeposit{value: msg.value}(
                 0,
                 pending,
@@ -351,7 +348,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
      * @param _strategy: Address of Strategy contract
      */
     function add(
-        IERC20 _want,
+        IERC20Upgradeable _want,
         uint256 _allocPoint,
         bool _withUpdate,
         address _strategy
@@ -417,11 +414,11 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         address _to,
         uint256 _amount
     ) internal {
-        uint256 _bal = IERC20(_rewardToken).balanceOf(address(this));
+        uint256 _bal = IERC20Upgradeable(_rewardToken).balanceOf(address(this));
         if (_amount > _bal) {
-            IERC20(_rewardToken).transfer(_to, _bal);
+            IERC20Upgradeable(_rewardToken).transfer(_to, _bal);
         } else {
-            IERC20(_rewardToken).transfer(_to, _amount);
+            IERC20Upgradeable(_rewardToken).transfer(_to, _amount);
         }
     }
 
@@ -521,7 +518,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             uint256 sharesRemoved = IStrategy(poolInfo[_pid].strategy).withdraw(msg.sender, _wantAmt);
             user.shares -= sharesRemoved;
 
-            uint256 wantBal = IERC20(pool.want).balanceOf(address(this));
+            uint256 wantBal = IERC20Upgradeable(pool.want).balanceOf(address(this));
             if (wantBal < _wantAmt) {
                 _wantAmt = wantBal;
             }
@@ -546,7 +543,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             IWETH(_token).withdraw(_amount);
             payable(_receiver).transfer(_amount);
         } else {
-            IERC20(_token).safeTransfer(_receiver, _amount);
+            IERC20Upgradeable(_token).safeTransfer(_receiver, _amount);
         }
     }
 }

@@ -5,7 +5,7 @@ const {
 	ethers
 } = require("hardhat");
 const { getContract, getNamedSigners } = ethers;
-const testVars = require("./../utilities/testVariables.json");
+const testVars = require("../../utils/constants/data/testVariables.json");
 
 describe("GymVaultsStrategyAlpaca contract: ", function () {
 	let accounts, deployer, owner, caller, holder, vzgo;

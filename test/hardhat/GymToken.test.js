@@ -2,17 +2,20 @@ const { expect } = require("chai");
 const {
 	deployments: { fixture },
 	network,
-	ethers: { getContract, getNamedSigners, BigNumber }
+	ethers: {
+		getContract,
+		getNamedSigners,
+		BigNumber
+	}
 } = require("hardhat");
-const testVars = require("./../utilities/testVariables.json");
+const testVars = require("./../../utils/constants/data/testVariables.json");
 const variables = require("../../utils/constants/solpp")("hardhat");
-
 
 describe("GymToken contract: ", function () {
 	let accounts, snapshotId, caller, holder;
 	let gymToken;
 	before("Before All: ", async function () {
-		await fixture();
+		await fixture("Hardhat");
 
 		accounts = await getNamedSigners();
 		({ caller, holder } = accounts);

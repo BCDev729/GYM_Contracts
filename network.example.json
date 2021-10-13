@@ -29,6 +29,18 @@
 			"tags": ["bsc"],
 			"deploy": ["./deploy/bsc", "./deploy/layer1"]
 		},
+		"bsc-proxy": {
+			"chainId": 56,
+			"accounts": {
+				"mnemonic": "hen hair couple rose hover crush math mango private apology bid antique",
+				"path": "m/44'/60'/0'/0",
+				"initialIndex": "0",
+				"count": "20"
+			},
+			"url": "https://bsc-dataseed.binance.org",
+			"tags": ["Proxy"],
+			"deploy": ["./deploy/bsc-proxy", "./deploy/layer1"]
+		},
 		"bsc-testnet": {
 			"chainId": 97,
 			"gasMultiplier": 2,
@@ -41,6 +53,19 @@
 			"url": "https://data-seed-prebsc-2-s3.binance.org:8545",
 			"tags": ["bsc-testnet"],
 			"deploy": ["./deploy/bsc-testnet", "./deploy/layer1"]
+		},
+		"bsc-testnet-proxy": {
+			"chainId": 97,
+			"gasMultiplier": 2,
+			"accounts": {
+				"mnemonic": "hen hair couple rose hover crush math mango private apology bid antique",
+				"path": "m/44'/60'/0'/0",
+				"initialIndex": "0",
+				"count": "20"
+			},
+			"url": "https://data-seed-prebsc-2-s3.binance.org:8545",
+			"tags": ["Proxy"],
+			"deploy": ["./deploy/bsc-testnet-proxy", "./deploy/layer1"]
 		}
 	},
 	"defaultConfig": {
