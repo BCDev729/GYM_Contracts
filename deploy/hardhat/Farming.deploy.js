@@ -1,10 +1,6 @@
 const args = require("../../utils/constants/data/hardhat/GymFarming.json");
 module.exports = async function ({
-	config: {
-		networks: {
-			hardhat: { forking }
-		}
-	},
+	config,
 	run,
 	getChainId,
 	ethers: {
@@ -12,10 +8,8 @@ module.exports = async function ({
 		utils: { parseEther }
 	}
 }) {
-	const chainId = await getChainId();
-	if (chainId !== "31337" || forking.enabled) {
-		return;
-	}
+	if(config.networks.hardhat.forking.enabled) return;
+
 	const bank = await getContract("GymVaultsBank");
 	const rewardToken = await getContract("GymToken");
 	const rewardPerBlock = parseEther(args.rewardPerBlock);

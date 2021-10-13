@@ -17,6 +17,7 @@ module.exports = async function (
 	withUpdate = (withUpdate === "true");
 
 	const tx = await farming.set(pid, BigNumber.from(allocPoint), withUpdate);
+	const totalAllocPoint = await farming.totalAllocPoint();
 
-	return tx;
+	return { tx, totalAllocPoint };
 };

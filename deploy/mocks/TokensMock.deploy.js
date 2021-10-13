@@ -1,4 +1,4 @@
-const testVars = require("../../test/utilities/testVariables.json");
+const testVars = require("../../utils/constants/data/testVariables.json");
 
 module.exports = async function ({
 	getChainId,

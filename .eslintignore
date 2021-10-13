@@ -5,3 +5,6 @@ cache
 coverage
 docgen
 typechain
+network.json
+package-lock.json
+coverage.json

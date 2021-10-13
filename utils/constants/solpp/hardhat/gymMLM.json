@@ -1,5 +1,24 @@
 {
-    "GymMLM_DIRECT_REFERRAL_BONUSES": [10, 7, 5, 4, 4, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1],
-    "GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH": 15,
-    "GymMLM_OWNER": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+	"GymMLM_DIRECT_REFERRAL_BONUSES": [
+		10, 7, 5, 4, 4, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1
+	],
+	"GymMLM_DIRECT_REFERRAL_BONUSES_LENGTH": 15,
+	"GymMLM_LEVELS": [
+		10,
+		10,
+		10,
+		10,
+		100,
+		300,
+		1000,
+		2000,
+		3000,
+		5000,
+		6000,
+		7000,
+		8000,
+		10000,
+		20000
+	],
+	"GymMLM_OWNER": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 }

@@ -146,7 +146,7 @@ contract GymFarming is Ownable, ReentrancyGuard {
     /**
      * @notice Function to set amount of reward per block
      */
-    function setRewardPerBlock() external onlyOwner {
+    function setRewardPerBlock() external nonReentrant {
         massUpdatePools();
         if (block.number - lastChangeBlock > $(GymFarming_REWARD_CHANGE_BLOCKS) && rewardPerBlockChangesCount > 0) {
             rewardPerBlock = (rewardPerBlock * $(GymFarming_COEFFICIENT)) / 1e12;

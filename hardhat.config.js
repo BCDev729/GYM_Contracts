@@ -20,6 +20,7 @@ require("@atixlabs/hardhat-time-n-mine");
 require("hardhat-local-networks-config-plugin");
 require("hardhat-log-remover");
 require("@tenderly/hardhat-tenderly");
+require("@atixlabs/hardhat-time-n-mine");
 require("@nomiclabs/hardhat-solhint");
 
 require("./tasks");
@@ -173,5 +174,8 @@ module.exports = {
 	},
 	mocha: {
 		timeout: 100000
+	},
+	paths: {
+		deploy: "./deploy/deploy"
 	}
 };

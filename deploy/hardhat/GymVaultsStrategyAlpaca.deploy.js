@@ -1,18 +1,10 @@
 const args = require("../../utils/constants/data/hardhat/GymVaultsStratedyAlpaca.json");
 module.exports = async function ({
-	config: {
-		networks: {
-			hardhat: { forking }
-		}
-	},
+	config,
 	run,
-	getChainId,
 	ethers: { getContract }
 }) {
-	const chainId = await getChainId();
-	if (chainId !== "31337" || forking.enabled) {
-		return;
-	}
+	if(config.networks.hardhat.forking.enabled) return;
 
 	const bank = await getContract("BankMock");
 	const isAutoComp = args.isAutoComp;
@@ -22,7 +14,6 @@ module.exports = async function ({
 	const want = args.want;
 	const earn = args.earn;
 	const router = args.router;
-	// const owner = bank.address;
 
 	await run("deploy:gymVaultsStrategy", {
 		contractName: "GymVaultsStrategyAlpaca",
