@@ -7,7 +7,7 @@ const {
 		getContract,
 		getContractAt,
 		utils: { parseEther },
-		provider: { getBlockNumber }
+		provider: { getBlockNumber, getBalance }
 	},
 	run
 } = require("hardhat");
@@ -18,7 +18,6 @@ const variables = require("../../utils/constants/solpp")("fork");
 const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
 describe("GymVaultsBank contract: ", function () {
 	let accounts, deployer, owner, caller, holder, vzgo;
-	// grno;
 	let gymToken,
 		relationship,
 		farming,
@@ -27,10 +26,11 @@ describe("GymVaultsBank contract: ", function () {
 		WBNB,
 		lpToken,
 		liquidityProvider,
+		contractbalance,
 		factory,
-		lp,
 		balanceLp,
-		pending;
+		pending,
+		balanceDifference;
 	// eslint-disable-next-line no-unused-vars
 	let strategy, strategy1, strategy2, router, snapshotId, snapshot;
 	const startBlock = 200;
@@ -38,12 +38,11 @@ describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
 		await fixture("Fork");
 		accounts = await getNamedSigners();
-		({ deployer, owner, caller, holder, vzgo } = accounts);
+		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
 		// wantToken2 = await getContract("WantToken2", caller);
 		// wantToken2 = await getContractAt("GymToken", "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f");
 		gymToken = await getContract("GymToken", caller);
 		relationship = await getContract("GymMLM", caller);
-		console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 48 ~ relationship", relationship.address);
 		farming = await getContract("GymFarming", deployer);
 		liquidityProvider = await getContractAt("ILiquidityProvider", deployer.address);
 		// await farming.connect(deployer).add(30, gymToken.address, false);
@@ -60,7 +59,7 @@ describe("GymVaultsBank contract: ", function () {
 		factory = await getContractAt("IPancakeFactory", factory);
 		// WBNB = await getContract("WBNBMock", caller);
 
-		// earnToken = await getContractAt("GymToken", variables.ALPACA_TOKEN);
+		earnToken = await getContractAt("GymToken", variables.ALPACA_TOKEN);
 		// earnToken = await getContract("EarnToken", caller);
 		strategy1 = await getContract("GymVaultsStrategyAlpaca", deployer);
 		// strategy2 = await getContract();
@@ -151,18 +150,8 @@ describe("GymVaultsBank contract: ", function () {
 
 		it("Should deposit in gymVaultsbank, claim rewards and deposit in Farming", async function () {
 			await advanceBlockTo((await getBlockNumber()) + startBlock);
-
-			// await run("gymVaultsBank:add", {
-			// 	want: gymToken.address,
-			// 	allocPoint: "30",
-			// 	withUpdate: "false",
-			// 	strategy: strategy1.address,
-			// 	caller: "deployer"
-			// });
-			// await gymToken.connect(vzgo).approve(gymVaultsBank.address, testVars.AMOUNT);
-
 			await run("gymVaultsBank:deposit", {
-				pid: "1",
+				pid: "0",
 				wantAmt: testVars.AMOUNT.toString(),
 				referrerId: (await relationship.addressToId(deployer.address)).toString(),
 				caller: "vzgo",
@@ -170,25 +159,24 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			await advanceBlockTo((await getBlockNumber()) + 250);
-			// await gymVaultsBank.connect(vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
 
-			await run("gymVaultsBank:claimAndDeposit", {
-				pid: "1",
-				caller: "vzgo"
-			});
+			pending = (await gymVaultsBank.pendingReward(0, vzgo.address)).add(parseEther(farmingData.rewardPerBlock));
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 189 ~ pending", pending.toString());
 
 			snapshot = await network.provider.request({
 				method: "evm_snapshot",
 				params: []
 			});
 
-			pending = (await gymVaultsBank.pendingReward(0, vzgo.address)) + parseEther(farmingData.rewardPerBlock);
-			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 187 ~ pending", pending);
 			await gymVaultsBank.connect(vzgo).claim(0);
-
+			let balanceVzgo, tx;
+			balanceVzgo = await gymToken.balanceOf(vzgo.address);
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 190 ~ balanceVzgo", balanceVzgo.toString());
 			await gymToken.connect(vzgo).approve(router.address, pending);
 
-			const c = await router
+			const startBalance = await getBalance(vzgo.address);
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 194 ~ a", startBalance.toString());
+			await router
 				.connect(vzgo)
 				.swapExactTokensForETHSupportingFeeOnTransferTokens(
 					pending,
@@ -197,25 +185,35 @@ describe("GymVaultsBank contract: ", function () {
 					vzgo.address,
 					deadline
 				);
-			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 203 ~ c", c.toString());
+			const finishBalace = await getBalance(vzgo.address);
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 208 ~ a", finishBalace.toString());
+			const diff = finishBalace.sub(startBalance);
 
-			const a = await WBNB.balanceOf(vzgo.address);
-			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 208 ~ a", a);
+			balanceVzgo = await gymToken.balanceOf(vzgo.address);
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 190 ~ balanceVzgo", balanceVzgo.toString());
 
-			lp = await liquidityProvider
-				.connect(holder)
-				.addLiquidityETH(gymToken.address, vzgo.address, 0, 0, 0, deadline, 1, {
-					value: 100
-				});
-
-			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 218 ~ lp", lp);
 			const pairAddress = await factory.getPair(gymToken.address, variables.WBNB_TOKEN);
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 196 ~ pairAddress", pairAddress);
 			lpToken = await getContractAt("IERC20", pairAddress);
+
+			balanceLp = await lpToken.balanceOf(vzgo.address);
+			console.log("diff", diff.toString());
+
+			tx = await liquidityProvider
+				.connect(vzgo)
+				.addLiquidityETH(gymToken.address, vzgo.address, 0, 0, 0, deadline, 1, {
+					value: diff
+				});
+			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 207 ~ tx", tx);
 			balanceLp = await lpToken.balanceOf(vzgo.address);
 			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 224 ~ balanceLp", balanceLp.toString());
 			await network.provider.request({
 				method: "evm_revert",
 				params: [snapshot]
+			});
+			await run("gymVaultsBank:claimAndDeposit", {
+				pid: "0",
+				caller: "vzgo"
 			});
 			expect((await farming.userInfo(0, vzgo.address)).amount).to.equal(variables.ROUTER_MOCK_RETURN_AMOUNT);
 		});

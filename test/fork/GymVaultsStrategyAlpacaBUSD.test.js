@@ -189,7 +189,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			});
 
 
-			await advanceBlockTo(tx.blockNumber + 200);
+			await advanceBlockTo(tx.blockNumber + 300);
 			const pending = await run("gymVaultsBank:pendingReward", {
 				pid: "1",
 				user: "holder"
@@ -237,7 +237,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				caller: "holder"
 			});
 
-			await advanceBlockTo(tx.blockNumber + 100);
+			await advanceBlockTo(tx.blockNumber + 300);
 			await expect(() =>
 				run("gymVaultsBank:withdraw", {
 					pid: "1",
@@ -272,7 +272,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				caller: "holder"
 			});
 
-			await advanceBlockTo(tx.blockNumber + 200);
+			await advanceBlockTo(tx.blockNumber + 300);
 
 			await run("gymVaultsBank:claimAndDeposit", {
 				pid: "1",
