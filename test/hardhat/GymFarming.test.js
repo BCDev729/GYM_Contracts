@@ -597,6 +597,27 @@ describe("GymFarming contract: ", function () {
 			expect(await testLp.balanceOf(gymFarming.address)).to.equal(amount);
 		});
 
+		it("Should correct transfer token whenn call deposit", async function () {
+			const pid = await run("farming:poolLength", {
+				caller: "deployer"
+			});
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+
+			await expect(() =>
+				run("farming:deposit", {
+					pid: `${pid}`,
+					amount: `${amount}`
+				})
+			)
+				.to
+				.changeTokenBalance(testLp, gymFarming, amount);
+		});
+
 		it("Emit event Deposit", async function () {
 			const pid = await gymFarming.poolLength();
 			await gymFarming.add(poolAllocPoint2, testLp.address, true);
@@ -650,6 +671,65 @@ describe("GymFarming contract: ", function () {
 
 			expect((await testLp.balanceOf(caller.address)).toString()).to.equal(accountLp);
 			expect((await testLp.balanceOf(gymFarming.address)).toString()).to.equal(contractLp);
+		});
+
+		it("Should correct transfer token when call withdraw (caller balance)", async function () {
+			const pid = await run("farming:poolLength", {
+				caller: "deployer"
+			});
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
+
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+
+			await run("farming:deposit", {
+				pid: `${pid}`,
+				amount: `${amount}`
+			});
+
+			const beforeWithdrawContract = await testLp.balanceOf(gymFarming.address);
+
+			await expect(() =>
+				run("farming:withdraw", {
+					pid: `${pid}`,
+					amount: `${amount}`
+				})
+			)
+				.to
+				.changeTokenBalance(testLp, caller, beforeWithdrawContract);
+		});
+
+		it("Should correct transfer token when call withdraw (contract balance balance)", async function () {
+			const pid = await run("farming:poolLength", {
+				caller: "deployer"
+			});
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
+
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+
+			await run("farming:deposit", {
+				pid: `${pid}`,
+				amount: `${amount}`
+			});
+
+			let beforeWithdrawContract = await testLp.balanceOf(gymFarming.address);
+			beforeWithdrawContract = beforeWithdrawContract.toBigInt();
+
+			await expect(() =>
+				run("farming:withdraw", {
+					pid: `${pid}`,
+					amount: `${amount}`
+				})
+			)
+				.to
+				.changeTokenBalance(testLp, gymFarming, BigNumber.from(-beforeWithdrawContract));
 		});
 
 		it("Emit event Withdraw", async function () {
@@ -741,6 +821,22 @@ describe("GymFarming contract: ", function () {
 			expect(await gymFarming.connect(vzgo).harvest(0))
 				.to.emit(gymFarming, "Harvest")
 				.withArgs(vzgo.address, 0, pending);
+		});
+
+		it("Should correct transfer when call harvest function", async function () {
+			await testLp.connect(vzgo).approve(gymFarming.address, amount);
+			await run("farming:deposit", {
+				pid: "0",
+				amount: `${amount}`,
+				caller: "vzgo"
+			});
+			const pending = await gymFarming.pendingReward(0, vzgo.address);
+
+			await expect(() =>
+				gymFarming.connect(vzgo).harvest(0)
+			)
+				.to
+				.changeTokenBalance(testLp, vzgo, pending);
 		});
 	});
 });
