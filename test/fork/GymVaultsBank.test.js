@@ -7,7 +7,7 @@ const {
 		getContract,
 		getContractAt,
 		utils: { parseEther },
-		provider: { getBlockNumber, getBalance }
+		provider: { getBlockNumber }
 	},
 	run
 } = require("hardhat");
@@ -17,22 +17,20 @@ const testVars = require("../utilities/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
 describe("GymVaultsBank contract: ", function () {
-	let accounts, deployer, owner, caller, holder, vzgo, grno;
+	let accounts, deployer, owner, caller, holder, vzgo;
+	// grno;
 	let gymToken,
 		relationship,
 		farming,
 		buyBack,
 		gymVaultsBank,
 		WBNB,
-		earnToken,
 		lpToken,
 		liquidityProvider,
-		contractbalance,
 		factory,
 		lp,
 		balanceLp,
-		pending,
-		balanceDifference;
+		pending;
 	// eslint-disable-next-line no-unused-vars
 	let strategy, strategy1, strategy2, router, snapshotId, snapshot;
 	const startBlock = 200;
@@ -40,7 +38,7 @@ describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
 		await fixture("Fork");
 		accounts = await getNamedSigners();
-		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
+		({ deployer, owner, caller, holder, vzgo } = accounts);
 		// wantToken2 = await getContract("WantToken2", caller);
 		// wantToken2 = await getContractAt("GymToken", "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f");
 		gymToken = await getContract("GymToken", caller);
@@ -62,7 +60,7 @@ describe("GymVaultsBank contract: ", function () {
 		factory = await getContractAt("IPancakeFactory", factory);
 		// WBNB = await getContract("WBNBMock", caller);
 
-		earnToken = await getContractAt("GymToken", variables.ALPACA_TOKEN);
+		// earnToken = await getContractAt("GymToken", variables.ALPACA_TOKEN);
 		// earnToken = await getContract("EarnToken", caller);
 		strategy1 = await getContract("GymVaultsStrategyAlpaca", deployer);
 		// strategy2 = await getContract();
@@ -190,9 +188,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			await gymToken.connect(vzgo).approve(router.address, pending);
 
-			let a, c;
-
-			c = await router
+			const c = await router
 				.connect(vzgo)
 				.swapExactTokensForETHSupportingFeeOnTransferTokens(
 					pending,
@@ -203,7 +199,7 @@ describe("GymVaultsBank contract: ", function () {
 				);
 			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 203 ~ c", c.toString());
 
-			a = await WBNB.balanceOf(vzgo.address);
+			const a = await WBNB.balanceOf(vzgo.address);
 			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 208 ~ a", a);
 
 			lp = await liquidityProvider
