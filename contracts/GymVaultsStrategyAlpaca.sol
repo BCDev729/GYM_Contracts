@@ -257,12 +257,16 @@ contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
      * @param _wantAmt Amount of want tokens that will be added to pool
      */
     function deposit(address, uint256 _wantAmt) public onlyOwner whenNotPaused strategyRunning returns (uint256) {
+        console.log(" ~ file: GymVaultsStrategyAlpaca.sol ~ line 260 ~ deposit ~ _wantAmt", _wantAmt);
+        console.log(" ~ file: GymVaultsStrategyAlpaca.sol ~ line 263 ~ deposit ~ wantAddress", wantAddress);
         IERC20(wantAddress).safeTransferFrom(address(msg.sender), address(this), _wantAmt);
         uint256 sharesAdded = _wantAmt;
         if (wantLockedTotal > 0) {
             sharesAdded = (_wantAmt * sharesTotal * entranceFeeFactor) / wantLockedTotal / entranceFeeFactorMax;
         }
+        console.log(" ~ file: GymVaultsStrategyAlpaca.sol ~ line 266 ~ deposit ~ sharesTotal", sharesTotal);
         sharesTotal = sharesTotal + sharesAdded;
+        console.log(" ~ file: GymVaultsStrategyAlpaca.sol ~ line 266 ~ deposit ~ sharesTotal", sharesTotal);
 
         if (isAutoComp) {
             _farm();

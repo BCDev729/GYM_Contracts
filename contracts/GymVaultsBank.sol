@@ -56,7 +56,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         IERC20 want;
         uint256 allocPoint;
         uint256 lastRewardBlock;
-        uint256 accRewardPerShare; 
+        uint256 accRewardPerShare;
         address strategy;
     }
 
@@ -113,7 +113,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         uint256 _startBlock,
         address _gym,
         uint256 _gymRewardRate
-    ){
+    ) {
         require(block.number < _startBlock, "GymVaultsBank: Start block must have a bigger value");
 
         startBlock = _startBlock;
@@ -201,6 +201,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         UserInfo storage user = userInfo[_pid][_user];
         uint256 _accRewardPerShare = pool.accRewardPerShare;
         uint256 sharesTotal = IStrategy(pool.strategy).sharesTotal();
+
         if (block.number > pool.lastRewardBlock && sharesTotal != 0) {
             uint256 _multiplier = block.number - pool.lastRewardBlock;
             uint256 _reward = (_multiplier * rewardPoolInfo.rewardPerBlock * pool.allocPoint) / totalAllocPoint;
@@ -522,7 +523,11 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             }
 
             if (_wantAmt > 0) {
-                _transfer(address(pool.want), treasuryAddress, (_wantAmt * withdrawFee) / $(GymVaultsBank_WITHDRAW_FEE_FACTOR_MAX));
+                _transfer(
+                    address(pool.want),
+                    treasuryAddress,
+                    (_wantAmt * withdrawFee) / $(GymVaultsBank_WITHDRAW_FEE_FACTOR_MAX)
+                );
                 _transfer(address(pool.want), msg.sender, pool.want.balanceOf(address(this)));
             }
         }
