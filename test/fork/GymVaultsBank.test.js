@@ -26,11 +26,9 @@ describe("GymVaultsBank contract: ", function () {
 		WBNB,
 		lpToken,
 		liquidityProvider,
-		contractbalance,
 		factory,
 		balanceLp,
-		pending,
-		balanceDifference;
+		pending;
 	// eslint-disable-next-line no-unused-vars
 	let strategy, strategy1, strategy2, router, snapshotId, snapshot;
 	const startBlock = 200;
@@ -38,7 +36,7 @@ describe("GymVaultsBank contract: ", function () {
 	before("Before All: ", async function () {
 		await fixture("Fork");
 		accounts = await getNamedSigners();
-		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
+		({ deployer, owner, caller, holder, vzgo } = accounts);
 		// wantToken2 = await getContract("WantToken2", caller);
 		// wantToken2 = await getContractAt("GymToken", "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f");
 		gymToken = await getContract("GymToken", caller);
@@ -59,7 +57,7 @@ describe("GymVaultsBank contract: ", function () {
 		factory = await getContractAt("IPancakeFactory", factory);
 		// WBNB = await getContract("WBNBMock", caller);
 
-		earnToken = await getContractAt("GymToken", variables.ALPACA_TOKEN);
+		// earnToken = await getContractAt("GymToken", variables.ALPACA_TOKEN);
 		// earnToken = await getContract("EarnToken", caller);
 		strategy1 = await getContract("GymVaultsStrategyAlpaca", deployer);
 		// strategy2 = await getContract();
@@ -169,7 +167,7 @@ describe("GymVaultsBank contract: ", function () {
 			});
 
 			await gymVaultsBank.connect(vzgo).claim(0);
-			let balanceVzgo, tx;
+			let balanceVzgo;
 			balanceVzgo = await gymToken.balanceOf(vzgo.address);
 			console.log("🚀 ~ file: GymVaultsBank.test.js ~ line 190 ~ balanceVzgo", balanceVzgo.toString());
 			await gymToken.connect(vzgo).approve(router.address, pending);
@@ -199,7 +197,7 @@ describe("GymVaultsBank contract: ", function () {
 			balanceLp = await lpToken.balanceOf(vzgo.address);
 			console.log("diff", diff.toString());
 
-			tx = await liquidityProvider
+			const tx = await liquidityProvider
 				.connect(vzgo)
 				.addLiquidityETH(gymToken.address, vzgo.address, 0, 0, 0, deadline, 1, {
 					value: diff
