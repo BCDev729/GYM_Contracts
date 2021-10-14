@@ -141,7 +141,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Reward Pool functions: ", function () {
+	xdescribe("Reward Pool functions: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -204,7 +204,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Add function: ", function () {
+	xdescribe("Add function: ", function () {
 		const allocPoint = 20;
 		const corePoolAllocPoint = 30;
 		let poolLength;
@@ -521,7 +521,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("depositBNB", function () {
+	xdescribe("depositBNB", function () {
 		before("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -568,7 +568,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Claim function: ", function () {
+	xdescribe("Claim function: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -794,18 +794,49 @@ describe("GymVaultsBank contract: ", function () {
 
 			const vzgoShares = (await gymVaultsBank.userInfo(1, vzgo.address)).shares;
 
+			console.log(`\nvzgo shares one is: ${vzgoShares}\n`);
+
 			await timeAndMine.mine(testVars.BLOCK_COUNT);
+
+			console.log(`\nvzgo shares two is: ${vzgoShares}\n`);
 
 			const pendingReward = await run("gymVaultsBank:pendingReward", {
 				pid: "1",
 				user: vzgo.address
 			});
 
+			console.log(`\nvzgo shares three is: ${vzgoShares}\n`);
+
+
 			await run("gymVaultsBank:withdraw", {
 				pid: "1",
 				wantAmt: `${vzgoShares}`,
 				caller: "vzgo"
 			});
+
+			console.log(`\nvzgo shares four is: ${vzgoShares}\n`);
+
+
+			// const vzgoBalanceToEq = Math.floor(
+			// 	vzgoWant2Balance -
+			// 	(testVars.AMOUNT *
+			// 		(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+			// 	100 -
+			// 	vzgoShares / 10
+			// );
+
+
+			// await expect(() =>
+			// 	run("gymVaultsBank:withdraw", {
+			// 		pid: "1",
+			// 		wantAmt: `${vzgoShares}`,
+			// 		caller: "vzgo"
+			// 	})
+			// )
+			// 	.to
+			// 	.changeTokenBalance(wantToken2, vzgo, vzgoBalanceToEq);
+
+
 			expect((await wantToken2.balanceOf(vzgo.address)).sub(1)).to.equal(
 				Math.floor(
 					vzgoWant2Balance -
@@ -839,6 +870,7 @@ describe("GymVaultsBank contract: ", function () {
 				referrerId: (await relationship.addressToId(deployer.address)).toString(),
 				caller: "vzgo"
 			});
+
 
 			const vzgoShares = (await gymVaultsBank.userInfo(1, vzgo.address)).shares;
 
@@ -1005,7 +1037,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("WithdrawBNB", function () {
+	xdescribe("WithdrawBNB", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -1074,7 +1106,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("MigrateStrategy", function () {
+	xdescribe("MigrateStrategy", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",

@@ -64,7 +64,10 @@ describe("GymToken contract: ", function () {
 		});
 
 		it("Should burn gym tokens: ", async function () {
-			await gymToken.connect(holder).transfer(caller.address, testVars.TX_AMOUNT);
+
+			await expect(() => gymToken.connect(holder).transfer(caller.address, testVars.TX_AMOUNT))
+				.to
+				.changeTokenBalance(gymToken, caller, testVars.TX_AMOUNT);
 
 			const callerBal = await gymToken.balanceOf(caller.address);
 			const totalSupply = await gymToken.totalSupply();
@@ -79,16 +82,20 @@ describe("GymToken contract: ", function () {
 			const checkpoint1Votes = (await gymToken.checkpoints(holder.address, srcRepNum - 1)).votes;
 			const oldVotes = srcRepNum > 0 ? checkpoint1Votes : 0;
 			const amnt = BigNumber.from(testVars.TX_AMOUNT);
-			const newVotes = oldVotes.sub(amnt.mul(10**2));
+			const newVotes = oldVotes.sub(amnt.mul(10 ** 2));
 
-			await expect(gymToken.connect(holder).transfer(caller.address, amnt.mul(10**2)))
+			await expect(gymToken.connect(holder).transfer(caller.address, amnt.mul(10 ** 2)))
 				.to
 				.emit(gymToken, "DelegateVotesChanged")
 				.withArgs(holder.address, oldVotes, newVotes);
 		});
 
 		it("Should emit Transfer event with correct args", async function () {
-			await gymToken.connect(holder).transfer(caller.address, testVars.TX_AMOUNT);
+
+			await expect(() => gymToken.connect(holder).transfer(caller.address, testVars.TX_AMOUNT))
+				.to.changeTokenBalance(gymToken, caller, testVars.TX_AMOUNT);
+
+
 			await expect(gymToken.connect(caller).burn(testVars.TX_AMOUNT))
 				.to
 				.emit(gymToken, "Transfer")
@@ -137,6 +144,11 @@ describe("GymToken contract: ", function () {
 		it("Should emit Approval event with correct args", async function () {
 			const amount = 500;
 			await gymToken.connect(holder).transfer(caller.address, 1000);
+
+			await expect(() => gymToken.connect(holder).transfer(caller.address, 1000))
+				.to
+				.changeTokenBalance(gymToken, caller, 1000);
+
 			await expect(gymToken.connect(caller).approve(holder.address, amount))
 				.to
 				.emit(gymToken, "Approval")

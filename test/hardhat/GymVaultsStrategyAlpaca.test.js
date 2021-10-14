@@ -105,14 +105,26 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		});
 
 		it("Should receive first deposit from user: ", async function () {
-			await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
+
 			expect(await want.balanceOf(strategyAlpaca.address)).to.equal(testVars.TX_AMOUNT);
 			expect(await strategyAlpaca.wantLockedTotal()).to.equal(testVars.TX_AMOUNT);
 			expect(await strategyAlpaca.sharesTotal()).to.equal(testVars.TX_AMOUNT);
 		});
 
 		it("Should receive second deposit from user: ", async function () {
-			await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT * 2);
+			// await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT * 2);
+
+			await expect(() =>
+				bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT * 2)
+			)
+				.to
+				.changeTokenBalance(want, bank, -2 * testVars.TX_AMOUNT);
 
 			expect(await want.balanceOf(strategyAlpaca.address)).to.equal(testVars.TX_AMOUNT * 3);
 			expect(await strategyAlpaca.wantLockedTotal()).to.equal(testVars.TX_AMOUNT * 3);
@@ -139,7 +151,13 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		it("Should stake token for farming: ", async function () {
 			const farmBalBefore = await want.balanceOf(vault.address);
 
-			await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			// await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
 
 			expect(await want.balanceOf(vault.address)).to.equal(Number(farmBalBefore) + testVars.TX_AMOUNT);
 			expect(await strategyAlpacaAutoComp.wantLockedTotal()).to.equal(testVars.TX_AMOUNT);
@@ -171,16 +189,43 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		});
 
 		it("Should revert with 'GymVaultsStrategy: !_wantAmt': ", async function () {
-			await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT);
+			// await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
 
 			await expect(bank.withdraw(strategyAlpaca.address, 0)).to.be.revertedWith(
 				"GymVaultsStrategyAlpaca: !_wantAmt"
 			);
 		});
 
+		it("Should correct transfer when call withdraw", async function () {
+			await expect(() =>
+				bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.withdraw(strategyAlpaca.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, strategyAlpaca, -1 * testVars.TX_AMOUNT);
+		});
+
 		it("Should emit Withdraw event with correct values", async function () {
 			const withdrawAmount = testVars.TX_AMOUNT / 4;
-			await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			// await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
+
 			await expect(bank.withdraw(strategyAlpacaAutoComp.address, withdrawAmount))
 				.to
 				.emit(strategyAlpacaAutoComp, "Withdraw")
@@ -190,7 +235,13 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		it("Should withdraw tokens(isAutoComp): ", async function () {
 			const withdrawAmount = testVars.TX_AMOUNT / 4;
 
-			await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+			// await bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.deposit(strategyAlpacaAutoComp.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
 
 			const fairLaunchBefore = await vault.balanceOf(fairLaunch.address);
 			const wantBalBefore = await want.balanceOf(vault.address);
@@ -198,7 +249,13 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 			const wantLockedTotalBefore = await strategyAlpacaAutoComp.wantLockedTotal();
 			const sharesTotalBefore = await strategyAlpacaAutoComp.sharesTotal();
 
-			await bank.withdraw(strategyAlpacaAutoComp.address, withdrawAmount);
+			// await bank.withdraw(strategyAlpacaAutoComp.address, withdrawAmount);
+
+			await expect(() =>
+				bank.withdraw(strategyAlpacaAutoComp.address, withdrawAmount)
+			)
+				.to
+				.changeTokenBalance(want, bank, withdrawAmount);
 
 			const sharesTotalAfter = sharesTotalBefore - (withdrawAmount * sharesTotalBefore) / wantLockedTotalBefore;
 
@@ -212,13 +269,25 @@ describe("GymVaultsStrategyAlpaca contract: ", function () {
 		it("Should withdraw tokens(!isAutoComp): ", async function () {
 			const withdrawAmount = testVars.TX_AMOUNT / 4;
 
-			await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT);
+			// await bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT);
+
+			await expect(() =>
+				bank.deposit(strategyAlpaca.address, testVars.TX_AMOUNT)
+			)
+				.to
+				.changeTokenBalance(want, bank, -1 * testVars.TX_AMOUNT);
 
 			const wantLockedTotalBefore = await strategyAlpaca.wantLockedTotal();
 			const bankBalBefore = await want.balanceOf(bank.address);
 			const sharesTotalBefore = await strategyAlpaca.sharesTotal();
 
-			await bank.withdraw(strategyAlpaca.address, withdrawAmount);
+			// await bank.withdraw(strategyAlpaca.address, withdrawAmount);
+
+			await expect(() =>
+				bank.withdraw(strategyAlpaca.address, withdrawAmount)
+			)
+				.to
+				.changeTokenBalance(want, bank, withdrawAmount);
 
 			expect(await want.balanceOf(bank.address)).to.equal(Number(bankBalBefore) + withdrawAmount);
 			expect(await strategyAlpaca.wantLockedTotal()).to.equal(wantLockedTotalBefore - withdrawAmount);
