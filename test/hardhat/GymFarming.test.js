@@ -522,7 +522,7 @@ describe("GymFarming contract: ", function () {
 			expect(Math.floor(BigNumber.from(await gymFarming.rewardPerBlock()))).to.equal(
 				Math.floor((rewardPerBlock * variables.GymFarming_COEFFICIENT ** 3) / 1e12 ** 3)
 			);
-			await advanceBlockTo(startBlock + 890);
+			await advanceBlockTo(startBlock + 90);
 
 			await run("farming:setRewardPerBlock", {});
 

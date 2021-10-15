@@ -7,5 +7,9 @@ module.exports = async function (
 	const gymVaultsBank = await getContract("GymVaultsBank", signers[caller]);
 
 	const tx = await gymVaultsBank.connect(signers[caller]).add(want, allocPoint, withUpdate, strategy);
-	return tx;
+
+	const pid = (await gymVaultsBank.poolLength()) - 1;
+	const totalAllocPoint = await gymVaultsBank.totalAllocPoint();
+
+	return { tx, pid, allocPoint, totalAllocPoint };
 };
