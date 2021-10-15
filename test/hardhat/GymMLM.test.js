@@ -156,12 +156,11 @@ describe("GymMLM contract: ", function () {
 			});
 		});
 
-		it("Should distribute rewards for referrers: ", async function () {
+		it("Should emit ReferralRewardReceved event with correct args", async function () {
 			let prevSigner = "deployer";
 			let index = 0;
 			let prevSignerBal;
 			let ownerBal = (await wantToken.balanceOf(owner.address)).sub(depositAmount);
-
 			for (const signer in accounts) {
 				if (signer === "deployer") {
 					continue;

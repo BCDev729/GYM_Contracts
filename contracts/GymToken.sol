@@ -234,6 +234,7 @@ contract GymToken {
         return _delegate(msg.sender, delegatee);
     }
 
+
     /**
      * @notice Delegates votes from signatory to `delegatee`
      * @param delegatee The address to delegate votes to
@@ -332,7 +333,6 @@ contract GymToken {
             checkpoints[delegatee][nCheckpoints] = Checkpoint(blockNumber, newVotes);
             numCheckpoints[delegatee] = nCheckpoints + 1;
         }
-
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
