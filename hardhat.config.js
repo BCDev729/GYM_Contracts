@@ -16,11 +16,9 @@ require("hardhat-tracer");
 require("hardhat-spdx-license-identifier");
 require("hardhat-docgen");
 require("hardhat-dependency-compiler");
-require("@atixlabs/hardhat-time-n-mine");
 require("hardhat-local-networks-config-plugin");
 require("hardhat-log-remover");
 require("@tenderly/hardhat-tenderly");
-require("@atixlabs/hardhat-time-n-mine");
 require("@nomiclabs/hardhat-solhint");
 
 require("./tasks");

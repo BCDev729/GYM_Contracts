@@ -5,12 +5,13 @@ const {
 	ethers: {
 		getNamedSigners,
 		getContract,
-		utils: { parseEther }
+		utils: { parseEther },
+		provider: { getBlockNumber }
 	},
-	run,
-	timeAndMine
+	run
 } = require("hardhat");
 
+const { advanceBlockTo } = require("../../utils/utilities/time");
 const testVars = require("../../utils/constants/data/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 
@@ -106,7 +107,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 
 		it("Should deposit in gymVaultsbank, claim rewards and deposit in Farming", async function () {
-			await timeAndMine.mine(startBlock);
+			await advanceBlockTo((await getBlockNumber()) + startBlock);
 
 			await run("gymVaultsBank:add", {
 				want: wantToken2.address,
@@ -124,7 +125,8 @@ describe("GymVaultsBank contract: ", function () {
 				caller: "vzgo"
 			});
 
-			await timeAndMine.mine(150);
+			await advanceBlockTo((await getBlockNumber()) + 150);
+
 			// await gymVaultsBank.connect(vzgo).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
 			await run("gymVaultsBank:claimAndDeposit", {
 				pid: "1",
