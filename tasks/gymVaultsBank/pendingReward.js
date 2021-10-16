@@ -1,8 +1,12 @@
-module.exports = async function ({ pid, user, caller }, { ethers: { getNamedSigners, getContract } }) {
-	const gymVaultsBank = await getContract("GymVaultsBank");
+module.exports = async function (
+	{ pid, user, caller },
+	{ ethers: { getNamedSigners, getContract } }
+) {
 	const signers = await getNamedSigners();
-	user = signers[user];
-	const tx = await gymVaultsBank.pendingReward(pid, user.address);
+
+	const gymVaultsBank = await getContract("GymVaultsBank", signers[caller]);
+
+	const tx = await gymVaultsBank.pendingReward(pid, user);
 
 	return tx;
 };

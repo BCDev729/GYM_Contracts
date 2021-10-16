@@ -19,12 +19,28 @@ task("deploy:farming", "Deploy GymFarming contract", require("./farming.deploy")
 
 task("deploy:gymVaultsBank", "Deploy GymVaultsBank contract", require("./gymVaultsBank.deploy"))
 	.addParam("startblock", "startBlock")
-	.addParam("gymtokenaddress", "GymTokenAddress address")
-	.addParam("rewardrate", "rewardRate");
+	.addParam("gymTokenAddress", "gymTokenAddress address")
+	.addParam("rewardRate", "rewardRate");
+
+task("deploy:gymVaultsBankProxy", "Deploy GymVaultsBankProxy contract", require("./gymVaultsBankProxy.deploy"))
+	.addParam("startblock", "startBlock")
+	.addParam("gymTokenAddress", "gymTokenAddress address")
+	.addParam("rewardRate", "rewardRate");
 
 task("deploy:gymMLM", "Deploy GymMLM contract", require("./gymMLM.deploy"));
 
 task("deploy:gymVaultsStrategy", "Deploy GymVaultsStrategy contract", require("./gymVaultsStrategy.deploy"))
+	.addParam("contractName", "contractName")
+	.addParam("bank", "GymVaultsBank address")
+	.addParam("isAutoComp", "Boolean")
+	.addParam("vault", "vault address")
+	.addParam("fairLaunch", "fairLaunch address")
+	.addParam("pid", "pool id on fairlunch")
+	.addParam("want", "want token address")
+	.addParam("earn", "earn token address")
+	.addParam("router", "router address");
+
+task("deploy:gymVaultsStrategyProxy", "Deploy GymVaultsStrategyProxy contract", require("./gymVaultsStrategyProxy.deploy"))
 	.addParam("contractName", "contractName")
 	.addParam("bank", "GymVaultsBank address")
 	.addParam("isAutoComp", "Boolean")

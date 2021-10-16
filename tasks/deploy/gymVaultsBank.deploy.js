@@ -1,9 +1,7 @@
 module.exports = async function (
-	{ startblock, gymtokenaddress, rewardrate },
+	{ startblock, gymTokenAddress, rewardRate },
 	{
-		ethers: {
-			getNamedSigners
-		},
+		ethers: { getNamedSigners },
 		deployments: { deterministic }
 		// upgrades: { deployProxy }
 	}
@@ -13,7 +11,7 @@ module.exports = async function (
 	const deterministicDeploy = await deterministic("GymVaultsBank", {
 		from: deployer.address,
 		contract: "GymVaultsBank",
-		args: [startblock, gymtokenaddress, rewardrate],
+		args: [startblock, gymTokenAddress, rewardRate],
 		log: true,
 		deterministicDeployment: true
 	});
@@ -21,7 +19,7 @@ module.exports = async function (
 	return deterministicDeploy;
 
 	// const GymVaultsBank = await getContractFactory("GymVaultsBank");
-	// const gymVaultsBank = await deployProxy(GymVaultsBank, [startblock, gymtokenaddress, rewardrate]);
+	// const gymVaultsBank = await deployProxy(GymVaultsBank, [startblock, gymTokenAddress, rewardRate]);
 	// await gymVaultsBank.deployed();
 	// console.log(gymVaultsBank.address);
 	// return gymVaultsBank.address;

@@ -1,19 +1,11 @@
 const args = require("../../utils/constants/data/fork/GymVaultsStrategyAlpacaBUSD.json");
 module.exports = async function ({
+	config,
 	run,
-	config: {
-		networks: {
-			hardhat: { forking }
-		}
-	},
-	getChainId,
 	ethers: { getContract }
 }) {
-	const chainId = await getChainId();
-	if (chainId !== "31337" || !forking.enabled) {
-		return;
-	}
-
+	if(!config.networks.hardhat.forking.enabled) return;
+	
 	const bank = await getContract("GymVaultsBank");
 	const isAutoComp = args.isAutoComp;
 	const vault = args.vault;

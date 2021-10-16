@@ -12,8 +12,8 @@ const {
 	run
 } = require("hardhat");
 
-const { advanceBlockTo } = require("../utilities/time");
-const testVars = require("../utilities/testVariables.json");
+const { advanceBlockTo } = require("../../utils/utilities/time");
+const testVars = require("../../utils/constants/data/testVariables.json");
 const variables = require("../../utils/constants/solpp")("fork");
 const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
 describe("GymVaultsBank contract: ", function () {

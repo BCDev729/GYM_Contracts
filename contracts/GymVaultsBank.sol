@@ -88,7 +88,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     address public constant buyBack = $(BUYBACK);
     address public farming;
     // contracts[7] - RelationShip address
-    address public constant relationship = $(RELATIONSHIP);
+    address public relationship = $(RELATIONSHIP);
     /// Treasury address where will be sent all unused assets
     address public treasuryAddress;
     /// Info of each pool.
@@ -134,6 +134,11 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
 
     fallback() external payable {}
 
+
+    function setMLMAddress(address _relationship) external onlyOwner {
+        relationship = _relationship;
+    }
+
     /**
      * @notice Update the given pool's reward allocation point. Can only be called by the owner
      * @param _pid: Pool id that will be updated
@@ -153,10 +158,10 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     function resetStrategy(uint256 _pid, address _strategy) external onlyOwner {
         PoolInfo storage pool = poolInfo[_pid];
         require(
-            pool.want.balanceOf(poolInfo[_pid].strategy) == 0 || pool.accRewardPerShare == 0,
+            pool.want.balanceOf(pool.strategy) == 0 || pool.accRewardPerShare == 0,
             "GymVaultsBank: Strategy not empty"
         );
-        poolInfo[_pid].strategy = _strategy;
+        pool.strategy = _strategy;
     }
 
     /**
@@ -182,7 +187,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     /**
      * @notice Updates amount of reward tokens  per block that user will get. Can only be called by the owner
      */
-    function updateRewardPerBlock() external nonReentrant onlyOwner {
+    function updateRewardPerBlock() external nonReentrant {
         massUpdatePools();
         if (block.number - lastChangeBlock > $(GymVaultsBank_REWARD_CHANGE_BLOCKS) && rewardPerBlockChangesCount > 0) {
             rewardPoolInfo.rewardPerBlock = (rewardPoolInfo.rewardPerBlock * $(GymVaultsBank_COEFFICIENT)) / 1e12;

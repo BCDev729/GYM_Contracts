@@ -1,5 +1,4 @@
 const { expect } = require("chai");
-const { advanceBlockTo } = require("../utilities");
 const {
 	deployments: { fixture },
 	network,
@@ -12,6 +11,7 @@ const {
 	},
 	run
 } = require("hardhat");
+const { advanceBlockTo } = require("../../utils/utilities/time");
 
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder;
@@ -140,13 +140,13 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Should claimA in pool: ", async function () {
-			const tx = await run("farming:speedStake", {
+			const speedStake = await run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
 				bnbAmount: parseEther("10").toString()
 			});
 
-			await advanceBlockTo(tx.blockNumber + 200);
+			await advanceBlockTo(speedStake.tx.blockNumber + 200);
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
 			await run("farming:claimAndDeposit", {
 				pid: "0",
@@ -157,13 +157,13 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Should claimA in pool with additional BNB: ", async function () {
-			const tx = await run("farming:speedStake", {
+			const speedStake = await run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
 				bnbAmount: `${parseEther("10")}`
 			});
 
-			await advanceBlockTo(tx.blockNumber + 200);
+			await advanceBlockTo(speedStake.tx.blockNumber + 200);
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
 			await run("farming:claimAndDeposit", {
 				pid: "0",

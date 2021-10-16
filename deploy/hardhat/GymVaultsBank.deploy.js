@@ -1,30 +1,23 @@
 const args = require("../../utils/constants/data/hardhat/GymVaultsBank.json");
 module.exports = async function ({
-	config: {
-		networks: {
-			hardhat: { forking }
-		}
-	},
+	config,
 	run,
-	getChainId,
 	ethers: {
 		getContract,
 		utils: { parseEther },
 		provider: { getBlockNumber }
 	}
 }) {
-	const chainId = await getChainId();
-	if (chainId !== "31337" || forking.enabled) {
-		return;
-	}
+	if(config.networks.hardhat.forking.enabled) return;
+
 	const startBlock = args.startBlock;
 	const gymToken = await getContract("GymToken");
 	const rewardRate = parseEther(args.rewardRate);
 
 	await run("deploy:gymVaultsBank", {
 		startblock: startBlock.toString(),
-		gymtokenaddress: gymToken.address,
-		rewardrate: rewardRate.toString()
+		gymTokenAddress: gymToken.address,
+		rewardRate: rewardRate.toString()
 	});
 
 };
