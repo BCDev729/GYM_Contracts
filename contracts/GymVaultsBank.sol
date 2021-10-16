@@ -202,7 +202,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         uint256 _accRewardPerShare = pool.accRewardPerShare;
 
         uint256 sharesTotal = IStrategy(pool.strategy).sharesTotal();
-  
+
         if (block.number > pool.lastRewardBlock && sharesTotal != 0) {
             uint256 _multiplier = block.number - pool.lastRewardBlock;
             uint256 _reward = (_multiplier * rewardPoolInfo.rewardPerBlock * pool.allocPoint) / totalAllocPoint;
@@ -248,7 +248,6 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             // If `want` is WBNB
             IWETH($(WBNB_TOKEN)).deposit{value: msg.value}();
             _wantAmt = msg.value;
-            console.log(" ~ file: GymVaultsBank.sol ~ line 248 ~ _wantAmt", _wantAmt);
         }
         _deposit(_pid, _wantAmt, _minBurnAmt, _deadline);
     }
@@ -278,7 +277,6 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         updatePool(_pid);
         uint256 pending = (user.shares * pool.accRewardPerShare) / (1e18) - (user.rewardDebt);
         if (pending > 0) {
-            console.log("here");
             IERC20(rewardPoolInfo.rewardToken).approve(farming, pending);
             IFarming(farming).autoDeposit{value: msg.value}(
                 0,
@@ -290,7 +288,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
                 _deadline
             );
         }
-        console.log("here1");
+
         user.rewardDebt = (user.shares * (pool.accRewardPerShare)) / (1e18);
     }
 
@@ -390,18 +388,15 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
     function updatePool(uint256 _pid) public {
         PoolInfo storage pool = poolInfo[_pid];
         if (block.number <= pool.lastRewardBlock) {
-            console.log("here--++++-");
             return;
         }
         uint256 sharesTotal = IStrategy(pool.strategy).sharesTotal();
         if (sharesTotal == 0) {
-            console.log("here---");
             pool.lastRewardBlock = block.number;
             return;
         }
         uint256 multiplier = block.number - pool.lastRewardBlock;
         if (multiplier <= 0) {
-            console.log("here---////");
             return;
         }
         uint256 _rewardPerBlock = rewardPoolInfo.rewardPerBlock;
@@ -462,7 +457,6 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             _claim(_pid);
         }
 
-        console.log(" ~ file: GymVaultsBank.sol ~ line 462 ~ _wantAmt", _wantAmt);
         if (_wantAmt > 0) {
             if (address(pool.want) != $(WBNB_TOKEN)) {
                 // If `want` not WBNB
@@ -475,7 +469,6 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             IGymMLM(relationship).distributeRewards(_wantAmt, address(pool.want), msg.sender);
 
             pool.want.safeTransfer(buyBack, (_wantAmt * BUY_AND_BURN_GYM) / 100);
-            console.log("knknk", (_wantAmt * BUY_AND_BURN_GYM) / 100);
 
             IBuyBack(buyBack).buyAndBurnToken(
                 address(pool.want),

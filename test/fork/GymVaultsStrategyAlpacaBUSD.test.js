@@ -7,7 +7,8 @@ const {
 		getContract,
 		getContractAt,
 		getSigner,
-		utils: { parseEther }
+		utils: { parseEther },
+		BigNumber
 	},
 	ethers,
 	run
@@ -15,7 +16,7 @@ const {
 
 const { advanceBlockTo } = require("../utilities/time");
 const variables = require("../../utils/constants/solpp")("fork");
-const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
+const bankData = require("../../utils/constants/data/fork/GymVaultsBank.json");
 
 describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 	let accounts, deployer, owner, caller, holder;
@@ -36,7 +37,6 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			lpToken: gymToken.address
 		});
 
-
 		buyBack = await getContract("BuyBack", caller);
 		gymVaultsBank = await getContract("GymVaultsBank", deployer);
 
@@ -47,7 +47,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		busd = await getContractAt("GymToken", variables.BUSD);
 		alpaca = await getContractAt("GymToken", variables.ALPACA_TOKEN);
 		ibToken = await getContractAt("GymToken", "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f");
-		strategyAlpaca = await getContract("GymVaultsStrategyAlpaca", caller);
+		strategyAlpaca = await getContract("GymVaultsStrategyAlpacaBUSD", caller);
 		await run("gymMLM:setBankAddress", {
 			bankAddress: gymVaultsBank.address,
 			caller: "deployer"
@@ -89,13 +89,13 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			});
 
 		lpGymBnb = await factory.getPair(gymToken.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
-		await run("gymVaultsBank:add", {
-			want: busd.address,
-			allocPoint: "30",
-			withUpdate: "false",
-			strategy: strategyAlpaca.address,
-			caller: "deployer"
-		});
+		// await run("gymVaultsBank:add", {
+		// 	want: busd.address,
+		// 	allocPoint: "30",
+		// 	withUpdate: "false",
+		// 	strategy: strategyAlpaca.address,
+		// 	caller: "deployer"
+		// });
 		await run("gymVaultsBank:add", {
 			want: busd.address,
 			allocPoint: "30",
@@ -108,7 +108,6 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			allocPoint: "30",
 			lpToken: lpGymBnb
 		});
-
 
 		await busd.connect(holder).transfer(gymVaultsBank.address, parseEther("1000"));
 		await busd.connect(holder).transfer(farming.address, parseEther("1000"));
@@ -153,7 +152,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		it("Should accept deposit from user: ", async function () {
 			await busd.connect(holder).approve(gymVaultsBank.address, ethers.utils.parseEther("100"));
 			await run("gymVaultsBank:deposit", {
-				pid: "1",
+				pid: "0",
 				wantAmt: `${parseEther("100")}`,
 				referrerId: "1",
 				caller: "holder"
@@ -182,31 +181,30 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		it("Should accept claim from user: ", async function () {
 			await busd.connect(holder).approve(gymVaultsBank.address, ethers.utils.parseEther("0.1"));
 			const tx = await run("gymVaultsBank:deposit", {
-				pid: "1",
+				pid: "0",
 				wantAmt: `${parseEther("0.1")}`,
 				referrerId: "1",
 				caller: "holder"
 			});
 
+			await advanceBlockTo(tx.blockNumber + 200);
+			await gymVaultsBank.updatePool(0);
 
-			await advanceBlockTo(tx.blockNumber + 300);
-			const pending = await run("gymVaultsBank:pendingReward", {
-				pid: "1",
-				user: "holder"
-			});
+			const pending = (await gymVaultsBank.userInfo(0, holder.address)).shares
+				.mul((await gymVaultsBank.poolInfo(0)).accRewardPerShare)
+				.div(BigNumber.from(`${1e18}`));
 
-		
 			await expect(() =>
 				run("gymVaultsBank:claim", {
-					pid: "1",
+					pid: "0",
 					caller: "holder"
 				})
 			).to.changeTokenBalances(
 				gymToken,
 				[holder, gymVaultsBank],
 				[
-					pending.add(parseEther(farmingData.rewardPerBlock).div(2)),
-					pending.add(parseEther(farmingData.rewardPerBlock).div(2)).mul(ethers.constants.NegativeOne)
+					pending.add(parseEther(bankData.rewardRate)),
+					pending.add(parseEther(bankData.rewardRate)).mul(ethers.constants.NegativeOne)
 				]
 			);
 		});
@@ -231,16 +229,16 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			await busd.connect(holder).approve(gymVaultsBank.address, ethers.utils.parseEther("0.1"));
 
 			const tx = await run("gymVaultsBank:deposit", {
-				pid: "1",
+				pid: "0",
 				wantAmt: `${parseEther("0.1")}`,
 				referrerId: "1",
 				caller: "holder"
 			});
 
-			await advanceBlockTo(tx.blockNumber + 300);
+			await advanceBlockTo(tx.blockNumber + 100);
 			await expect(() =>
 				run("gymVaultsBank:withdraw", {
-					pid: "1",
+					pid: "0",
 					wantAmt: `${parseEther("0.04")}`,
 					caller: "holder"
 				})
@@ -266,16 +264,16 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 		it("Should accept claimAndDeposit from user: ", async function () {
 			await busd.connect(holder).approve(gymVaultsBank.address, ethers.utils.parseEther("0.1"));
 			const tx = await run("gymVaultsBank:deposit", {
-				pid: "1",
+				pid: "0",
 				wantAmt: `${parseEther("0.1")}`,
 				referrerId: "1",
 				caller: "holder"
 			});
 
-			await advanceBlockTo(tx.blockNumber + 300);
+			await advanceBlockTo(tx.blockNumber + 200);
 
 			await run("gymVaultsBank:claimAndDeposit", {
-				pid: "1",
+				pid: "0",
 				caller: "holder"
 			});
 
