@@ -156,7 +156,7 @@ describe("GymMLM contract: ", function () {
 			});
 		});
 
-		it("Should emit ReferralRewardReceved event with correct args", async function () {
+		it("Should emit ReferralRewardReceived event with correct args", async function () {
 			let prevSigner = "deployer";
 			let index = 0;
 			let prevSignerBal;

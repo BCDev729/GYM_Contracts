@@ -11,7 +11,7 @@ module.exports = async function ({ run, getChainId, ethers: { getContract } }) {
 	const router = args.router;
 
 	await run("deploy:gymVaultsStrategy", {
-		contractName: "GymVaultsStrategyAlpaca",
+		contractName: "GymVaultsStrategyAlpacaBUSD",
 		bank: bank.address,
 		isAutoComp: isAutoComp.toString(),
 		vault: vault,
