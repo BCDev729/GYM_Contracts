@@ -3,6 +3,7 @@ const {
 	deployments: { fixture, deploy },
 	network,
 	ethers: {
+		constants,
 		getNamedSigners,
 		getContract,
 		utils: { parseEther },
@@ -141,7 +142,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	xdescribe("Reward Pool functions: ", function () {
+	describe("Reward Pool functions: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -204,7 +205,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	xdescribe("Add function: ", function () {
+	describe("Add function: ", function () {
 		const allocPoint = 20;
 		const corePoolAllocPoint = 30;
 		let poolLength;
@@ -521,7 +522,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	xdescribe("depositBNB", function () {
+	describe("depositBNB", function () {
 		before("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -568,7 +569,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	xdescribe("Claim function: ", function () {
+	describe("Claim function: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -640,12 +641,18 @@ describe("GymVaultsBank contract: ", function () {
 			const totalAllocPoint = await gymVaultsBank.totalAllocPoint();
 			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, testVars.AMOUNT);
 
-			await run("gymVaultsBank:deposit", {
-				pid: "1",
-				wantAmt: testVars.AMOUNT.toString(),
-				referrerId: (await relationship.addressToId(deployer.address)).toString(),
-				caller: "vzgo"
-			});
+			await expect(async () =>
+				await run("gymVaultsBank:deposit", {
+					pid: "1",
+					wantAmt: testVars.AMOUNT.toString(),
+					referrerId: (await relationship.addressToId(deployer.address)).toString(),
+					caller: "vzgo"
+				})
+
+			)
+				.to
+				.changeTokenBalance(wantToken2, vzgo, -1 * testVars.AMOUNT);
+
 			await timeAndMine.mine(150);
 
 			const pending = await run("gymVaultsBank:pendingReward", {
@@ -783,68 +790,52 @@ describe("GymVaultsBank contract: ", function () {
 			const poolAllocPoint1 = (await gymVaultsBank.poolInfo(1)).allocPoint;
 			const totalAllocPoint = await gymVaultsBank.totalAllocPoint();
 
-			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, testVars.AMOUNT);
+			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, (25000).toString());
 
-			await run("gymVaultsBank:deposit", {
-				pid: "1",
-				wantAmt: testVars.AMOUNT.toString(),
-				referrerId: (await relationship.addressToId(deployer.address)).toString(),
-				caller: "vzgo"
-			});
+			const _referrerId = await relationship.addressToId(deployer.address);
+
+
+			await expect(() =>
+				run("gymVaultsBank:deposit", {
+					pid: "1",
+					wantAmt: `${25000}`,
+					referrerId: _referrerId.toString(),
+					caller: "vzgo"
+				})
+			)
+				.to
+				.changeTokenBalance(wantToken2, vzgo, -1 * 25000);
 
 			const vzgoShares = (await gymVaultsBank.userInfo(1, vzgo.address)).shares;
 
-			console.log(`\nvzgo shares one is: ${vzgoShares}\n`);
-
 			await timeAndMine.mine(testVars.BLOCK_COUNT);
-
-			console.log(`\nvzgo shares two is: ${vzgoShares}\n`);
 
 			const pendingReward = await run("gymVaultsBank:pendingReward", {
 				pid: "1",
 				user: vzgo.address
 			});
 
-			console.log(`\nvzgo shares three is: ${vzgoShares}\n`);
+			const withdrawFee = await gymVaultsBank.withdrawFee();
+			console.log("withdraw", withdrawFee.toString());
+
+			const vzgoSharesWithoutFee = Math.round(vzgoShares - vzgoShares * withdrawFee / 10000);
+			await expect(() =>
+				run("gymVaultsBank:withdraw", {
+					pid: "1",
+					wantAmt: `${vzgoShares}`,
+					caller: "vzgo"
+				})
+			)
+				.to
+				.changeTokenBalance(wantToken2, vzgo, vzgoSharesWithoutFee);
 
 
-			await run("gymVaultsBank:withdraw", {
-				pid: "1",
-				wantAmt: `${vzgoShares}`,
-				caller: "vzgo"
-			});
-
-			console.log(`\nvzgo shares four is: ${vzgoShares}\n`);
-
-
-			// const vzgoBalanceToEq = Math.floor(
-			// 	vzgoWant2Balance -
-			// 	(testVars.AMOUNT *
-			// 		(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
-			// 	100 -
-			// 	vzgoShares / 10
-			// );
-
-
-			// await expect(() =>
-			// 	run("gymVaultsBank:withdraw", {
-			// 		pid: "1",
-			// 		wantAmt: `${vzgoShares}`,
-			// 		caller: "vzgo"
-			// 	})
-			// )
-			// 	.to
-			// 	.changeTokenBalance(wantToken2, vzgo, vzgoBalanceToEq);
-
-
-			expect((await wantToken2.balanceOf(vzgo.address)).sub(1)).to.equal(
-				Math.floor(
-					vzgoWant2Balance -
-					(testVars.AMOUNT *
-						(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
-					100 -
-					vzgoShares / 10
-				)
+			expect((await wantToken2.balanceOf(vzgo.address))).to.equal(
+				vzgoWant2Balance -
+				(25000 *
+					(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
+				100 -
+				vzgoShares / 10
 			);
 			expect(BigNumber.from(await gymToken.balanceOf(vzgo.address))).to.equal(
 				BigNumber.from(rewardPerBlock).mul(poolAllocPoint1).div(totalAllocPoint).add(pendingReward)
@@ -1037,7 +1028,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	xdescribe("WithdrawBNB", function () {
+	describe("WithdrawBNB", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -1051,6 +1042,96 @@ describe("GymVaultsBank contract: ", function () {
 				params: [snapshotId]
 			});
 		});
+
+		it("Should correct transfer bnb when call deposit and withdraw functions", async function () {
+			const snapshot1 = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+			await timeAndMine.mine(startBlock);
+
+			const depositTx = await run("gymVaultsBank:deposit", {
+				pid: "0",
+				wantAmt: "0",
+				referrerId: (await relationship.addressToId(deployer.address)).toString(),
+				caller: "vzgo",
+				bnbAmount: `${parseEther(testVars.AMOUNT.toString())}`
+			});
+
+			await timeAndMine.mine(testVars.BLOCK_COUNT);
+
+			const withdrawTx = await run("gymVaultsBank:withdraw", {
+				pid: "0",
+				wantAmt: `${parseEther(testVars.AMOUNT.toString())}`,
+				caller: "vzgo"
+			});
+
+			const fee =
+				(await depositTx.wait()).gasUsed * depositTx.gasPrice +
+				(await withdrawTx.wait()).gasUsed * withdrawTx.gasPrice;
+
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshot1]
+			});
+
+
+			await timeAndMine.mine(startBlock);
+
+			const vzgoBalance = (await vzgo.getBalance()).toString();
+
+			const referrerId = (await relationship.addressToId(deployer.address)).toString();
+
+			await expect(async () =>
+				await run("gymVaultsBank:deposit", {
+					pid: "0",
+					wantAmt: "0",
+					referrerId: referrerId,
+					caller: "vzgo",
+					bnbAmount: `${parseEther(testVars.AMOUNT.toString())}`
+				})
+			)
+				.to
+				.changeEtherBalance(vzgo, (parseEther(testVars.AMOUNT.toString())).mul(constants.NegativeOne));
+
+			const vzgoBalanceAfterDep = (await vzgo.getBalance()).toString();
+
+			const vzgoShares = (await gymVaultsBank.userInfo(0, vzgo.address)).shares;
+
+			const procents = BigNumber.from(vzgoBalance)
+				.sub(
+					BigNumber.from(parseEther(testVars.AMOUNT.toString()))
+						.mul(
+							BigNumber.from(variables.GymVaultsBank_BUY_AND_BURN).add(
+								variables.GymVaultsBank_RELATIONSHIP_REWARD
+							)
+						)
+						.div(100)
+				)
+				.sub(BigNumber.from(vzgoShares).div(10));
+
+			const balanceWithoutProcents = BigNumber.from(vzgoBalanceAfterDep).sub(procents);
+
+			let balanceAfterWithdraw = balanceWithoutProcents.sub(fee).mul(constants.NegativeOne);
+			balanceAfterWithdraw = balanceAfterWithdraw.toString();
+			balanceAfterWithdraw = parseInt(balanceAfterWithdraw);
+
+			await timeAndMine.mine(testVars.BLOCK_COUNT);
+
+			balanceAfterWithdraw = balanceAfterWithdraw / 1e17;
+			balanceAfterWithdraw = Math.floor(balanceAfterWithdraw);
+			balanceAfterWithdraw = balanceAfterWithdraw * 1e17;
+			await expect(async () =>
+				await run("gymVaultsBank:withdraw", {
+					pid: "0",
+					wantAmt: `${parseEther(testVars.AMOUNT.toString())}`,
+					caller: "vzgo"
+				})
+			)
+				.to
+				.changeEtherBalance(vzgo, BigNumber.from(balanceAfterWithdraw.toString()));
+		});
+
 		it("Should withdraw all shared amount and return BNB", async function () {
 			await timeAndMine.mine(startBlock);
 			const poolAllocPoint = (await gymVaultsBank.poolInfo(0)).allocPoint;
@@ -1106,7 +1187,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	xdescribe("MigrateStrategy", function () {
+	describe("MigrateStrategy", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
