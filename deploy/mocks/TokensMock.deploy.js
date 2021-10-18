@@ -15,7 +15,7 @@ module.exports = async function ({
 		await run("deploy:tokensMock", {
 			contractName: "WantToken1",
 			symbol: "WT1",
-			supply: `${ethers.utils.parseEther("100000000")}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 
 		await run("deploy:tokensMock", {
