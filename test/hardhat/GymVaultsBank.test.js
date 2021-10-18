@@ -660,10 +660,16 @@ describe("GymVaultsBank contract: ", function () {
 				user: vzgo.address
 			});
 
-			await run("gymVaultsBank:claim", {
-				pid: "1",
-				caller: "vzgo"
-			});
+			const amntToTransfer = pending.add(rewardPerBlock.mul(poolAllocPoint1).div(totalAllocPoint));
+
+			await expect(async () =>
+				await run("gymVaultsBank:claim", {
+					pid: "1",
+					caller: "vzgo"
+				})
+			)
+				.to
+				.changeTokenBalance(gymToken, vzgo, amntToTransfer);
 
 			expect(await gymToken.balanceOf(vzgo.address)).to.equal(
 				pending.add(rewardPerBlock.mul(poolAllocPoint1).div(totalAllocPoint))
@@ -1116,14 +1122,11 @@ describe("GymVaultsBank contract: ", function () {
 			balanceAfterWithdraw = balanceAfterWithdraw.toString();
 			balanceAfterWithdraw = parseInt(balanceAfterWithdraw);
 
-			await timeAndMine.mine(testVars.BLOCK_COUNT);
-
-			balanceAfterWithdraw = balanceAfterWithdraw / 1e17;
-			balanceAfterWithdraw = Math.floor(balanceAfterWithdraw);
-			balanceAfterWithdraw = balanceAfterWithdraw * 1e17;
-
-			// if()
-
+			if (vzgoBalance > fee && vzgoBalance < procents) {
+				balanceAfterWithdraw = balanceAfterWithdraw / 1e17;
+				balanceAfterWithdraw = Math.floor(balanceAfterWithdraw);
+				balanceAfterWithdraw = balanceAfterWithdraw * 1e17;
+			}
 			await expect(async () =>
 				await run("gymVaultsBank:withdraw", {
 					pid: "0",
@@ -1183,7 +1186,7 @@ describe("GymVaultsBank contract: ", function () {
 					.sub(vzgoShares.div(10)),
 				BigNumber.from(fee)
 			);
-			
+
 			console.log(`fee is: ${fee}`);
 
 			expect(await gymToken.balanceOf(vzgo.address)).to.be.closeTo(
