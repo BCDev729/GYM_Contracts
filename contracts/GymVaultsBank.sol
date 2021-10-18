@@ -134,6 +134,9 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
 
     fallback() external payable {}
 
+    function setRewardPoolInfo(address _rewardToken, uint256 _rewardPerBlock) external onlyOwner {
+        rewardPoolInfo = RewardPoolInfo({rewardToken: _rewardToken, rewardPerBlock: _rewardPerBlock});
+    }
 
     function setMLMAddress(address _relationship) external onlyOwner {
         relationship = _relationship;
@@ -254,6 +257,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             IWETH($(WBNB_TOKEN)).deposit{value: msg.value}();
             _wantAmt = msg.value;
         }
+
         _deposit(_pid, _wantAmt, _minBurnAmt, _deadline);
     }
 
