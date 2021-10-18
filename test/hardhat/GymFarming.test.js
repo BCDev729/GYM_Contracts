@@ -12,7 +12,9 @@ const {
 	},
 	run
 } = require("hardhat");
-const { advanceBlock, advanceBlockTo } = require("../../utils/utilities/time");
+const {
+	time: { advanceBlock, advanceBlockTo }
+} = require("@openzeppelin/test-helpers");
 const variables = require("../../utils/constants/solpp")("hardhat");
 const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
@@ -727,7 +729,7 @@ describe("GymFarming contract: ", function () {
 			});
 
 			expect((await gymFarming.poolInfo(0)).lastRewardBlock).to.equal(startBlock);
-			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
+			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10) + 0);
 			await run("farming:harvestAll", {
 				caller: "vzgo"
 			});

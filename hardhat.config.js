@@ -14,6 +14,7 @@ require("@openzeppelin/hardhat-upgrades");
 require("@nomiclabs/hardhat-solhint");
 require("hardhat-tracer");
 require("hardhat-spdx-license-identifier");
+require("@nomiclabs/hardhat-web3");
 require("hardhat-docgen");
 require("hardhat-dependency-compiler");
 require("hardhat-local-networks-config-plugin");
