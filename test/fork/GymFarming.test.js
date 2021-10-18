@@ -139,7 +139,7 @@ describe("GymFarming contract: ", function () {
 			});
 		});
 
-		it("Should claimA in pool: ", async function () {
+		it("Should claim and deposit in pool: ", async function () {
 			const speedStake = await run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",
@@ -156,7 +156,7 @@ describe("GymFarming contract: ", function () {
 			expect((await gymFarming.userInfo(0, holder.address)).amount.sub(userAmount)).to.not.equal(0);
 		});
 
-		it("Should claimA in pool with additional BNB: ", async function () {
+		it("Should claim and deposit in pool with additional BNB: ", async function () {
 			const speedStake = await run("farming:speedStake", {
 				pid: "0",
 				caller: "holder",

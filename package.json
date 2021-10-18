@@ -4,6 +4,7 @@
 	"scripts": {
 		"compile": "npm run prettier:solidity && npx hardhat compile",
 		"test": "npm run eslint:fix && npx hardhat test test/hardhat/*",
+		"test:fork": "npm run eslint:fix && npx hardhat test test/fork/*",
 		"deploy": "npm run eslint:fix && npx hardhat deploy",
 		"verify:bsc": "npx hardhat etherscan-verify --network bsc",
 		"verify:bsc-testnet": "npx hardhat etherscan-verify --network bsc-testnet",
