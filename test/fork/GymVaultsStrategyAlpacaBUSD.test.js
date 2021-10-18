@@ -6,14 +6,13 @@ const {
 		getNamedSigners,
 		getContract,
 		getContractAt,
-		provider: { getBlockNumber },
 		getSigner,
 		utils: { parseEther }
 	},
-	ethers,
-	timeAndMine
+	ethers
 } = require("hardhat");
 
+const { advanceBlockTo } = require("../../utils/utilities/time");
 const variables = require("../../utils/constants/solpp")("fork");
 const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
 
@@ -149,7 +148,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				.connect(holder)
 				.deposit(1, ethers.utils.parseEther("0.1"), 1, 0, new Date().getTime() + 20);
 
-			await timeAndMine.mine(tx.blockNumber + 100 - (await getBlockNumber()));
+			await advanceBlockTo(tx.blockNumber + 100);
 
 			const pending = await gymVaultsBank.pendingReward(1, holder.address);
 
@@ -186,7 +185,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				.connect(holder)
 				.deposit(1, ethers.utils.parseEther("0.1"), 1, 0, new Date().getTime() + 20);
 
-			await timeAndMine.mine(tx.blockNumber + 100 - (await getBlockNumber()));
+			await advanceBlockTo(tx.blockNumber + 100);
 
 			await expect(() =>
 				gymVaultsBank.connect(holder).withdraw(1, ethers.utils.parseEther("0.04"))
@@ -216,7 +215,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				.connect(holder)
 				.deposit(1, ethers.utils.parseEther("0.1"), 1, 0, new Date().getTime() + 20);
 
-			await timeAndMine.mine(tx.blockNumber + 100 - (await getBlockNumber()));
+			await advanceBlockTo(tx.blockNumber + 100);
 
 			await gymVaultsBank.connect(holder).claimAndDeposit(1, 0, 0, 0, new Date().getTime() + 20);
 			expect((await farming.userInfo(0, holder.address)).amount).to.not.equal(0);

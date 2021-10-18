@@ -4,14 +4,13 @@ const {
 	network,
 	ethers: {
 		utils: { parseEther },
-		provider: { getBlockNumber },
 		getContract,
 		getContractAt,
 		getNamedSigners,
 		constants
-	},
-	timeAndMine
+	}
 } = require("hardhat");
+const { advanceBlockTo } = require("../../utils/utilities/time");
 
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder;
@@ -127,7 +126,7 @@ describe("GymFarming contract: ", function () {
 				value: parseEther("10")
 			});
 
-			await timeAndMine.mine(tx.blockNumber + 200 - (await getBlockNumber()));
+			await advanceBlockTo(tx.blockNumber + 200);
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
 			await gymFarming.connect(holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20);
 
@@ -139,7 +138,7 @@ describe("GymFarming contract: ", function () {
 				value: parseEther("10")
 			});
 
-			await timeAndMine.mine(tx.blockNumber + 200 - (await getBlockNumber()));
+			await advanceBlockTo(tx.blockNumber + 200);
 			const userAmount = (await gymFarming.userInfo(0, holder.address)).amount;
 			await gymFarming.connect(holder).claimAndDeposit(0, 0, 0, 0, new Date().getTime() + 20, {
 				value: parseEther("1")

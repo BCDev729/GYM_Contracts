@@ -22,7 +22,7 @@ contract GymMLM is Ownable {
 
     event NewReferral(address indexed user, address indexed referral);
 
-    event ReferralRewardReceved(address indexed user, address indexed referral, uint256 amount, address wantAddress);
+    event ReferralRewardReceived(address indexed user, address indexed referral, uint256 level, uint256 amount, address wantAddress);
 
     constructor() {
         directReferralBonuses = $(GymMLM_DIRECT_REFERRAL_BONUSES);
@@ -105,7 +105,7 @@ contract GymMLM is Ownable {
                 if (investment[referrer] >= levels[index]) {
                     uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
                     token.transfer(referrer, reward);
-                    emit ReferralRewardReceved(referrer, _user, reward, _wantAddr);
+                    emit ReferralRewardReceived(referrer, _user, index, reward, _wantAddr);
                 }
                 _user = userToReferrer[_user];
                 index++;
@@ -124,7 +124,7 @@ contract GymMLM is Ownable {
                 uint256 reward = (_wantAmt * directReferralBonuses[index]) / 100;
                 IWETH($(WBNB_TOKEN)).withdraw(reward);
                 payable(referrer).transfer(reward);
-                emit ReferralRewardReceved(referrer, _user, reward, _wantAddr);
+                emit ReferralRewardReceived(referrer, _user, index, reward, _wantAddr);
             }
             _user = userToReferrer[_user];
             index++;

@@ -1121,6 +1121,9 @@ describe("GymVaultsBank contract: ", function () {
 			balanceAfterWithdraw = balanceAfterWithdraw / 1e17;
 			balanceAfterWithdraw = Math.floor(balanceAfterWithdraw);
 			balanceAfterWithdraw = balanceAfterWithdraw * 1e17;
+
+			// if()
+
 			await expect(async () =>
 				await run("gymVaultsBank:withdraw", {
 					pid: "0",
@@ -1180,6 +1183,9 @@ describe("GymVaultsBank contract: ", function () {
 					.sub(vzgoShares.div(10)),
 				BigNumber.from(fee)
 			);
+			
+			console.log(`fee is: ${fee}`);
+
 			expect(await gymToken.balanceOf(vzgo.address)).to.be.closeTo(
 				pendingReward.add(rewardPerBlock).mul(poolAllocPoint).div(totalAllocPoint),
 				BigNumber.from(40)

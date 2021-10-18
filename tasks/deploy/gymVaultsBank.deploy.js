@@ -1,9 +1,7 @@
 module.exports = async function (
 	{ startblock, gymTokenAddress, rewardRate },
 	{
-		ethers: {
-			getNamedSigners
-		},
+		ethers: { getNamedSigners },
 		deployments: { deterministic }
 		// upgrades: { deployProxy }
 	}

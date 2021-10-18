@@ -156,7 +156,7 @@ describe("GymMLM contract: ", function () {
 			});
 		});
 
-		it("Should emit ReferralRewardReceved event with correct args", async function () {
+		it("Should emit ReferralRewardReceived event with correct args", async function () {
 			let prevSigner = "deployer";
 			let index = 0;
 			let prevSignerBal;
@@ -255,13 +255,12 @@ describe("GymMLM contract: ", function () {
 			let index = 0;
 			let prevSignerBal;
 			let ownerBal = (await owner.getBalance()).sub(depositAmount);
-			let tx;
 
 			for (const signer in accounts) {
 				if (signer === "deployer") {
 					continue;
 				}
-				tx = await run("gymVaultsBank:deposit", {
+				const deposit = await run("gymVaultsBank:deposit", {
 					pid: "0",
 					wantAmt: "0",
 					referrerId: (await gymMLM.addressToId(accounts[prevSigner].address)).toString(),
@@ -272,7 +271,7 @@ describe("GymMLM contract: ", function () {
 				if (index === 0) {
 					prevSigner = signer;
 					prevSignerBal = await accounts[signer].getBalance();
-					ownerBal = ownerBal.sub((await tx.wait()).gasUsed * tx.gasPrice);
+					ownerBal = ownerBal.sub((await deposit.tx.wait()).gasUsed * deposit.tx.gasPrice);
 					index++;
 					continue;
 				}
