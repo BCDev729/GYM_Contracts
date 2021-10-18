@@ -20,6 +20,7 @@ describe("GymVaultsBank contract: ", function () {
 	let accounts, deployer, owner, caller, holder, vzgo, grno;
 	let wantToken1,
 		wantToken2,
+		tokenA,
 		gymToken,
 		relationship,
 		farming,
@@ -41,6 +42,7 @@ describe("GymVaultsBank contract: ", function () {
 		({ deployer, owner, caller, holder, vzgo, grno } = accounts);
 		wantToken1 = await getContract("WantToken1", caller);
 		wantToken2 = await getContract("WantToken2", caller);
+		tokenA = await getContract("TokenA", caller);
 		gymToken = await getContract("GymToken", caller);
 		relationship = await getContract("GymMLM", caller);
 		farming = await getContract("GymFarming", deployer);
@@ -137,6 +139,67 @@ describe("GymVaultsBank contract: ", function () {
 					deterministicDeployment: false
 				})
 			).to.be.revertedWith("GymVaultsBank: Start block must have a bigger value");
+		});
+	});
+
+	describe("setRewardPoolInfo function: ", function () {
+		beforeEach("Before: ", async function () {
+			snapshotId = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+		});
+
+		afterEach("After tests: ", async function () {
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshotId]
+			});
+		});
+		const rewardPerBlock = 10000000;
+
+		it("Should update RewardPoolInfo", async function () {
+			await gymVaultsBank.setRewardPoolInfo(tokenA.address, rewardPerBlock);
+
+			expect(await gymVaultsBank.rewardPoolInfo()).to.deep.equal([
+				tokenA.address,
+				BigNumber.from(rewardPerBlock)
+			]);
+		});
+
+		it("Should claim new reward tokens", async function () {
+			await tokenA.connect(deployer).transfer(gymVaultsBank.address, 10000000000);
+			await tokenA.connect(deployer).transfer(routerMock.address, 10000000);
+
+			await advanceBlockTo((await getBlockNumber()) + startBlock);
+
+			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, testVars.AMOUNT);
+
+			await run("gymVaultsBank:deposit", {
+				pid: "0",
+				wantAmt: "0",
+				bnbAmount: testVars.AMOUNT.toString(),
+				referrerId: (await relationship.addressToId(deployer.address)).toString(),
+				caller: "vzgo"
+			});
+
+			await gymVaultsBank.setRewardPoolInfo(tokenA.address, rewardPerBlock);
+
+			await advanceBlockTo((await getBlockNumber()) + testVars.BLOCK_COUNT);
+
+			expect(
+				await run("gymVaultsBank:pendingReward", {
+					pid: "0",
+					user: vzgo.address
+				})
+			).to.equal(rewardPerBlock * (testVars.BLOCK_COUNT + 1) - 1);
+
+			await expect(() =>
+				run("gymVaultsBank:claim", {
+					pid: "0",
+					caller: "vzgo"
+				})
+			).to.changeTokenBalances(tokenA, [vzgo], [rewardPerBlock * (testVars.BLOCK_COUNT + 2) - 1]);
 		});
 	});
 

@@ -56,7 +56,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         IERC20 want;
         uint256 allocPoint;
         uint256 lastRewardBlock;
-        uint256 accRewardPerShare; 
+        uint256 accRewardPerShare;
         address strategy;
     }
 
@@ -113,7 +113,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         uint256 _startBlock,
         address _gym,
         uint256 _gymRewardRate
-    ){
+    ) {
         require(block.number < _startBlock, "GymVaultsBank: Start block must have a bigger value");
 
         startBlock = _startBlock;
@@ -134,6 +134,9 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
 
     fallback() external payable {}
 
+    function setRewardPoolInfo(address _rewardToken, uint256 _rewardPerBlock) external onlyOwner {
+        rewardPoolInfo = RewardPoolInfo({rewardToken: _rewardToken, rewardPerBlock: _rewardPerBlock});
+    }
 
     function setMLMAddress(address _relationship) external onlyOwner {
         relationship = _relationship;
@@ -251,6 +254,7 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             IWETH($(WBNB_TOKEN)).deposit{value: msg.value}();
             _wantAmt = msg.value;
         }
+
         _deposit(_pid, _wantAmt, _minBurnAmt, _deadline);
     }
 
@@ -527,7 +531,11 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
             }
 
             if (_wantAmt > 0) {
-                _transfer(address(pool.want), treasuryAddress, (_wantAmt * withdrawFee) / $(GymVaultsBank_WITHDRAW_FEE_FACTOR_MAX));
+                _transfer(
+                    address(pool.want),
+                    treasuryAddress,
+                    (_wantAmt * withdrawFee) / $(GymVaultsBank_WITHDRAW_FEE_FACTOR_MAX)
+                );
                 _transfer(address(pool.want), msg.sender, pool.want.balanceOf(address(this)));
             }
         }
