@@ -1,4 +1,4 @@
-module.exports = async function ({ run, getNamedAccounts, getChainId }) {
+module.exports = async function ({ run, getNamedAccounts, getChainId, deployments }) {
 	const chainId = await getChainId();
 	const { holder } = await getNamedAccounts();
 
@@ -6,6 +6,12 @@ module.exports = async function ({ run, getNamedAccounts, getChainId }) {
 		contractName: "GymToken",
 		args: [holder]
 	};
+
+	// await deployments.deploy(options.contractName, {
+	// 	from: deployer,
+	// 	args: options.args,
+	// 	log: true
+	// });
 
 	const deterministicDeploy = await run("deploy:gymToken", {
 		holder: holder
