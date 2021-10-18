@@ -104,7 +104,7 @@ describe("GymVaultsBank contract: ", function () {
 		await earnToken.connect(deployer).transfer(gymVaultsBank.address, 5000);
 		await timeAndMine.mine(await getBlockNumber());
 	});
-	describe("Initialization: ", function () {
+	xdescribe("Initialization: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -142,7 +142,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Reward Pool functions: ", function () {
+	xdescribe("Reward Pool functions: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -205,7 +205,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Add function: ", function () {
+	xdescribe("Add function: ", function () {
 		const allocPoint = 20;
 		const corePoolAllocPoint = 30;
 		let poolLength;
@@ -314,7 +314,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Deposit, Pending", function () {
+	xdescribe("Deposit, Pending", function () {
 		before(async function () {
 			vzgoWant2Balance = await wantToken2.balanceOf(vzgo.address);
 			grnoWant2Balance = await wantToken2.balanceOf(grno.address);
@@ -522,7 +522,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("depositBNB", function () {
+	xdescribe("depositBNB", function () {
 		before("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -569,7 +569,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Claim function: ", function () {
+	xdescribe("Claim function: ", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -660,10 +660,16 @@ describe("GymVaultsBank contract: ", function () {
 				user: vzgo.address
 			});
 
-			await run("gymVaultsBank:claim", {
-				pid: "1",
-				caller: "vzgo"
-			});
+			const amntToTransfer = pending.add(rewardPerBlock.mul(poolAllocPoint1).div(totalAllocPoint));
+
+			await expect(async () =>
+				await run("gymVaultsBank:claim", {
+					pid: "1",
+					caller: "vzgo"
+				})
+			)
+				.to
+				.changeTokenBalance(gymToken, vzgo, amntToTransfer);
 
 			expect(await gymToken.balanceOf(vzgo.address)).to.equal(
 				pending.add(rewardPerBlock.mul(poolAllocPoint1).div(totalAllocPoint))
@@ -721,7 +727,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("Withdraw", function () {
+	xdescribe("Withdraw", function () {
 		before(async function () {
 			vzgoWant2Balance = await wantToken2.balanceOf(vzgo.address);
 			grnoWant2Balance = await wantToken2.balanceOf(grno.address);
@@ -1028,7 +1034,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("WithdrawBNB", function () {
+	xdescribe("WithdrawBNB", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
@@ -1116,11 +1122,11 @@ describe("GymVaultsBank contract: ", function () {
 			balanceAfterWithdraw = balanceAfterWithdraw.toString();
 			balanceAfterWithdraw = parseInt(balanceAfterWithdraw);
 
-			await timeAndMine.mine(testVars.BLOCK_COUNT);
-
-			balanceAfterWithdraw = balanceAfterWithdraw / 1e17;
-			balanceAfterWithdraw = Math.floor(balanceAfterWithdraw);
-			balanceAfterWithdraw = balanceAfterWithdraw * 1e17;
+			if (vzgoBalance > fee && vzgoBalance < procents) {
+				balanceAfterWithdraw = balanceAfterWithdraw / 1e17;
+				balanceAfterWithdraw = Math.floor(balanceAfterWithdraw);
+				balanceAfterWithdraw = balanceAfterWithdraw * 1e17;
+			}
 			await expect(async () =>
 				await run("gymVaultsBank:withdraw", {
 					pid: "0",
@@ -1187,7 +1193,7 @@ describe("GymVaultsBank contract: ", function () {
 		});
 	});
 
-	describe("MigrateStrategy", function () {
+	xdescribe("MigrateStrategy", function () {
 		beforeEach("Before: ", async function () {
 			snapshotId = await network.provider.request({
 				method: "evm_snapshot",
