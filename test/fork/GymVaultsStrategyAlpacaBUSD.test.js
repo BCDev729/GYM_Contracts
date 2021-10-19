@@ -14,7 +14,9 @@ const {
 	run
 } = require("hardhat");
 
-const { advanceBlockTo } = require("../../utils/utilities/time");
+const {
+	time: { advanceBlockTo }
+} = require("@openzeppelin/test-helpers");
 const variables = require("../../utils/constants/solpp")("fork");
 const bankData = require("../../utils/constants/data/fork/GymVaultsBank.json");
 
@@ -234,8 +236,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				referrerId: "1",
 				caller: "holder"
 			});
-
-			await advanceBlockTo(tx.blockNumber + 100);
+			await advanceBlockTo(tx.tx.blockNumber + 100);
 			await expect(() =>
 				run("gymVaultsBank:withdraw", {
 					pid: "0",

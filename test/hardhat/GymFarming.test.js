@@ -12,7 +12,9 @@ const {
 	},
 	run
 } = require("hardhat");
-const { advanceBlock, advanceBlockTo } = require("../../utils/utilities/time");
+const {
+	time: { advanceBlock, advanceBlockTo }
+} = require("@openzeppelin/test-helpers");
 const variables = require("../../utils/constants/solpp")("hardhat");
 const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
@@ -518,7 +520,9 @@ describe("GymFarming contract: ", function () {
 			});
 			await gymFarming.setRewardToken(tokenA.address);
 
-			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(2));
+			const block = (await gymFarming.poolInfo(0)).lastRewardBlock.add(2).toString();
+
+			await advanceBlockTo(parseInt(block));
 
 			const pending = await gymFarming.pendingReward(0, caller.address);
 			const rewardPerBlock = await gymFarming.rewardPerBlock();
@@ -780,7 +784,8 @@ describe("GymFarming contract: ", function () {
 			});
 
 			expect((await gymFarming.poolInfo(0)).lastRewardBlock).to.equal(startBlock);
-			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
+			const block = (await gymFarming.poolInfo(0)).lastRewardBlock.add(10).toString();
+			await advanceBlockTo(parseInt(block));
 			await run("farming:harvestAll", {
 				caller: "vzgo"
 			});

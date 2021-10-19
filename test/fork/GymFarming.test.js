@@ -11,8 +11,9 @@ const {
 	},
 	run
 } = require("hardhat");
-const { advanceBlockTo } = require("../../utils/utilities/time");
-
+const {
+	time: { advanceBlockTo }
+} = require("@openzeppelin/test-helpers");
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder;
 	let gymFarming, gym, snapshotStart;
