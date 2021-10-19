@@ -12,7 +12,9 @@ const {
 	ethers
 } = require("hardhat");
 
-const { advanceBlockTo } = require("../../utils/utilities/time");
+const {
+	time: { advanceBlockTo }
+} = require("@openzeppelin/test-helpers");
 const variables = require("../../utils/constants/solpp")("fork");
 const farmingData = require("../../utils/constants/data/fork/GymFarming.json");
 
