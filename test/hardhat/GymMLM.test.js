@@ -35,7 +35,11 @@ describe("GymMLM contract: ", function () {
 		buyBack = await getContract("BuyBack", caller);
 
 		gymMLM = await getContract("GymMLM", deployer);
-		await gymMLM.setBankAddress(gymVaultsBank.address);
+		await run("gymMLM:setBankAddress", {
+			bankAddress: gymVaultsBank.address,
+			caller: "deployer"
+		});
+
 		wantToken = await getContract("WantToken2", caller);
 		WBNBMock = await getContract("WBNBMock", caller);
 		strategy = await getContract("StrategyMock2", caller);
@@ -43,7 +47,11 @@ describe("GymMLM contract: ", function () {
 		routerMock = await getContract("RouterMock", caller);
 
 		await gymToken.connect(holder).delegate(buyBack.address);
-		await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
+		await run("gymVaultsBank:setTreasuryAddress", {
+			treasuryAddress: deployer.address,
+			caller: "deployer"
+		});
+		// await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
 
 		for (const signer in accounts) {
 			if (signer === "deployer") {

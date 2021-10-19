@@ -11,11 +11,11 @@ module.exports = async function ({
 	}
 }) {
 	const chainId = await getChainId();
-	if (chainId === "31337" && !forking.enabled) {
+	if (chainId === "31337") {
 		await run("deploy:tokensMock", {
 			contractName: "WantToken1",
 			symbol: "WT1",
-			supply: `${ethers.utils.parseEther("100000000")}`
+			supply: `${testVars.TOKENS_MINT_AMOUNT}`
 		});
 
 		await run("deploy:tokensMock", {

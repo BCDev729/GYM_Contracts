@@ -20,7 +20,7 @@ const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
 describe("GymFarming contract: ", function () {
 	let accounts, deployer, caller, holder, chugun, vzgo, grno;
-	let gymFarming, gym, startBlock, snapshotStart, testLp, testLp1;
+	let gymFarming, gym, startBlock, snapshotStart, testLp, testLp1, tokenA;
 	const amount = parseEther("4");
 	const poolAllocPoint1 = 30;
 	const poolAllocPoint2 = 50;
@@ -46,6 +46,8 @@ describe("GymFarming contract: ", function () {
 			log: true
 		});
 		testLp1 = await getContract("testLp1");
+
+		tokenA = await getContract("TokenA", deployer);
 
 		await testLp.transfer(caller.address, parseEther(amount.toString()));
 		await testLp.transfer(chugun.address, parseEther(amount.toString()));
@@ -477,6 +479,57 @@ describe("GymFarming contract: ", function () {
 					.div(4)
 					.add(pendingReward5)
 			);
+		});
+	});
+
+	describe("setRewardToken function: ", function () {
+		beforeEach("Before: ", async function () {
+			snapshotStart = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+		});
+
+		afterEach("After tests: ", async function () {
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshotStart]
+			});
+		});
+
+		it("Should update RewardPoolInfo", async function () {
+			await gymFarming.setRewardToken(tokenA.address);
+
+			expect(await gymFarming.rewardToken()).to.equal(tokenA.address);
+			expect(await gymFarming.rewardTokenToWBNB(0)).to.equal(tokenA.address);
+		});
+
+		it("Should harvest right rewardTokens", async function () {
+			await tokenA.connect(deployer).transfer(gymFarming.address, parseEther("100"));
+
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
+
+			await testLp.connect(caller).approve(gymFarming.address, amount);
+			await run("farming:deposit", {
+				pid: "0",
+				amount: `${amount}`
+			});
+			await gymFarming.setRewardToken(tokenA.address);
+
+			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(2));
+
+			const pending = await gymFarming.pendingReward(0, caller.address);
+			const rewardPerBlock = await gymFarming.rewardPerBlock();
+
+			await expect(() =>
+				run("farming:harvest", {
+					pid: "0"
+				})
+			).to.changeTokenBalances(tokenA, [caller], [pending.add(rewardPerBlock)]);
 		});
 	});
 

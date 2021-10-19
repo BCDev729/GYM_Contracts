@@ -139,8 +139,9 @@ contract GymFarming is Ownable, ReentrancyGuard {
      * @notice Function to set reward token
      * @param _rewardToken: address of reward token
      */
-    function setRewardToken(IERC20 _rewardToken) external onlyOwner {
-        rewardToken = _rewardToken;
+    function setRewardToken(address _rewardToken) external onlyOwner {
+        rewardToken = IERC20(_rewardToken);
+        rewardTokenToWBNB = [_rewardToken, wbnbAddress];
     }
 
     /**

@@ -20,8 +20,8 @@ module.exports = async function (
 
 	const accRewardPerShare = (await farming.poolInfo(pid)).accRewardPerShare;
 	const lastRewardBlock = (await farming.poolInfo(pid)).lastRewardBlock;
-	const userAmount = (await farming.UserInfo(pid, signers[caller].address)).amount;
-	const userRewardDebt = (await farming.UserInfo(pid, signers[caller].address)).rewardDebt;
+	const userAmount = (await farming.userInfo(pid, signers[caller].address)).amount;
+	const userRewardDebt = (await farming.userInfo(pid, signers[caller].address)).rewardDebt;
 
 
 	return {tx, poolInfo: { accRewardPerShare, lastRewardBlock }, UserInfo: { userAmount, userRewardDebt }};
