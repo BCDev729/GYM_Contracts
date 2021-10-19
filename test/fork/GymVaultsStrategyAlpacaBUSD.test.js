@@ -236,8 +236,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 				referrerId: "1",
 				caller: "holder"
 			});
-
-			await advanceBlockTo(tx.blockNumber + 100);
+			await advanceBlockTo(tx.tx.blockNumber + 100);
 			await expect(() =>
 				run("gymVaultsBank:withdraw", {
 					pid: "0",
