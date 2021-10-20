@@ -51,7 +51,7 @@ describe("GymMLM contract: ", function () {
 			treasuryAddress: deployer.address,
 			caller: "deployer"
 		});
-		// await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
+
 
 		for (const signer in accounts) {
 			if (signer === "deployer") {

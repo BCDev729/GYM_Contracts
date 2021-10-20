@@ -48,7 +48,12 @@ describe("GymVaultsBank contract: ", function () {
 		gymToken = await getContract("GymToken", caller);
 		relationship = await getContract("GymMLM", caller);
 		farming = await getContract("GymFarming", deployer);
-		await farming.connect(deployer).add(30, gymToken.address, false);
+		await run("farming:add", {
+			allocPoint: "30",
+			lpToken: gymToken.address,
+			withUpdate: "false"
+		});
+
 		buyBack = await getContract("BuyBack", caller);
 		gymVaultsBank = await getContract("GymVaultsBank", deployer);
 		WBNB = await getContract("WBNBMock", caller);
@@ -286,7 +291,6 @@ describe("GymVaultsBank contract: ", function () {
 			});
 		});
 		it("Should add Pool:", async function () {
-			// poolLength = await gymVaultsBank.poolLength();
 			await advanceBlockTo((await getBlockNumber()) + 200);
 
 			const add = await run("gymVaultsBank:add", {
@@ -557,9 +561,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			await advanceBlockTo((await getBlockNumber()) + testVars.BLOCK_COUNT);
 
-			// const currentBlock = await getBlockNumber();
-			// expect(await gymVaultsBank.pendingReward(1, vzgo.address))
-			//     .to.equal((ethers.BigNumber.from(currentBlock).sub(vzgoDeposit.blockNumber)).mul(rewardPerBlock).mul(poolAllocPoint1).div(totalAllocPoint))
+			
 			expect(
 				(
 					await run("gymVaultsBank:pendingReward", {

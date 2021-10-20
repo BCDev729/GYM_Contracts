@@ -774,7 +774,7 @@ describe("GymFarming contract: ", function () {
 				lpToken: testLp.address,
 				withUpdate: "true"
 			});
-			// await gymFarming.add(poolAllocPoint2, testLp.address, true);
+	
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
 			await run("farming:deposit", {
