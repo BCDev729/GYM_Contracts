@@ -35,7 +35,10 @@ describe("GymMLM contract: ", function () {
 		buyBack = await getContract("BuyBack", caller);
 
 		gymMLM = await getContract("GymMLM", deployer);
-		await gymMLM.setBankAddress(gymVaultsBank.address);
+		await run("gymMLM:setBankAddress", {
+			bankAddress: `${gymVaultsBank.address}`,
+			caller: "deployer"
+		});
 		wantToken = await getContract("WantToken2", caller);
 		WBNBMock = await getContract("WBNBMock", caller);
 		strategy = await getContract("StrategyMock2", caller);
