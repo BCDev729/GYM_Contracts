@@ -6,6 +6,7 @@ const {
 	ethers: {
 		getNamedSigners,
 		getContract,
+		constants,
 		utils: { parseEther },
 		BigNumber,
 		provider: { getBlockNumber }
@@ -704,7 +705,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			)
 				.to
-				.changeTokenBalance(wantToken2, vzgo, -1 * testVars.AMOUNT);
+				.changeTokenBalance(wantToken2, vzgo, BigNumber.from(testVars.AMOUNT).mul(constants.NegativeOne));
 
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
@@ -754,7 +755,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			)
 				.to
-				.changeTokenBalance(wantToken2, vzgo, -1 * testVars.AMOUNT);
+				.changeTokenBalance(wantToken2, vzgo, BigNumber.from(testVars.AMOUNT).mul(constants.NegativeOne));
 
 			await advanceBlockTo((await getBlockNumber()) + 150);
 
@@ -910,7 +911,7 @@ describe("GymVaultsBank contract: ", function () {
 				})
 			)
 				.to
-				.changeTokenBalance(wantToken2, vzgo, -1 * 25000);
+				.changeTokenBalance(wantToken2, vzgo, BigNumber.from(25000).mul(constants.NegativeOne));
 
 			const vzgoShares = (await gymVaultsBank.userInfo(1, vzgo.address)).shares;
 

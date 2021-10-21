@@ -7,6 +7,8 @@ const {
 	network,
 	ethers: {
 		getContract,
+		constants,
+		BigNumber,
 		getNamedSigners,
 		utils: { parseEther }
 	},
@@ -46,7 +48,11 @@ describe("GymMLM contract: ", function () {
 		routerMock = await getContract("RouterMock", caller);
 
 		await gymToken.connect(holder).delegate(buyBack.address);
-		await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
+
+		await run("gymVaultsBank:setTreasuryAddress", {
+			treasuryAddress: `${deployer.address}`,
+			caller: "deployer"
+		});
 
 		for (const signer in accounts) {
 			if (signer === "deployer") {
@@ -253,7 +259,7 @@ describe("GymMLM contract: ", function () {
 				})).tx
 			)
 				.to
-				.changeTokenBalance(wantToken, grno, depositAmount * -1);
+				.changeTokenBalance(wantToken, grno, BigNumber.from(depositAmount).mul(constants.NegativeOne));
 		});
 
 	});
@@ -371,7 +377,7 @@ describe("GymMLM contract: ", function () {
 				})).tx
 			)
 				.to
-				.changeEtherBalance(grno, depositAmount * -1);
+				.changeEtherBalance(grno, BigNumber.from(depositAmount).mul(constants.NegativeOne));
 		});
 	});
 });
