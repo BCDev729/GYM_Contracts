@@ -897,7 +897,7 @@ describe("GymVaultsBank contract: ", function () {
 			const poolAllocPoint1 = (await gymVaultsBank.poolInfo(1)).allocPoint;
 			const totalAllocPoint = await gymVaultsBank.totalAllocPoint();
 
-			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, (25000).toString());
+			await wantToken2.connect(vzgo).approve(gymVaultsBank.address, (testVars.TX_AMOUNT).toString());
 
 			const _referrerId = await relationship.addressToId(deployer.address);
 
@@ -905,13 +905,13 @@ describe("GymVaultsBank contract: ", function () {
 			await expect(() =>
 				run("gymVaultsBank:deposit", {
 					pid: "1",
-					wantAmt: `${25000}`,
+					wantAmt: `${testVars.TX_AMOUNT}`,
 					referrerId: _referrerId.toString(),
 					caller: "vzgo"
 				})
 			)
 				.to
-				.changeTokenBalance(wantToken2, vzgo, BigNumber.from(25000).mul(constants.NegativeOne));
+				.changeTokenBalance(wantToken2, vzgo, BigNumber.from(testVars.TX_AMOUNT).mul(constants.NegativeOne));
 
 			const vzgoShares = (await gymVaultsBank.userInfo(1, vzgo.address)).shares;
 
@@ -938,7 +938,7 @@ describe("GymVaultsBank contract: ", function () {
 
 			expect((await wantToken2.balanceOf(vzgo.address))).to.equal(
 				vzgoWant2Balance -
-				(25000 *
+				(testVars.TX_AMOUNT *
 					(variables.GymVaultsBank_BUY_AND_BURN + variables.GymVaultsBank_RELATIONSHIP_REWARD)) /
 				100 -
 				vzgoShares / 10
