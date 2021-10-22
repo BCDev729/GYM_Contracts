@@ -35,7 +35,11 @@ describe("BuyBack contract: ", function () {
 
 		await gymToken.connect(holder).delegate(buyBack.address);
 
-		await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
+		await run("gymVaultsBank:setTreasuryAddress", {
+			treasuryAddress: deployer.address,
+			caller: "deployer"
+		});
+
 
 		await wantToken.connect(deployer).transfer(routerMock.address, transferAmount);
 		await wantToken.connect(deployer).transfer(holder.address, transferAmount);

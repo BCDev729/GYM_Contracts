@@ -91,13 +91,7 @@ describe("GymVaultsStrategyAlpacaBUSD contract: ", function () {
 			});
 
 		lpGymBnb = await factory.getPair(gymToken.address, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
-		// await run("gymVaultsBank:add", {
-		// 	want: busd.address,
-		// 	allocPoint: "30",
-		// 	withUpdate: "false",
-		// 	strategy: strategyAlpaca.address,
-		// 	caller: "deployer"
-		// });
+
 		await run("gymVaultsBank:add", {
 			want: busd.address,
 			allocPoint: "30",

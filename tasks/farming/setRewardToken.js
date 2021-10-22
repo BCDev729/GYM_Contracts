@@ -2,7 +2,7 @@ module.exports = async function ({ token, caller }, { ethers: { getNamedSigners,
 	const signers = await getNamedSigners();
 	const farming = await getContract("GymFarming", signers[caller]);
 
-	const tx = await farming.setRewardToken(token.address);
+	const tx = await farming.setRewardToken(token);
 
 	const rewardToken = await farming.rewardToken();
 
