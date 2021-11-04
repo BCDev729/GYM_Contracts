@@ -12,7 +12,9 @@ const {
 	},
 	run
 } = require("hardhat");
-const { advanceBlock, advanceBlockTo } = require("../../utils/utilities/time");
+const {
+	time: { advanceBlock, advanceBlockTo }
+} = require("@openzeppelin/test-helpers");
 const variables = require("../../utils/constants/solpp")("hardhat");
 const data = require("../../utils/constants/data/hardhat/GymFarming.json");
 
@@ -496,7 +498,9 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Should update RewardPoolInfo", async function () {
-			await gymFarming.setRewardToken(tokenA.address);
+			await run("farming:setRewardToken", {
+				token: tokenA.address
+			});
 
 			expect(await gymFarming.rewardToken()).to.equal(tokenA.address);
 			expect(await gymFarming.rewardTokenToWBNB(0)).to.equal(tokenA.address);
@@ -516,11 +520,19 @@ describe("GymFarming contract: ", function () {
 				pid: "0",
 				amount: `${amount}`
 			});
-			await gymFarming.setRewardToken(tokenA.address);
+			await run("farming:setRewardToken", {
+				token: tokenA.address
+			});
 
-			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(2));
+			const block = (await gymFarming.poolInfo(0)).lastRewardBlock.add(2).toString();
 
-			const pending = await gymFarming.pendingReward(0, caller.address);
+			await advanceBlockTo(parseInt(block));
+
+			const pending = await run("farming:pendingReward", {
+				pid: "0",
+				user: "caller",
+				caller: "deployer"
+			});
 			const rewardPerBlock = await gymFarming.rewardPerBlock();
 
 			await expect(() =>
@@ -676,11 +688,24 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Emit event Deposit", async function () {
-			const pid = await gymFarming.poolLength();
-			await gymFarming.add(poolAllocPoint2, testLp.address, true);
+			const pid = await run("farming:poolLength", {
+				caller: "deployer"
+			});
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
-			expect(await gymFarming.connect(caller).deposit(pid, amount))
+			expect(
+				(
+					await run("farming:deposit", {
+						pid: `${pid}`,
+						amount: `${amount}`
+					})
+				).tx
+			)
 				.to.emit(gymFarming, "Deposit")
 				.withArgs(caller.address, pid, amount);
 		});
@@ -791,26 +816,66 @@ describe("GymFarming contract: ", function () {
 		});
 
 		it("Emit event Withdraw", async function () {
-			const pid = await gymFarming.poolLength();
-			await gymFarming.add(poolAllocPoint2, testLp.address, true);
+			const pid = await run("farming:poolLength", {
+				caller: "deployer"
+			});
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
-			await gymFarming.connect(caller).deposit(pid, amount);
+			await run("farming:deposit", {
+				pid: `${pid}`,
+				amount: `${amount}`
+			});
+
 			await advanceBlock();
-			expect(await gymFarming.connect(caller).withdraw(pid, amount))
+			expect(
+				(
+					await run("farming:withdraw", {
+						pid: `${pid}`,
+						amount: `${amount}`
+					})
+				).tx
+			)
 				.to.emit(gymFarming, "Withdraw")
 				.withArgs(caller.address, pid, amount);
 		});
 
 		it("Emit event Harvest", async function () {
-			const pid = await gymFarming.poolLength();
-			await gymFarming.add(poolAllocPoint2, testLp.address, true);
+			const pid = await run("farming:poolLength", {
+				caller: "deployer"
+			});
+
+			await run("farming:add", {
+				allocPoint: `${poolAllocPoint2}`,
+				lpToken: testLp.address,
+				withUpdate: "true"
+			});
+	
 
 			await testLp.connect(caller).approve(gymFarming.address, amount);
-			await gymFarming.connect(caller).deposit(pid, amount);
+			await run("farming:deposit", {
+				pid: `${pid}`,
+				amount: `${amount}`
+			});
+
 			await advanceBlock();
-			const pending = await gymFarming.connect(caller).pendingReward(pid, caller.address);
-			expect(await gymFarming.connect(caller).withdraw(pid, amount))
+			const pending = await run("farming:pendingReward", {
+				pid: `${pid}`,
+				user: "caller"
+			});
+
+			expect(
+				(
+					await run("farming:withdraw", {
+						pid: `${pid}`,
+						amount: `${amount}`
+					})
+				).tx
+			)
 				.to.emit(gymFarming, "Harvest")
 				.withArgs(caller.address, pid, pending);
 		});
@@ -860,7 +925,8 @@ describe("GymFarming contract: ", function () {
 			});
 
 			expect((await gymFarming.poolInfo(0)).lastRewardBlock).to.equal(startBlock);
-			await advanceBlockTo((await gymFarming.poolInfo(0)).lastRewardBlock.add(10));
+			const block = (await gymFarming.poolInfo(0)).lastRewardBlock.add(10).toString();
+			await advanceBlockTo(parseInt(block));
 			await run("farming:harvestAll", {
 				caller: "vzgo"
 			});
@@ -871,12 +937,26 @@ describe("GymFarming contract: ", function () {
 
 		it("Emit Harvest event", async function () {
 			await testLp.connect(vzgo).approve(gymFarming.address, amount);
+			await run("farming:deposit", {
+				pid: "0",
+				amount: `${amount}`,
+				caller: "vzgo"
+			});
 
-			await gymFarming.connect(vzgo).deposit(0, amount);
+			const pending = await run("farming:pendingReward", {
+				pid: "0",
+				user: "vzgo",
+				caller: "deployer"
+			});
 
-			const pending = await gymFarming.pendingReward(0, vzgo.address);
-
-			expect(await gymFarming.connect(vzgo).harvest(0))
+			expect(
+				(
+					await run("farming:harvest", {
+						pid: "0",
+						caller: "vzgo"
+					})
+				).tx
+			)
 				.to.emit(gymFarming, "Harvest")
 				.withArgs(vzgo.address, 0, pending);
 		});

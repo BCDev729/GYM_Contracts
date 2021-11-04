@@ -1,6 +1,6 @@
 module.exports = async function ({ holder }, { deployments: { deterministic }, ethers: { getNamedSigners } }) {
 	const { deployer } = await getNamedSigners();
-	
+
 	const deterministicDeploy = await deterministic("GymToken", {
 		from: deployer.address,
 		contract: "GymToken",
@@ -12,3 +12,4 @@ module.exports = async function ({ holder }, { deployments: { deterministic }, e
 	await deterministicDeploy.deploy();
 	return deterministicDeploy;
 };
+

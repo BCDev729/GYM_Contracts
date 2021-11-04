@@ -11,7 +11,7 @@ module.exports = async function ({
 	}
 }) {
 	const chainId = await getChainId();
-	if (chainId === "31337" && !forking.enabled) {
+	if (chainId === "31337") {
 		await run("deploy:tokensMock", {
 			contractName: "WantToken1",
 			symbol: "WT1",

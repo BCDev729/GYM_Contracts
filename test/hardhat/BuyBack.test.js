@@ -23,7 +23,10 @@ describe("BuyBack contract: ", function () {
 		gymVaultsBank = await getContract("GymVaultsBank", caller);
 		buyBack = await getContract("BuyBack", caller);
 		relationship = await getContract("GymMLM", caller);
-		await relationship.connect(deployer).setBankAddress(gymVaultsBank.address);
+		await run("gymMLM:setBankAddress", {
+			bankAddress: gymVaultsBank.address,
+			caller: "deployer"
+		});
 
 		wantToken = await getContract("WantToken1", caller);
 		wBNBMock = await getContract("WBNBMock", caller);
@@ -33,7 +36,11 @@ describe("BuyBack contract: ", function () {
 
 		await gymToken.connect(holder).delegate(buyBack.address);
 
-		await gymVaultsBank.connect(deployer).setTreasuryAddress(deployer.address);
+		await run("gymVaultsBank:setTreasuryAddress", {
+			treasuryAddress: deployer.address,
+			caller: "deployer"
+		});
+
 
 		await wantToken.connect(deployer).transfer(routerMock.address, transferAmount);
 		await wantToken.connect(deployer).transfer(holder.address, transferAmount);

@@ -10,7 +10,7 @@ module.exports = async function ({
 }) {
 	const chainId = await getChainId();
 
-	if (chainId === "31337" && !forking.enabled) {
+	if (chainId === "31337") {
 		const WBNB = await getContract("WBNBMock");
 		const wantToken1 = await getContract("WantToken1");
 		const wantToken2 = await getContract("WantToken2");
