@@ -128,7 +128,7 @@ contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
         address _wantAddress,
         address _earnedAddress,
         address _uniRouterAddress // address[] memory _token0Info, // address[] memory _token1Info
-    ) {
+    ){
         operator = msg.sender;
         strategist = msg.sender;
         // to call earn if public not allowed
@@ -262,7 +262,6 @@ contract GymVaultsStrategyAlpaca is Ownable, ReentrancyGuard, Pausable {
         if (wantLockedTotal > 0) {
             sharesAdded = (_wantAmt * sharesTotal * entranceFeeFactor) / wantLockedTotal / entranceFeeFactorMax;
         }
-
         sharesTotal = sharesTotal + sharesAdded;
 
         if (isAutoComp) {

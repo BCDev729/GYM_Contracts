@@ -1,14 +1,15 @@
 const { expect } = require("chai");
 const {
 	deployments: { fixture },
+	network,
 	ethers: { getContract, getNamedSigners },
-	run
+	run,
 } = require("hardhat");
 const variables = require("../../utils/constants/solpp")("hardhat");
 
 describe("BuyBack contract: ", function () {
 	let accounts, deployer, caller, holder;
-	let gymToken, gymVaultsBank, buyBack, relationship, wantToken, wBNBMock, strategy, strategyAlpaca, routerMock;
+	let gymToken, snapshotStart, gymVaultsBank, buyBack, relationship, wantToken, wBNBMock, strategy, strategyAlpaca, routerMock;
 
 	const transactionAmount = 500;
 	const transferAmount = 5000;
@@ -60,6 +61,41 @@ describe("BuyBack contract: ", function () {
 			withUpdate: "true",
 			strategy: strategy.address,
 			caller: "deployer"
+		});
+	});
+
+	describe("Transfer: ", function () {
+		before("Before: ", async function () {
+			snapshotStart = await network.provider.request({
+				method: "evm_snapshot",
+				params: []
+			});
+		});
+
+		after("After tests: ", async function () {
+			await network.provider.request({
+				method: "evm_revert",
+				params: [snapshotStart]
+			});
+		});
+
+		it("Should transfer wantToken and gymToken", async function () {
+			await gymToken.connect(holder).delegate(buyBack.address);
+
+
+			await expect(() => wantToken.connect(deployer).transfer(routerMock.address, transferAmount))
+				.to.changeTokenBalance(wantToken, routerMock, transferAmount);
+
+			await expect(() => wantToken.connect(deployer).transfer(holder.address, transferAmount))
+				.to.changeTokenBalance(wantToken, holder, transferAmount);
+
+
+
+			await expect(() => gymToken.connect(holder).transfer(gymVaultsBank.address, 10000))
+				.to.changeTokenBalance(gymToken, gymVaultsBank, 10000);
+
+			await expect(() => gymToken.connect(holder).transfer(routerMock.address, 10000))
+				.to.changeTokenBalance(gymToken, routerMock, 10000);
 		});
 	});
 

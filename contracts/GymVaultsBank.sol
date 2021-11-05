@@ -208,15 +208,12 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
         uint256 _accRewardPerShare = pool.accRewardPerShare;
-
         uint256 sharesTotal = IStrategy(pool.strategy).sharesTotal();
-
         if (block.number > pool.lastRewardBlock && sharesTotal != 0) {
             uint256 _multiplier = block.number - pool.lastRewardBlock;
             uint256 _reward = (_multiplier * rewardPoolInfo.rewardPerBlock * pool.allocPoint) / totalAllocPoint;
             _accRewardPerShare = _accRewardPerShare + ((_reward * 1e18) / sharesTotal);
         }
-
         return (user.shares * _accRewardPerShare) / 1e18 - user.rewardDebt;
     }
 
@@ -297,7 +294,6 @@ contract GymVaultsBank is ReentrancyGuard, Ownable {
                 _deadline
             );
         }
-
         user.rewardDebt = (user.shares * (pool.accRewardPerShare)) / (1e18);
     }
 
